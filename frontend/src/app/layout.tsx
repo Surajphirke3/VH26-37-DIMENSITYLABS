@@ -6,8 +6,11 @@ import { SessionProvider } from "@/lib/auth-context";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "MechMind — Machine Troubleshooting",
-  description: "RAG-powered machine troubleshooting system for factory floors",
+  title: "MEND - X — From Failure to Function | Industrial Diagnostics",
+  description: "MEND - X — Intelligent Machine Troubleshooting & Industrial RAG for Factory Floor Diagnostics",
+  icons: {
+    icon: "/logo-solid.png",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

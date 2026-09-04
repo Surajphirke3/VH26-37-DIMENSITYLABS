@@ -69,7 +69,8 @@ export default function AdminPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <h1 className="text-lg font-bold text-slate-800">Admin Panel</h1>
+          <img src="/logo.png" alt="MEND - X" className="w-7 h-7 rounded-md object-contain" />
+          <h1 className="text-lg font-bold text-slate-800">MEND - X Admin Panel</h1>
         </div>
         <button onClick={() => router.push("/admin/manuals/upload")}
           className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors">

@@ -8,7 +8,7 @@ _BASE_URL = "https://openrouter.ai/api/v1"
 
 
 class OpenRouterLLM(LLMProvider):
-    def __init__(self, api_key: str, model: str, site_url: str = "", site_name: str = "MechMind") -> None:
+    def __init__(self, api_key: str, model: str, site_url: str = "", site_name: str = "MEND - X") -> None:
         self._api_key = api_key
         self._model = model
         self._headers = {

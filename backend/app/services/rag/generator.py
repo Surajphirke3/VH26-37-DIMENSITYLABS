@@ -7,7 +7,7 @@ from app.services.ai.factory import get_llm_provider
 
 logger = get_logger("rag.generator")
 
-_SYSTEM_PROMPT = """You are an expert industrial maintenance assistant for MechMind.
+_SYSTEM_PROMPT = """You are an expert industrial maintenance assistant for MEND - X (From Failure to Function).
 
 HARD RULES:
 1. Only answer from the provided context. Never invent procedures, specifications, or error meanings.

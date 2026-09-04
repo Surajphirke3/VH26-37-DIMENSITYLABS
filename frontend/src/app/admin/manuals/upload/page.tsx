@@ -121,7 +121,8 @@ export default function UploadManualPage() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
-        <h1 className="text-lg font-bold text-slate-800">Upload Manual</h1>
+        <img src="/logo.png" alt="MEND - X" className="w-7 h-7 rounded-md object-contain" />
+        <h1 className="text-lg font-bold text-slate-800">MEND - X — Upload Manual</h1>
       </header>
 
       <div className="max-w-xl mx-auto px-6 py-8">
