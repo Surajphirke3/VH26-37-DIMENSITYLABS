@@ -15,7 +15,7 @@ class GroqLLM(LLMProvider):
             model=self._model,
             messages=[{"role": "user", "content": prompt}],
             temperature=0.1,
-            max_tokens=2048,
+            max_tokens=800,
         )
         return resp.choices[0].message.content or ""
 
@@ -24,7 +24,7 @@ class GroqLLM(LLMProvider):
             model=self._model,
             messages=[{"role": "user", "content": prompt}],
             temperature=0.1,
-            max_tokens=2048,
+            max_tokens=800,
             response_format={"type": "json_object"},
         )
         return resp.choices[0].message.content or ""

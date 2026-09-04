@@ -35,7 +35,7 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title="MEND - X",
         description="From Failure to Function — Industrial RAG & Intelligent Machine Troubleshooting System",
-        version="1.0.1",
+        version="1.1.0",
         docs_url="/api/docs",
         redoc_url="/api/redoc",
         openapi_url="/api/openapi.json",
