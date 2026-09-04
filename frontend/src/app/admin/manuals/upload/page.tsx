@@ -4,8 +4,11 @@ import { useState, useEffect, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { getMachines, uploadManual, getManualStatus } from "@/lib/api";
-import type { Machine, Manual } from "@/lib/types";
+import type { Machine } from "@/lib/types";
 import Spinner from "@/components/ui/Spinner";
+
+interface UploadResult { manual_id: string; ingestion_job_id: string; status: string; }
+type PollStatus = "pending" | "processing" | "completed" | "failed";
 
 const MANUAL_TYPES = ["operation", "maintenance", "troubleshooting", "installation", "parts"];
 
@@ -20,8 +23,8 @@ export default function UploadManualPage() {
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
-  const [queued, setQueued] = useState<Manual | null>(null);
-  const [pollStatus, setPollStatus] = useState<Manual["processing_status"] | null>(null);
+  const [queued, setQueued] = useState<(UploadResult & { title: string; filename: string }) | null>(null);
+  const [pollStatus, setPollStatus] = useState<PollStatus | null>(null);
 
   useEffect(() => {
     if (!isLoading && (!user || user.role !== "admin")) router.replace("/dashboard");
@@ -33,11 +36,11 @@ export default function UploadManualPage() {
 
   // Poll status after queuing
   useEffect(() => {
-    if (!queued || queued.processing_status === "completed" || queued.processing_status === "failed") return;
+    if (!queued || pollStatus === "completed" || pollStatus === "failed") return;
     const timer = setInterval(async () => {
       try {
-        const updated = await getManualStatus(queued.id);
-        setPollStatus(updated.processing_status);
+        const updated = await getManualStatus(queued.manual_id);
+        setPollStatus(updated.processing_status as PollStatus);
         if (updated.processing_status === "completed" || updated.processing_status === "failed") {
           clearInterval(timer);
         }
@@ -61,8 +64,8 @@ export default function UploadManualPage() {
       fd.append("manual_type", manualType);
       if (version) fd.append("version", version);
       const result = await uploadManual(fd);
-      setQueued(result);
-      setPollStatus(result.processing_status);
+      setQueued({ ...result, title, filename: file.name });
+      setPollStatus("pending");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Upload failed.");
     } finally {
@@ -94,7 +97,7 @@ export default function UploadManualPage() {
                 : <Spinner size="md" />}
               <div>
                 <p className="font-semibold text-slate-800">{queued.title}</p>
-                <p className="text-sm text-slate-500">{queued.original_filename}</p>
+                <p className="text-sm text-slate-500">{queued.filename}</p>
               </div>
             </div>
             <div className={`px-4 py-2 rounded-lg text-sm font-medium

@@ -1,12 +1,9 @@
 from __future__ import annotations
 
-import asyncio
 import json
 
-import google.generativeai as genai
-
-from app.core.config import settings
 from app.core.logging import get_logger
+from app.services.ai.factory import get_llm_provider
 
 logger = get_logger("rag.generator")
 
@@ -76,8 +73,7 @@ def _strip_markdown_fences(text: str) -> str:
 
 class LLMGenerator:
     def __init__(self) -> None:
-        genai.configure(api_key=settings.GEMINI_API_KEY)
-        self.model = genai.GenerativeModel(settings.GEMINI_GENERATION_MODEL)
+        self._provider = get_llm_provider()
 
     async def generate(
         self,
@@ -87,14 +83,11 @@ class LLMGenerator:
         conversation_history: list,
     ) -> dict:
         prompt = _build_prompt(query, chunks, machine_name, conversation_history)
-        loop = asyncio.get_event_loop()
 
         for attempt in range(2):
             try:
-                response = await loop.run_in_executor(
-                    None, lambda: self.model.generate_content(prompt)
-                )
-                return json.loads(_strip_markdown_fences(response.text))
+                raw = await self._provider.generate_json(prompt)
+                return json.loads(_strip_markdown_fences(raw))
             except json.JSONDecodeError as exc:
                 logger.warning("generator.json_parse_failed", attempt=attempt, error=str(exc))
                 if attempt == 1:

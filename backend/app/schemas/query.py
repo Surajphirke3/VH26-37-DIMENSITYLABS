@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field
 class QueryRequest(BaseModel):
     query: str = Field(min_length=1, max_length=2000)
     machine_id: Optional[uuid.UUID] = None
-    machine_name: Optional[str] = None
+    machine_name: Optional[str] = Field(default=None, max_length=255)
 
 
 class CorrectionStep(BaseModel):

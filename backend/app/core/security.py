@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+import hashlib
+import hmac
+import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
-import hashlib
-import hmac
 from fastapi import HTTPException, status
 from jose import ExpiredSignatureError, JWTError, jwt
 
@@ -43,6 +44,7 @@ def create_access_token(
         "exp": expire,
         "iat": _utc_now(),
         "type": "access",
+        "jti": str(uuid.uuid4()),
     }
     return jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
 
@@ -79,3 +81,24 @@ def decode_token(token: str) -> dict[str, Any]:
         )
     except JWTError:
         raise credentials_exception
+
+
+async def blacklist_token(jti: str, ttl_seconds: int) -> None:
+    """Store jti in Redis blacklist with expiry."""
+    import redis.asyncio as aioredis
+    client = aioredis.from_url(settings.REDIS_URL)
+    try:
+        await client.setex(f"blacklist:{jti}", ttl_seconds, "1")
+    finally:
+        await client.aclose()
+
+
+async def is_token_blacklisted(jti: str) -> bool:
+    """Return True if jti is in the Redis blacklist."""
+    import redis.asyncio as aioredis
+    client = aioredis.from_url(settings.REDIS_URL)
+    try:
+        result = await client.exists(f"blacklist:{jti}")
+        return bool(result)
+    finally:
+        await client.aclose()

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import uuid
 
 from fastapi import Depends, HTTPException, status
@@ -7,9 +8,11 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.security import decode_token
+from app.core.security import decode_token, is_token_blacklisted
 from app.db.session import get_db
 from app.models.user import User, UserRole
+
+_log = logging.getLogger(__name__)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
@@ -19,6 +22,20 @@ async def get_current_user(
     db: AsyncSession = Depends(get_db),
 ) -> User:
     payload = decode_token(token)
+
+    jti = payload.get("jti")
+    if jti:
+        try:
+            if await is_token_blacklisted(jti):
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Token has been revoked",
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
+        except HTTPException:
+            raise
+        except Exception:
+            _log.warning("Redis unavailable for blacklist check, continuing without it")
 
     token_type = payload.get("type")
     if token_type != "access":

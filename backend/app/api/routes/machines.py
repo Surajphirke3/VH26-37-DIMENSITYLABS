@@ -72,3 +72,19 @@ async def get_machine(
         "description": machine.description,
         "is_active": machine.is_active,
     }}
+
+
+@router.delete("/machines/{machine_id}", response_model=dict)
+async def deactivate_machine(
+    machine_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_manager_or_admin),
+):
+    """Soft-delete a machine by marking it inactive."""
+    result = await db.execute(select(Machine).where(Machine.id == machine_id))
+    machine = result.scalar_one_or_none()
+    if not machine:
+        raise HTTPException(404, "Machine not found")
+    machine.is_active = False
+    await db.commit()
+    return {"success": True, "data": {"id": str(machine_id), "is_active": False}}

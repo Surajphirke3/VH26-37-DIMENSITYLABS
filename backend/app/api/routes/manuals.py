@@ -6,7 +6,7 @@ import os
 from uuid import UUID, uuid4
 
 import aiofiles
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -26,6 +26,7 @@ _PDF_MAGIC = b"%PDF"
 
 @router.post("/manuals/upload", response_model=dict)
 async def upload_manual(
+    request: Request,
     file: UploadFile = File(...),
     machine_id: UUID = Form(...),
     title: str = Form(...),
@@ -35,11 +36,14 @@ async def upload_manual(
     current_user: User = Depends(require_manager_or_admin),
 ):
     """Upload a PDF manual, persist metadata, and kick off async ingestion."""
+    max_bytes = settings.MAX_UPLOAD_SIZE_MB * 1024 * 1024
+    cl_header = request.headers.get("content-length")
+    if cl_header and int(cl_header) > max_bytes:
+        raise HTTPException(status_code=413, detail=f"File exceeds {settings.MAX_UPLOAD_SIZE_MB} MB limit")
     if not file.filename.lower().endswith(".pdf"):
         raise HTTPException(400, "Only PDF files are accepted")
 
     content = await file.read()
-    max_bytes = settings.MAX_UPLOAD_SIZE_MB * 1024 * 1024
     if len(content) > max_bytes:
         raise HTTPException(400, f"File exceeds {settings.MAX_UPLOAD_SIZE_MB} MB limit")
     if not content.startswith(_PDF_MAGIC):

@@ -6,14 +6,16 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_current_user, require_admin
+from app.api.deps import get_current_user, oauth2_scheme, require_admin
 from app.core.security import (
+    blacklist_token,
     create_access_token,
     create_refresh_token,
     decode_token,
     hash_password,
     verify_password,
 )
+from app.core.config import settings
 from app.db.session import get_db
 from app.models.user import User
 from app.schemas.auth import (
@@ -63,8 +65,15 @@ async def refresh_token(body: RefreshRequest, db: AsyncSession = Depends(get_db)
 
 
 @router.post("/logout")
-async def logout() -> dict:
-    # TODO: implement Redis-backed token blacklist
+async def logout(
+    current_user: User = Depends(get_current_user),
+    token: str = Depends(oauth2_scheme),
+) -> dict:
+    payload = decode_token(token)
+    jti = payload.get("jti")
+    if jti:
+        ttl = settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
+        await blacklist_token(jti, ttl)
     return {"message": "logged out"}
 
 

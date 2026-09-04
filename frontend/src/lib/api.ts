@@ -1,8 +1,8 @@
 import type { Machine, Manual, TroubleshootingResponse, User } from "@/lib/types";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
-export async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
+async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
 
   const headers: Record<string, string> = {
@@ -33,7 +33,10 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}): Prom
     throw new Error(message);
   }
 
-  return res.json() as Promise<T>;
+  const json = await res.json();
+  // All backend endpoints return {success, data: T} — unwrap here
+  if (json && typeof json === "object" && "data" in json) return json.data as T;
+  return json as T;
 }
 
 export async function login(email: string, password: string): Promise<void> {
@@ -59,19 +62,37 @@ export function logout(): void {
 
 export const getMe = (): Promise<User> => apiFetch<User>("/api/v1/auth/me");
 
-export const getMachines = (): Promise<Machine[]> => apiFetch<Machine[]>("/api/v1/machines");
+// backend: {success, data: {items: Machine[]}}
+export const getMachines = (): Promise<Machine[]> =>
+  apiFetch<{ items: Machine[] }>("/api/v1/machines").then((d) => d.items);
 
-export const uploadManual = (formData: FormData): Promise<Manual> =>
-  apiFetch<Manual>("/api/v1/manuals/upload", { method: "POST", body: formData });
+export const createMachine = (body: {
+  name: string;
+  model?: string;
+  manufacturer?: string;
+  category?: string;
+  description?: string;
+}): Promise<{ id: string; name: string }> =>
+  apiFetch("/api/v1/machines", { method: "POST", body: JSON.stringify(body) });
 
+export const deactivateMachine = (machineId: string): Promise<void> =>
+  apiFetch(`/api/v1/machines/${machineId}`, { method: "DELETE" });
+
+// backend: {success, data: {manual_id, ingestion_job_id, status}}
+export const uploadManual = (formData: FormData): Promise<{ manual_id: string; ingestion_job_id: string; status: string }> =>
+  apiFetch("/api/v1/manuals/upload", { method: "POST", body: formData });
+
+// backend: {success, data: {items: Manual[]}}
 export const getManuals = (machineId?: string): Promise<Manual[]> => {
   const qs = machineId ? `?machine_id=${machineId}` : "";
-  return apiFetch<Manual[]>(`/api/v1/manuals${qs}`);
+  return apiFetch<{ items: Manual[] }>(`/api/v1/manuals${qs}`).then((d) => d.items);
 };
 
-export const getManualStatus = (manualId: string): Promise<Manual> =>
-  apiFetch<Manual>(`/api/v1/manuals/${manualId}/status`);
+// backend: {success, data: {manual_id, processing_status, progress_pct, ...}}
+export const getManualStatus = (manualId: string): Promise<{ processing_status: Manual["processing_status"]; progress_pct?: number }> =>
+  apiFetch(`/api/v1/manuals/${manualId}/status`);
 
+// backend: {success, data: TroubleshootingResponse}
 export const singleQuery = (
   query: string,
   machineId?: string,
@@ -82,9 +103,11 @@ export const singleQuery = (
     body: JSON.stringify({ query, machine_id: machineId, machine_name: machineName }),
   });
 
-export const createConversation = (): Promise<{ id: string }> =>
-  apiFetch<{ id: string }>("/api/v1/conversations", { method: "POST", body: JSON.stringify({}) });
+// backend: {success, data: {conversation_id, session_id}}
+export const createConversation = (): Promise<{ conversation_id: string; session_id: string }> =>
+  apiFetch("/api/v1/conversations", { method: "POST", body: JSON.stringify({}) });
 
+// backend: {success, data: TroubleshootingResponse + conversation_id + message_id}
 export const sendMessage = (
   conversationId: string,
   query: string,
@@ -95,6 +118,7 @@ export const sendMessage = (
     body: JSON.stringify({ query, machine_id: machineId }),
   });
 
+// backend: {success, data: {message, machine_id}} — returns no answer, caller ignores body
 export const disambiguate = (
   conversationId: string,
   machineId: string
@@ -103,3 +127,20 @@ export const disambiguate = (
     method: "POST",
     body: JSON.stringify({ machine_id: machineId }),
   });
+
+// backend: {success, data: {conversation_id, machine_id, title, messages: [...]}}
+export const getConversationMessages = (conversationId: string): Promise<{
+  conversation_id: string;
+  machine_id: string | null;
+  title: string | null;
+  messages: Array<{
+    id: string;
+    role: "user" | "assistant";
+    content: string;
+    answer_type: string | null;
+    confidence_level: string | null;
+    evidence_score: number | null;
+    total_latency_ms: number | null;
+    created_at: string;
+  }>;
+}> => apiFetch(`/api/v1/conversations/${conversationId}/messages`);

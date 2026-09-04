@@ -50,6 +50,9 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
+    from app.core.middleware import ObservabilityMiddleware
+    app.add_middleware(ObservabilityMiddleware)
+
     @app.exception_handler(Exception)
     async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
         logger.error("Unhandled exception", path=str(request.url), error=str(exc), exc_info=True)
@@ -78,12 +81,14 @@ def _register_routers(app: FastAPI) -> None:
     from app.api.routes.machines import router as machines_router
     from app.api.routes.manuals import router as manuals_router
     from app.api.routes.query import router as query_router
+    from app.api.routes.conversation import router as conversation_router
 
     app.include_router(health_router, prefix="/api/v1")
     app.include_router(auth_router, prefix="/api/v1")
     app.include_router(machines_router, prefix="/api/v1")
     app.include_router(manuals_router, prefix="/api/v1")
     app.include_router(query_router, prefix="/api/v1")
+    app.include_router(conversation_router, prefix="/api/v1")
 
 
 app = create_app()

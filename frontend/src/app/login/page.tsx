@@ -88,6 +88,13 @@ export default function LoginPage() {
           </form>
         </div>
 
+        {process.env.NODE_ENV !== "production" && (
+          <div className="mt-4 px-4 py-3 rounded-lg bg-slate-100 border border-slate-200 text-center">
+            <p className="text-xs font-medium text-slate-500 mb-1">Demo credentials</p>
+            <p className="text-xs text-slate-400 font-mono">admin@mechmind.io / Admin123!</p>
+          </div>
+        )}
+
         <p className="text-center text-xs text-slate-400 mt-6">
           MechMind v0.1 · Factory Floor Troubleshooting
         </p>

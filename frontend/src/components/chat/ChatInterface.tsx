@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import type { Message, Machine, TroubleshootingResponse } from "@/lib/types";
+import type { Message, TroubleshootingResponse } from "@/lib/types";
 import { sendMessage, disambiguate } from "@/lib/api";
 import MessageInput from "@/components/chat/MessageInput";
 import StructuredAnswer from "@/components/chat/StructuredAnswer";
@@ -13,6 +13,7 @@ interface ChatInterfaceProps {
   conversationId: string | null;
   machineId: string | null;
   onMachineSelect?: (machineId: string) => void;
+  onFirstMessage?: (query: string) => void;
 }
 
 function renderAssistantContent(
@@ -36,20 +37,22 @@ function renderAssistantContent(
   return <StructuredAnswer response={response} onSuggestionClick={onSuggestion} />;
 }
 
-export default function ChatInterface({ conversationId, machineId, onMachineSelect }: ChatInterfaceProps) {
+export default function ChatInterface({ conversationId, machineId, onMachineSelect, onFirstMessage }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [pendingInput, setPendingInput] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  // Clear messages when conversation changes
+  useEffect(() => {
+    setMessages([]);
+  }, [conversationId]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
 
-  const addUserMessage = (content: string): string => {
-    const id = crypto.randomUUID();
-    setMessages((prev) => [...prev, { id, role: "user", content, timestamp: new Date().toISOString() }]);
-    return id;
+  const addUserMessage = (content: string) => {
+    setMessages((prev) => [...prev, { id: crypto.randomUUID(), role: "user", content, timestamp: new Date().toISOString() }]);
   };
 
   const addAssistantMessage = (response: TroubleshootingResponse) => {
@@ -62,6 +65,7 @@ export default function ChatInterface({ conversationId, machineId, onMachineSele
   const handleSend = async (query: string) => {
     if (!conversationId) return;
     addUserMessage(query);
+    if (messages.length === 0) onFirstMessage?.(query);
     setIsLoading(true);
     try {
       const res = await sendMessage(conversationId, query, machineId ?? undefined);
@@ -95,11 +99,6 @@ export default function ChatInterface({ conversationId, machineId, onMachineSele
     }
   };
 
-  const handleSuggestion = (s: string) => {
-    setPendingInput(s);
-    handleSend(s);
-  };
-
   if (!conversationId) {
     return (
       <div className="flex-1 flex items-center justify-center text-slate-400 text-sm">
@@ -126,7 +125,7 @@ export default function ChatInterface({ conversationId, machineId, onMachineSele
             ) : (
               <div className="max-w-[90%] w-full bg-white rounded-2xl rounded-tl-sm border border-slate-200 px-4 py-3 shadow-sm">
                 {msg.response
-                  ? renderAssistantContent(msg.response, handleDisambiguate, handleSuggestion)
+                  ? renderAssistantContent(msg.response, handleDisambiguate, (s) => handleSend(s))
                   : <p className="text-sm text-slate-700">{msg.content}</p>}
               </div>
             )}

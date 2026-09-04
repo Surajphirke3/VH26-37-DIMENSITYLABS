@@ -24,10 +24,28 @@ class Settings(BaseSettings):
     # Redis
     REDIS_URL: str = "redis://localhost:6379/0"
 
+    # AI Provider selection
+    LLM_PROVIDER: str = "groq"           # groq | gemini | openrouter | ollama
+    EMBEDDING_PROVIDER: str = "gemini"   # gemini | groq | openrouter | ollama | local
+
     # Gemini
     GEMINI_API_KEY: str = "placeholder"
     GEMINI_EMBEDDING_MODEL: str = "text-embedding-004"
     GEMINI_GENERATION_MODEL: str = "gemini-1.5-flash"
+
+    # Groq
+    GROQ_API_KEY: str = "placeholder"
+    GROQ_MODEL: str = "llama-3.3-70b-versatile"
+
+    # OpenRouter
+    OPENROUTER_API_KEY: str = "placeholder"
+    OPENROUTER_MODEL: str = "anthropic/claude-3.5-haiku"
+    OPENROUTER_SITE_URL: str = ""
+
+    # Ollama (local)
+    OLLAMA_BASE_URL: str = "http://localhost:11434"
+    OLLAMA_LLM_MODEL: str = "llama3.2"
+    OLLAMA_EMBEDDING_MODEL: str = "nomic-embed-text"
 
     # JWT
     JWT_SECRET_KEY: str = "dev-secret-change-in-production-min-32-chars!"

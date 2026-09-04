@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
-import { getManuals, getMachines } from "@/lib/api";
+import { getManuals, getMachines, deactivateMachine } from "@/lib/api";
 import type { Manual, Machine } from "@/lib/types";
 import ManualList from "@/components/admin/ManualList";
+import MachineForm from "@/components/admin/MachineForm";
 import Spinner from "@/components/ui/Spinner";
 
 type Tab = "manuals" | "machines";
@@ -17,6 +18,7 @@ export default function AdminPage() {
   const [manuals, setManuals] = useState<Manual[]>([]);
   const [machines, setMachines] = useState<Machine[]>([]);
   const [fetching, setFetching] = useState(true);
+  const [deactivating, setDeactivating] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isLoading && (!user || user.role !== "admin")) {
@@ -24,7 +26,7 @@ export default function AdminPage() {
     }
   }, [user, isLoading, router]);
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setFetching(true);
     try {
       const [m, mac] = await Promise.all([getManuals(), getMachines()]);
@@ -35,11 +37,23 @@ export default function AdminPage() {
     } finally {
       setFetching(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (user?.role === "admin") loadData();
-  }, [user]);
+  }, [user, loadData]);
+
+  const handleDeactivate = async (machineId: string) => {
+    setDeactivating(machineId);
+    try {
+      await deactivateMachine(machineId);
+      setMachines((prev) => prev.filter((m) => m.id !== machineId));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setDeactivating(null);
+    }
+  };
 
   if (isLoading || fetching) {
     return <div className="min-h-screen flex items-center justify-center"><Spinner size="lg" label="Loading..." /></div>;
@@ -64,7 +78,6 @@ export default function AdminPage() {
       </header>
 
       <div className="max-w-5xl mx-auto px-6 py-6">
-        {/* Tabs */}
         <div className="flex gap-1 border-b border-slate-200 mb-6">
           {(["manuals", "machines"] as Tab[]).map((t) => (
             <button key={t} onClick={() => setTab(t)}
@@ -86,6 +99,7 @@ export default function AdminPage() {
 
         {tab === "machines" && (
           <div className="bg-white rounded-xl border border-slate-200 p-6">
+            <MachineForm onCreated={loadData} />
             {machines.length === 0 ? (
               <p className="text-center text-slate-400 text-sm py-8">No machines registered.</p>
             ) : (
@@ -96,9 +110,17 @@ export default function AdminPage() {
                       <p className="text-sm font-semibold text-slate-800">{m.name}</p>
                       <p className="text-xs text-slate-400">{[m.manufacturer, m.model].filter(Boolean).join(" · ")}</p>
                     </div>
-                    {m.category && (
-                      <span className="text-xs px-2 py-1 bg-slate-100 text-slate-600 rounded-full">{m.category}</span>
-                    )}
+                    <div className="flex items-center gap-3">
+                      {m.category && (
+                        <span className="text-xs px-2 py-1 bg-slate-100 text-slate-600 rounded-full">{m.category}</span>
+                      )}
+                      <button
+                        onClick={() => handleDeactivate(m.id)}
+                        disabled={deactivating === m.id}
+                        className="text-xs text-red-400 hover:text-red-600 disabled:opacity-40 transition-colors">
+                        {deactivating === m.id ? "…" : "Deactivate"}
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>

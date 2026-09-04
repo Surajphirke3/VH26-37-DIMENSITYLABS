@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Manual } from "@/lib/types";
 import { getManualStatus } from "@/lib/api";
 
@@ -18,6 +18,7 @@ const statusConfig: Record<Manual["processing_status"], { label: string; classNa
 
 function StatusBadge({ manual, onComplete }: { manual: Manual; onComplete: () => void }) {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [pct, setPct] = useState<number | null>(null);
   const cfg = statusConfig[manual.processing_status];
 
   useEffect(() => {
@@ -25,6 +26,7 @@ function StatusBadge({ manual, onComplete }: { manual: Manual; onComplete: () =>
     timerRef.current = setInterval(async () => {
       try {
         const updated = await getManualStatus(manual.id);
+        if (updated.progress_pct != null) setPct(updated.progress_pct);
         if (updated.processing_status !== "processing") {
           clearInterval(timerRef.current!);
           onComplete();
@@ -42,6 +44,9 @@ function StatusBadge({ manual, onComplete }: { manual: Manual; onComplete: () =>
         <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
       )}
       {cfg.label}
+      {manual.processing_status === "processing" && pct != null && (
+        <span className="text-amber-600 ml-0.5">{pct}%</span>
+      )}
     </span>
   );
 }
