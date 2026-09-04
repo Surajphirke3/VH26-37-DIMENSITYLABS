@@ -1,213 +1,240 @@
 <div align="center">
 
-# 🔧 MechMind — Intelligent Machine Troubleshooting System
-### *Industrial RAG for Factory Floor Diagnostics & Downtime Reduction*
+<img src="Hackathon/MEND%20-%20X.png" alt="MEND - X Logo" width="320" style="border-radius: 18px; margin-bottom: 12px;"/>
 
-[![VCET HackC++thon 2026](https://img.shields.io/badge/VCET%20HackC%2B%2Bthon-2026-blueviolet?style=for-the-badge&logo=codeforces&logoColor=white)](https://vcet.edu.in)
-[![Domain](https://img.shields.io/badge/Domain-Application%20Data%20Management%20(RAG)-blue?style=for-the-badge)](https://github.com/Surajphirke3/VH26-37-DIMENSITYLABS)
-[![Team](https://img.shields.io/badge/Team-DIMENSITY%20LABS%20%5BVH26--37%5D-orange?style=for-the-badge)](#-team--contributors)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+# MEND - X
+### *From Failure to Function.*
+**Industrial RAG & Intelligent Machine Troubleshooting System for Factory Floor Diagnostics**
+
+[![VCET HackC++thon 2026](https://img.shields.io/badge/VCET%20HackC%2B%2Bthon-2026-7C3AED?style=for-the-badge&logo=codeforces&logoColor=white)](https://vcet.edu.in)
+[![Domain](https://img.shields.io/badge/Domain-Application%20Data%20Management%20(RAG)-0284C7?style=for-the-badge)](https://github.com/Surajphirke3/VH26-37-DIMENSITYLABS)
+[![Team](https://img.shields.io/badge/Team-DIMENSITY%20LABS%20%5BVH26--37%5D-EA580C?style=for-the-badge)](#-team--contributors)
+[![License: MIT](https://img.shields.io/badge/License-MIT-16A34A?style=for-the-badge)](LICENSE)
 
 <br/>
 
-[![Python 3.10+](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat-square&logo=python&logoColor=white)](https://python.org)
-[![LangChain](https://img.shields.io/badge/LangChain-0.3+-1C3C3C?style=flat-square&logo=langchain&logoColor=white)](https://langchain.com)
+[![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![Next.js 14](https://img.shields.io/badge/Frontend-Next.js%2014-000000?style=flat-square&logo=next.js&logoColor=white)](https://nextjs.org)
 [![ChromaDB](https://img.shields.io/badge/Vector_DB-ChromaDB-FF6F00?style=flat-square)](https://www.trychroma.com)
-[![Streamlit](https://img.shields.io/badge/UI-Streamlit-FF4B4B?style=flat-square&logo=streamlit&logoColor=white)](https://streamlit.io)
-[![OpenAI](https://img.shields.io/badge/LLM-GPT--4o%20%2F%20Groq-412991?style=flat-square&logo=openai&logoColor=white)](https://openai.com)
+[![Docker](https://img.shields.io/badge/Deploy-Docker%20Compose-2496ED?style=flat-square&logo=docker&logoColor=white)](https://docker.com)
+[![Multi-Provider AI](https://img.shields.io/badge/AI%20Engine-Groq%20%7C%20Gemini%20%7C%20Ollama-8A2BE2?style=flat-square)](docs/OWN_MODEL_GUIDE.md)
 
-> **"Stop hunting through 400-page manuals while the assembly line is halted. Ask in plain English, get step-by-step repair actions, with verifiable manual page citations in seconds."**
+> **"Stop hunting through 400-page manuals while production is halted. Type an error code or symptom, route through tiered intelligence, and receive exact, verified repair steps with page citations in seconds."**
 
-[Key Highlights](#-key-highlights) · [The Industrial Challenge](#-the-industrial-challenge) · [Architecture](#-system-architecture) · [Hallucination Control](#-hallucination-defense--confidence-gate) · [Setup & Run](#-quick-start-guide) · [Demo Cases](#-live-demo-test-cases) · [Hackathon Deliverables](#-hackathon-deliverables-checklist)
+[Model Tiers](#-the-three-model-tiers) · [The Industrial Challenge](#-the-industrial-challenge) · [Key Capabilities](#-key-capabilities) · [System Architecture](#-system-architecture) · [Hallucination Defense](#-hallucination-defense--confidence-gate) · [Quick Start](#-quick-start-guide) · [Demo Scenarios](#-live-demo-test-cases) · [Team](#-team--contributors)
 
 ---
 
 </div>
 
-## 📌 Executive Summary
+## ⚡ The Three Model Tiers
 
-On any modern manufacturing line, unplanned downtime costs between **$10,000 to $250,000 per hour**. When a machine throws a cryptic error (e.g., `E101`), the resolution is usually buried across dozens of 400-page PDF service manuals, diagnostic schematics, and tabular fault matrices.
+**MEND - X** features a purpose-built **Three-Tier Intelligence Architecture**. Industrial plants range from resource-constrained edge PLCs to cloud-connected control rooms. Rather than relying on a single one-size-fits-all model, MEND - X adapts inference power to the operational criticality of the query:
 
-Traditional "Chat-with-PDF" tools fail catastrophically in industrial settings:
-- **Same Error, Different Machines:** Error code `E101` means *Overvoltage* on CNC Milling Station A, but *Spindle Encoder Loss* on Robotic Arm B.
-- **Critical Safety Risk:** A hallucinated troubleshooting step isn't just an inconvenience — it can fry a $50,000 drive or pose severe operator hazard.
-- **Tabular & Schematics Loss:** Naive parsers mangle fault diagnosis lookup tables.
+<div align="center">
 
-**MechMind** is an enterprise-grade Retrieval-Augmented Generation (RAG) system specifically architected for industrial data management. It guarantees **cross-document disambiguation**, **zero-hallucination enforcement via pre-LLM confidence gating**, and **strict page-level source traceability**.
+| <img src="Hackathon/NORD.png" width="220" alt="NORD Logo"/><br/>**NORD** *(Low Tier)* | <img src="Hackathon/FORGE.png" width="220" alt="FORGE Logo"/><br/>**FORGE** *(Mid Tier)* | <img src="Hackathon/APEX.png" width="220" alt="APEX Logo"/><br/>**APEX** *(High Tier)* |
+| :---: | :---: | :---: |
+| **"Fast Answers. Real Support."** | **"Deeper Insights. Stronger Solutions."** | **"Maximum Intelligence. Minimum Downtime."** |
+| **Speed & Edge First** | **Balanced Industrial Reasoning** | **Safety-Critical Deep Diagnostics** |
+
+</div>
+
+### Tier Comparison Matrix
+
+| Specification | 🔵 NORD *(Low Tier)* | 🟠 FORGE *(Mid Tier)* | 🔴 APEX *(High Tier)* |
+| :--- | :--- | :--- | :--- |
+| **Primary Mission** | Instant error code lookup & field triage | Multi-step troubleshooting & cause analysis | Cross-document disambiguation & safety verification |
+| **Base Model Architecture** | `Phi-3-mini (3.8B)` / `TinyLlama-1.1B` | `Llama-3.1-8B-Instruct` / `Mistral-7B` | `Llama-3.1-70B` / `Mixtral-8x7B` / `GPT-4o` |
+| **Deployment Target** | Factory Floor Edge PCs, Tablets, Raspberry Pi | Local Workshop GPU Server / Cloud API | High-Throughput Cloud Cluster / Groq LPU |
+| **Average Latency** | **< 350 ms** (Sub-second instant) | **~1.2 – 2.0 s** | **~2.5 – 4.5 s** (Deep cross-attention) |
+| **Hardware Footprint** | CPU-only (4 GB RAM) | Single consumer GPU (RTX 3060 / 12 GB VRAM) | Multi-GPU cluster or accelerated API |
+| **Offline Capability** | 100% Fully Offline (Local Ollama / ONNX) | Local or Hybrid Cloud | Cloud or On-Premise Enterprise Rack |
+| **Best For...** | *"What does alarm code E101 mean?"* | *"Machine A overheating after 2 hours of run time"* | Ambiguous codes across multiple machines, complex hydraulic/electrical schematics, and root cause synthesis |
 
 ---
 
-## ✨ Key Highlights
+## 📌 The Industrial Challenge
 
-| Capability | What Naive RAG Does | What MechMind Delivers |
+On modern factory lines, unplanned downtime costs between **$10,000 to $250,000 per hour**. When a CNC workstation or robotic cell halts with a cryptic alarm:
+1. **The Manual Paradox:** The diagnostic procedure is buried on page 214 of a 400-page PDF manual — or scattered across three separate documents for similar-but-different machine models.
+2. **Cross-Document Ambiguity:** Error code `E101` means **DC Bus Overvoltage** on CNC Milling Center Alpha, but **Spindle Pulse Encoder Lost** on Robotic Arm Beta. A wrong diagnosis damages machinery.
+3. **Mangled Non-Text Content:** Standard parsers scramble multi-column fault registers, pinout diagrams, and tabular lookup matrices.
+4. **Safety & Hallucination Risks:** An invented mechanical fix isn't just a software bug — it is a severe occupational hazard.
+
+**MEND - X — From Failure to Function** solves this with **metadata-scoped vector retrieval**, **cross-document entity routing**, **dual-layer confidence gating**, and **strict page-level source citations**.
+
+---
+
+## ✨ Key Capabilities
+
+| Capability | Naive PDF Chatbot | MEND - X Solution |
 | :--- | :--- | :--- |
-| **Multi-Manual Ingestion** | Concatenates documents into a single flat index. | Ingests multi-machine manuals with isolated metadata tagging (`machine_id`, `subsystem`, `page`, `section`). |
-| **Cross-Manual Ambiguity** | Retrieves conflicting passages and confuses error codes. | **Entity-aware routing:** Automatically identifies machine context or prompts for clarification if ambiguous. |
-| **Query Flexibility** | Struggles with terse 4-character codes or vague noises. | Supports **3 query styles**: Exact Error Codes (`E101`), Natural Language Symptoms, and Scoped queries. |
-| **Hallucination Control** | Hopes system prompts will prevent hallucination. | **Two-tier deterministic gate**: Drops responses below cosine similarity `0.75` before the LLM is ever called. |
-| **Tabular Data Fidelity** | Mangles multi-column fault code tables into unreadable text. | Table-aware structural parsing using PyMuPDF + pdfplumber with markdown table chunk retention. |
-| **Traceability** | Gives generic answers ("According to manual..."). | Defensible citations: Exact **Manual Name**, **Section Header**, and **Verified Page Number**. |
-| **Conversational Memory** | Loses machine context across turns. | Stateful follow-ups: Handles *"What if step 2 doesn't clear the fault?"* without context re-entry. |
+| **Cross-Manual Ambiguity** | Retrieves conflicting passages; confuses machine models. | **Context Disambiguator:** Automatically extracts machine entities or prompts interactive disambiguation before answering. |
+| **3 Query Modalities** | Struggles with brief codes or vague complaints. | Seamlessly handles **Exact Codes** (`E101`), **Natural Language Symptoms** (*"Why is spindle vibrating?"*), and **Scoped Queries**. |
+| **Hallucination Control** | Relies on gentle prompt instructions. | **Deterministic Confidence Gate:** Cosine similarity `< 0.75` immediately halts generation with graceful refusal. |
+| **Tabular Fidelity** | Flattens tables into disorganized sentences. | PyMuPDF + pdfplumber structural extraction preserving tabular matrices in Markdown. |
+| **Source Traceability** | Gives vague answers without verifiable links. | Full citation: **Machine Model**, **Manual Title**, **Section**, and **Exact Page Number**. |
+| **Conversational Memory** | Forgets prior turns when troubleshooting fails. | Contextual session memory: handles *"What if step 2 doesn't work?"* without re-specifying machine context. |
 
 ---
 
 ## 🏗 System Architecture
 
 ```
-                                  INGESTION PIPELINE
-  ┌──────────────────┐      ┌─────────────────────────┐      ┌─────────────────────────┐
-  │ PDF Manuals      │ ───► │ PyMuPDF + pdfplumber    │ ───► │ Structural & Table-     │
-  │ (Machine A, B..) │      │ Multi-Page Extraction   │      │ Aware Sentence Chunker  │
-  └──────────────────┘      └─────────────────────────┘      └────────────┬────────────┘
-                                                                          │
-                                 ┌─────────────────────────┐              │
-                                 │ ChromaDB Vector Store   │ ◄────────────┘
-                                 │ (Embedded with Metadata)│
-                                 └───────────┬─────────────┘
-                                             │
-─────────────────────────────────────────────┼──────────────────────────────────────────
-                                             │
-                                   RETRIEVAL & QUERY PIPELINE
-  ┌──────────────────┐      ┌────────────────┴────────┐      ┌─────────────────────────┐
-  │ User Query       │ ───► │ Machine Context Parser  │ ───► │ Scoped Vector Search    │
-  │ (Code / Symptom) │      │ & Disambiguation Router │      │ (Metadata Filter: Model)│
-  └──────────────────┘      └─────────────────────────┘      └────────────┬────────────┘
-                                                                          │
-                                                                          ▼
-                                                             ┌─────────────────────────┐
-                                                             │ Reranker (Cross-Encoder)│
-                                                             │ Top-K Semantic Scorer   │
-                                                             └────────────┬────────────┘
-                                                                          │
-                                   CONFIDENCE GATE                        ▼
-                             ┌─────────────────────────┐      ┌─────────────────────────┐
-                             │ Top-1 Similarity < 0.75?│ ──►  │ 🛑 Graceful Refusal:    │
-                             └────────────┬────────────┘ YES  │ "Insufficient Context"  │
-                                          │ NO                └─────────────────────────┘
-                                          ▼
-                             ┌─────────────────────────┐      ┌─────────────────────────┐
-                             │ LLM Synthesis (GPT-4o)  │ ───► │ Sourced Diagnostic Card │
-                             │ + Citation Enforcer     │      │ (Cause + Fix + Page No) │
-                             └─────────────────────────┘      └─────────────────────────┘
+                                      INGESTION PIPELINE
+  ┌──────────────────────┐      ┌─────────────────────────────┐      ┌─────────────────────────────┐
+  │ Technical Manuals    │ ───► │ PyMuPDF + pdfplumber        │ ───► │ Structural Table-Aware      │
+  │ (Machine A, B, C...) │      │ Multi-Page PDF Parser       │      │ Sentence & Chunk Splitting  │
+  └──────────────────────┘      └─────────────────────────────┘      └──────────────┬──────────────┘
+                                                                                    │
+                                       ┌─────────────────────────────┐              │
+                                       │ ChromaDB Vector Store       │ ◄────────────┘
+                                       │ (Tagged with Machine & Page)│
+                                       └──────────────┬──────────────┘
+                                                      │
+──────────────────────────────────────────────────────┼──────────────────────────────────────────────
+                                                      │
+                                      QUERY & RETRIEVAL PIPELINE
+  ┌──────────────────────┐      ┌─────────────────────┴───────┐      ┌─────────────────────────────┐
+  │ Technician Query     │ ───► │ Query Classifier &          │ ───► │ Scoped Vector Retrieval     │
+  │ (Code / Symptom)     │      │ Disambiguation Router       │      │ (Metadata Filter: Machine)  │
+  └──────────────────────┘      └─────────────────────────────┘      └──────────────┬──────────────┘
+                                                                                    │
+                                                                                    ▼
+                                                                     ┌─────────────────────────────┐
+                                                                     │ Cross-Encoder Reranker      │
+                                                                     │ Top-K Semantic Scoring      │
+                                                                     └──────────────┬──────────────┘
+                                                                                    │
+                                       CONFIDENCE GATE                              ▼
+                                 ┌─────────────────────────────┐      ┌─────────────────────────────┐
+                                 │ Max Similarity < 0.75?      │ ──►  │ 🛑 Graceful Refusal:         │
+                                 └──────────────┬──────────────┘ YES  │ "Insufficient Information"  │
+                                                │ NO                  └─────────────────────────────┘
+                                                ▼
+                                 ┌─────────────────────────────┐
+                                 │ MODEL TIER ROUTER           │
+                                 │ ├── 🔵 NORD (Edge / Fast)   │
+                                 │ ├── 🟠 FORGE (Balanced)     │
+                                 │ └── 🔴 APEX (Deep / Schem)  │
+                                 └──────────────┬──────────────┘
+                                                │
+                                                ▼
+                                 ┌─────────────────────────────┐
+                                 │ Structured Actionable Plan  │
+                                 │ Cause + Fix + Page Citation │
+                                 └─────────────────────────────┘
 ```
 
 ---
 
 ## 🛡 Hallucination Defense & Confidence Gate
 
-Industrial environments cannot tolerate speculative guesses. MechMind applies a **two-layer defense mechanism**:
+In an industrial setting, a wrong answer can result in physical injury or machine destruction. MEND - X enforces a **two-layer defense**:
 
 ```mermaid
 flowchart TD
-    A[User Troubleshooting Query] --> B[Retrieve Top-K Chunks from ChromaDB]
+    A[Technician Input Query] --> B[Retrieve Candidates from ChromaDB]
     B --> C[Compute Cosine Similarity & Cross-Encoder Score]
-    C --> D{Confidence >= 0.75?}
-    D -- NO --> E[HALT: Return 'Insufficient Information' Refusal]
-    D -- YES --> F[Assemble Prompt with Grounded Passages Only]
-    F --> G[LLM Constrained Generation]
-    G --> H{All steps verifiable in context?}
-    H -- NO --> I[Suppress Unverified Claims]
-    H -- YES --> J[Output Structured Action Plan with Page Citation]
+    C --> D{Top Similarity >= 0.75?}
+    D -- NO --> E[🛑 Refusal Gate: 'Insufficient Information Found']
+    D -- YES --> F[Select Model Tier: Nord / Forge / Apex]
+    F --> G[Assemble Grounded-Only Context Prompt]
+    G --> H[Synthesize Step-by-Step Fix]
+    H --> I{All assertions cited back to manual?}
+    I -- NO --> J[Suppress Speculative Claims]
+    I -- YES --> K[Deliver Sourced Action Plan with Page Number]
 ```
 
 1. **Pre-LLM Confidence Gate (Deterministic Barrier):**
-   - If the maximum similarity score among retrieved chunks falls below the configurable threshold (`CONFIDENCE_THRESHOLD = 0.75`), the pipeline immediately terminates.
-   - It outputs an honest refusal with the low confidence score, preventing the LLM from synthesizing an ungrounded or dangerous repair procedure.
-2. **Strict Grounding & Citation Validation:**
-   - The LLM generation prompt enforces that every step must directly attribute its source page and section. Any inference not supported by context is explicitly banned.
-
----
-
-## 🎯 Chunking & Ingestion Strategy
-
-Manuals are not standard narrative texts; they contain dense diagnostic flowcharts, pinout diagrams, and tabular error code registers.
-
-- **Window Size:** 512 tokens with 64-token sliding overlap to ensure boundary continuity.
-- **Table Preservation:** Markdown table representation prevents row/column dissociation.
-- **Rich Metadata Schema attached to every chunk:**
-  ```json
-  {
-    "machine_id": "CNC_LATHE_M400",
-    "manual_title": "M400 Maintenance & Service Guide Rev 3.2",
-    "section_title": "Chapter 5: Spindle & Drive Troubleshooting",
-    "page_number": 47,
-    "chunk_type": "fault_table",
-    "error_codes_present": ["E101", "E102", "E103"]
-  }
-  ```
+   - If the top chunk retrieved scores below `0.75` cosine similarity, the LLM is **never called**.
+   - MEND - X responds with an honest refusal including the confidence score, preventing synthetic guesses.
+2. **Source Attribution & Grounded Prompting:**
+   - Generation is strictly confined to retrieved passages.
+   - Every output requires manual name, section title, and page number citations.
 
 ---
 
 ## 🚀 Quick Start Guide
 
-### Prerequisites
-- Python 3.10 or higher
-- An OpenAI API Key (or Groq / Anthropic / Local Ollama instance)
+You can run MEND - X using **Docker Compose** (recommended) or as separate **Backend & Frontend** services.
 
-### 1. Clone & Setup Virtual Environment
+### Option A: Docker Compose (Fastest)
+
 ```bash
-# Clone the repository
+# 1. Clone repository
 git clone https://github.com/Surajphirke3/VH26-37-DIMENSITYLABS.git
 cd VH26-37-DIMENSITYLABS
 
+# 2. Configure environment
+cp .env.example .env
+# Add your API keys (GROQ_API_KEY, GEMINI_API_KEY, or OPENAI_API_KEY)
+
+# 3. Launch stack
+docker compose up --build
+```
+- **Web Dashboard:** `http://localhost:3000`
+- **FastAPI API Docs:** `http://localhost:8000/docs`
+
+---
+
+### Option B: Local Development Setup
+
+#### 1. Backend Setup (FastAPI + ChromaDB)
+```bash
+cd backend
+
 # Create and activate virtual environment
 python3 -m venv venv
-source venv/bin/activate       # On Windows: venv\Scripts\activate
-```
+source venv/bin/activate       # Windows: venv\Scripts\activate
 
-### 2. Install Dependencies
-```bash
+# Install dependencies
 pip install --upgrade pip
 pip install -r requirements.txt
+
+# Run migrations & seed demo manuals
+alembic upgrade head
+python scripts/create_demo_pdfs.py
+python scripts/seed_demo.py
+
+# Start Backend server
+uvicorn app.main:app --reload --port 8000
 ```
 
-### 3. Configure Environment Variables
-Create a `.env` file in the root directory:
+#### 2. Frontend Setup (Next.js 14)
 ```bash
-cp .env.example .env
-```
-Populate `.env` with your credentials:
-```env
-OPENAI_API_KEY=your-openai-api-key-here
-# Optional Reranker API Key
-COHERE_API_KEY=your-cohere-api-key-here
-# Vector DB & Confidence Tuning
-CHROMA_PERSIST_DIR=./chroma_db
-CONFIDENCE_THRESHOLD=0.75
-```
+cd ../frontend
 
-### 4. Ingest PDF Manuals
-Drop your technical PDF manuals into the `manuals/` folder and trigger ingestion:
-```bash
-python ingest.py --manuals_dir ./manuals
-```
+# Install dependencies
+npm install
 
-### 5. Launch the Streamlit Interface
-```bash
-streamlit run app.py
+# Start development server
+npm run dev
 ```
-Open `http://localhost:8501` in your browser.
+Open `http://localhost:3000` in your browser.
 
 ---
 
 ## 🎬 Live Demo Test Cases
 
-MechMind satisfies all four mandated evaluation scenarios:
+MEND - X satisfies all four mandated evaluation scenarios:
 
 <details open>
-<summary><b>1. Exact Error Code Query (e.g. <code>E101</code>)</b></summary>
+<summary><b>1. Exact Error Code Query (e.g., <code>E101</code>)</b></summary>
 <br/>
 
 **User:** `E101 on Machine A`  
-**MechMind Output:**
-> **Machine:** Machine A (High-Precision CNC Milling Center)  
+**MEND - X Output:**
+> **Machine:** Machine A — Precision CNC Milling Center  
+> **Model Tier:** 🔵 NORD / 🟠 FORGE  
 > **Fault Meaning:** DC Bus Overvoltage Alarm  
-> **Probable Cause:** Deceleration ramp set too steep; regenerative energy saturating braking resistor.  
-> **Corrective Action:**
-> 1. Power off machine and verify DC bus discharge (indicator LED off).
-> 2. Inspect braking resistor terminal resistance across terminals `B1` and `B2` (nominal: 47 $\Omega$).
-> 3. In parameter setting `P2-04`, increase spindle deceleration time from `1.2s` to `2.5s`.  
-> **Citation:** *Machine A Operations Manual*, Section 5.3 ("Drive Fault Codes"), **Page 47**.
+> **Probable Cause:** Deceleration ramp set too steep; kinetic regen saturating braking resistor.  
+> **Step-by-Step Fix:**
+> 1. Power off machine and confirm DC bus discharge indicator LED is unlit.
+> 2. Measure resistance across braking resistor terminals `B1` and `B2` (nominal: 47 $\Omega$).
+> 3. Enter drive parameter `P2-04` and increase deceleration time from `1.2s` to `2.5s`.  
+> **Source Citation:** *Machine A Operations Manual*, Section 5.3 ("Drive Fault Codes"), **Page 47**.
 
 </details>
 
@@ -216,15 +243,16 @@ MechMind satisfies all four mandated evaluation scenarios:
 <br/>
 
 **User:** *Why is Machine B overheating while idling?*  
-**MechMind Output:**
-> **Machine:** Machine B (Hydraulic Press System)  
-> **Subsystem:** Auxiliary Cooling Unit  
-> **Probable Cause:** Auxiliary cooling fan thermostatic relay failure or bypass valve stuck in open circuit.  
-> **Corrective Action:**
-> 1. Inspect coolant reservoir level via sight glass `SG-1`.
-> 2. Measure supply voltage across relay `K14` on main junction panel.
-> 3. Check bypass valve `BV-03` for debris accumulation; flush with clean hydraulic fluid if obstructed.  
-> **Citation:** *Machine B Preventative Maintenance Handbook*, Section 8.1 ("Thermal Management"), **Page 112**.
+**MEND - X Output:**
+> **Machine:** Machine B — 6-Axis Articulated Industrial Robot  
+> **Model Tier:** 🟠 FORGE  
+> **Subsystem:** Auxiliary Thermal Unit  
+> **Probable Cause:** Coolant flow switch reading 0 L/min due to stuck bypass valve or faulty thermostatic relay.  
+> **Step-by-Step Fix:**
+> 1. Inspect fluid level in coolant reservoir sight glass `SG-1`.
+> 2. Measure supply voltage across relay `K14` on main electrical junction.
+> 3. Disassemble bypass valve `BV-03`, check for particle blockage, and flush line.  
+> **Source Citation:** *Machine B Preventative Maintenance Handbook*, Section 8.1, **Page 112**.
 
 </details>
 
@@ -233,15 +261,15 @@ MechMind satisfies all four mandated evaluation scenarios:
 <br/>
 
 **User:** `E101` *(No machine specified)*  
-**MechMind Output:**
+**MEND - X Output:**
 > ⚠️ **Ambiguity Detected: Multiple Machines Match Code `E101`**  
+> **Model Tier:** 🔴 APEX  
 > 
-> Code `E101` exists in multiple active manuals with completely different meanings:
+> Code `E101` has conflicting definitions across your loaded manuals:
+> - **Machine A (CNC Mill):** *DC Bus Overvoltage* (Section 5.3, Page 47)
+> - **Machine B (Robotic Arm):** *Spindle Pulse Encoder Loss* (Section 3.7, Page 29)
 > 
-> - **Machine A (CNC Milling Station):** *DC Bus Overvoltage* (Section 5.3, Page 47)
-> - **Machine B (Robotic Arm Unit):** *Spindle Pulse Encoder Connection Lost* (Section 3.7, Page 29)
-> 
-> *Which machine are you currently troubleshooting? Type `Machine A` or `Machine B` to proceed with the specific step-by-step repair.*
+> *Which machine are you currently diagnosing? Select Machine A or Machine B to view the exact repair sequence.*
 
 </details>
 
@@ -249,45 +277,43 @@ MechMind satisfies all four mandated evaluation scenarios:
 <summary><b>4. Graceful Refusal on Low Confidence</b></summary>
 <br/>
 
-**User:** *What is the torque specification for the third-party hydraulic pump adapter flange?*  
-**MechMind Output:**
+**User:** *What is the torque spec for the third-party hydraulic adapter flange?*  
+**MEND - X Output:**
 > 🛑 **Insufficient Information in Knowledge Base**  
 > 
-> The loaded technical manuals do not contain verified torque specifications for third-party adapter flanges.  
-> - **Top Match Score:** `0.41` *(Below strict safety threshold of `0.75`)*  
-> - **Recommendation:** Please refer to the OEM supplier technical bulletin or contact the plant safety lead. MechMind will not generate unverified mechanical specs.
+> The loaded manuals do not contain verified torque specifications for third-party adapter flanges.  
+> - **Retrieved Confidence Score:** `0.41` *(Below required safety threshold of `0.75`)*  
+> - **Safety Advisory:** Consult OEM engineering specifications directly. MEND - X suppresses speculative mechanical data to prevent component failure.
 
 </details>
 
 ---
 
-## 📊 Structured JSON Output Format
-
-All diagnostic responses adhere to a consistent, machine-readable JSON schema, making it ideal for integration with Computerized Maintenance Management Systems (CMMS):
+## 📊 Structured CMMS-Compatible Output Schema
 
 ```json
 {
   "machine_id": "MACHINE_A_CNC",
   "error_code": "E101",
   "fault_name": "DC Bus Overvoltage",
-  "confidence_score": 0.93,
+  "model_tier_used": "FORGE",
+  "confidence_score": 0.94,
   "confidence_gate_passed": true,
   "probable_causes": [
-    "Deceleration time parameter too low",
-    "Regenerative braking resistor open circuit"
+    "Deceleration ramp set too steep",
+    "Braking resistor open circuit"
   ],
-  "step_by_step_fix": [
-    "Lockout / Tagout machine power supply",
-    "Measure resistance between terminals B1 and B2 (nominal 47 ohms)",
-    "Adjust parameter P2-04 deceleration ramp to 2.5 seconds"
+  "corrective_actions": [
+    "Verify DC bus discharge before panel opening",
+    "Measure terminal resistance across B1-B2 (47 ohms)",
+    "Increase parameter P2-04 deceleration time to 2.5s"
   ],
   "source_citation": {
     "manual_title": "Machine A Operations Manual",
-    "document_id": "MAN-A-REV3",
-    "section": "5.3 Fault Diagnostics",
+    "section": "5.3 Drive Fault Codes",
     "page_number": 47
   },
-  "safety_advisory": "High voltage present on DC bus terminals for up to 5 minutes post power-down."
+  "safety_advisory": "High voltage present on capacitor bank for up to 5 minutes after power cutoff."
 }
 ```
 
@@ -297,55 +323,42 @@ All diagnostic responses adhere to a consistent, machine-readable JSON schema, m
 
 ```
 VH26-37-DIMENSITYLABS/
-├── .env.example             # Template for API keys and configuration
-├── .gitignore               # Git ignore for venv, caches, and chroma_db
-├── README.md                # Comprehensive project documentation
-├── requirements.txt         # Pinned Python package dependencies
-├── config.py                # Global thresholds, model names, and filepaths
+├── Hackathon/                       # Official Brand Assets & Logos
+│   ├── MEND - X.png                 # Main MEND - X Hero Identity
+│   ├── NORD.png                     # Low-Tier Edge Model Logo
+│   ├── FORGE.png                    # Mid-Tier Balanced Model Logo
+│   └── APEX.png                     # High-Tier Diagnostic Model Logo
 │
-├── ingest.py                # PDF extraction, table parsing & vector storage
-├── retriever.py             # Metadata-filtered hybrid retrieval & reranking
-├── generator.py             # Prompt engineering, LLM synthesis & citation validation
-├── memory.py                # Multi-turn conversational buffer & state tracking
+├── docs/                            # Engineering & Architecture Guides
+│   ├── OWN_MODEL_GUIDE.md           # Three-Tier (Nord/Forge/Apex) Implementation
+│   ├── MANUALS_STRATEGY.md          # Multi-Manual Ingestion & Disambiguation Strategy
+│   ├── THREE_ROUND_STRATEGY.md      # Hackathon Evaluation Walkthrough
+│   └── DOCS_INDEX.md                # Comprehensive Documentation Index
 │
-├── app.py                   # Production-grade Streamlit web interface
+├── backend/                         # FastAPI RAG Engine
+│   ├── app/
+│   │   ├── api/routes/              # Endpoints: /query, /machines, /manuals, /auth
+│   │   ├── core/                    # Config, Security, Logging, Middleware
+│   │   ├── models/                  # SQLAlchemy ORM: Chunk, Citation, Manual, Machine
+│   │   └── services/
+│   │       ├── ai/                  # Multi-Provider Factory (Groq, Gemini, Ollama)
+│   │       ├── ingestion/           # PDF Parser, Table Extractor, Chunker, Embedder
+│   │       └── rag/                 # Disambiguator, Retriever, Reranker, Generator
+│   ├── scripts/                     # Seeders & PDF generators
+│   └── tests/                       # Comprehensive pytest suite
 │
-├── manuals/                 # Knowledge base directory for industrial PDFs
-│   ├── machine_a_cnc.pdf
-│   ├── machine_b_robot.pdf
-│   └── hydraulic_press.pdf
+├── frontend/                        # Next.js 14 Web Dashboard
+│   ├── src/
+│   │   ├── app/                     # App Router: /dashboard, /admin, /login
+│   │   ├── components/chat/         # ChatInterface, StructuredAnswer, DisambiguationCard
+│   │   └── lib/                     # API client, Auth context, Type definitions
+│   └── tailwind.config.ts           # Industrial UI theme tokens
 │
-└── tests/                   # Automated evaluation & test scripts
-    ├── test_retrieval.py    # Disambiguation & precision test suites
-    └── test_confidence.py   # Confidence gate refusal verification
+├── docker-compose.yml               # Multi-container orchestration
+├── Makefile                         # Unified development shortcuts
+├── .env.example                     # Environment configuration template
+└── README.md                        # Project documentation
 ```
-
----
-
-## 🛠 Tech Stack & Engineering Rationale
-
-| Layer | Component | Engineering Justification |
-| :--- | :--- | :--- |
-| **PDF Extraction** | `PyMuPDF (fitz)` + `pdfplumber` | High-throughput text parsing with specialized bounding-box table extraction. |
-| **Text Chunking** | `LangChain RecursiveCharacterTextSplitter` | Preserves sentence and paragraph boundaries with metadata propagation. |
-| **Embeddings** | `text-embedding-3-small` / `BGE-Small-EN` | Dense vector representation optimized for semantic technical terms. |
-| **Vector Database** | `ChromaDB` | Embedded, lightweight, native metadata filtering without external cluster overhead. |
-| **Reranking** | `Cohere Rerank` / `Cross-Encoder` | Refines top-20 retrieved chunks to top-3 with high cross-attention precision. |
-| **LLM Inference** | `OpenAI GPT-4o` / `Groq Llama 3.3` | High-fidelity JSON output formatting and strict instruction adherence. |
-| **User Interface** | `Streamlit` | Rapid, dynamic, interactive web UI tailored for quick diagnostic workflows. |
-
----
-
-## 📋 Hackathon Deliverables Checklist
-
-- [x] **Working Prototype with Setup Instructions:** Complete virtual environment, dependency management, and single-command launcher (`streamlit run app.py`).
-- [x] **Architecture Documentation:** In-depth explanation of chunking strategy, metadata scoping, reranking, and two-layer hallucination control.
-- [x] **Four Live Demo Scenarios:**
-  - [x] Exact error code query (`E101`).
-  - [x] Natural language symptom query (*"Why is Machine B overheating?"*).
-  - [x] Cross-manual ambiguity handling (*"E101 on Machine B vs Machine A"*).
-  - [x] Insufficient information graceful refusal (*"Torque specs for third-party flange"*).
-- [x] **Source Attribution:** Exact manual name, chapter section, and page number for every diagnosis.
 
 ---
 
@@ -354,17 +367,18 @@ VH26-37-DIMENSITYLABS/
 **Team DIMENSITY LABS (VH26-37)**  
 *Vidyavardhini's College of Engineering & Technology · Department of Information Technology*
 
-| Team Member | Role / Area of Contribution | GitHub Profile |
+| Team Member | Role & Key Contributions | GitHub Profile |
 | :--- | :--- | :--- |
-| **James Lewis** | RAG Architecture & Core Pipeline | [@jameslewis](https://github.com) |
-| **Suraj Phirke** | Ingestion Pipeline & Metadata Engineering | [@Surajphirke3](https://github.com/Surajphirke3) |
-| **Deep** | UI/UX & Diagnostic Dashboard | [@deep](https://github.com) |
-| **Rajvi** | Disambiguation Logic & Confidence Evaluation | [@rajvi](https://github.com) |
+| **James Lewis** | RAG Architecture, Tier Routing & Ingestion Pipeline | [@jameslewis](https://github.com) |
+| **Suraj Phirke** | Backend Services, DB Schemas & API Integration | [@Surajphirke3](https://github.com/Surajphirke3) |
+| **Deep** | Frontend Engineering & Industrial UI Dashboard | [@deep](https://github.com) |
+| **Rajvi** | Disambiguation Logic, Confidence Gate & Quality Testing | [@rajvi](https://github.com) |
 
 ---
 
 <div align="center">
 
-Made with 💡 at **VCET HackC++thon 2026** — *Pixels to Possibilities*
+**MEND - X** — *From Failure to Function.*  
+Built with purpose for **VCET HackC++thon 2026** · *Pixels to Possibilities*
 
 </div>
