@@ -24,8 +24,13 @@ frontend/out/
 # DB
 *.sqlite
 
-# OS
+# OS & Editor
 .DS_Store
 *.swp
+.vscode/
+.claude/
+*.log
 
-.claude
+# Dumps & Excessive Data
+core
+*.core

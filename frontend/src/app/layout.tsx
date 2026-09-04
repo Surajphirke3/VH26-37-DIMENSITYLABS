@@ -1,9 +1,6 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { SessionProvider } from "@/lib/auth-context";
-
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
   title: "MEND - X — From Failure to Function | Industrial Diagnostics",
@@ -13,13 +10,16 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  themeColor: "#04040f",
+  width: "device-width",
+  initialScale: 1,
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={inter.variable}>
-      <body
-        className="font-sans antialiased min-h-screen"
-        style={{ backgroundColor: "#f8fafc", color: "#0f172a" }}
-      >
+    <html lang="en">
+      <body className="antialiased min-h-screen">
         <SessionProvider>{children}</SessionProvider>
       </body>
     </html>
