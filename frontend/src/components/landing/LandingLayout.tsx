@@ -47,32 +47,28 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-          {/* Brand Logo */}
-          <Link href="/" className="flex items-center gap-3.5 flex-shrink-0 group">
-            <div className="relative">
-              <div className="absolute -inset-1 rounded-xl bg-gradient-to-r from-indigo-600 via-violet-600 to-pink-600 opacity-60 group-hover:opacity-100 blur-sm transition-all duration-500 group-hover:scale-105" />
-              <div className="relative w-10 h-10 rounded-xl bg-[var(--bg-surface)] p-[2px] border border-[var(--border)] flex items-center justify-center overflow-hidden shadow-md">
-                <Image
-                  src={theme === "light" ? "/logo-solid.png" : "/logo-dark.png"}
-                  alt="MEND-X"
-                  width={24}
-                  height={24}
-                  className="object-contain transform group-hover:scale-110 transition-transform duration-300"
-                />
-              </div>
-            </div>
-            <div className="hidden sm:flex flex-col leading-tight">
-              <span className="font-black text-lg tracking-tight text-[var(--text-primary)] group-hover:text-indigo-400 transition-colors">
-                MEND<span className="text-indigo-500 dark:text-indigo-400">-X</span>
+          {/* Brand Logo & Name - NO circle/box, direct prominent emblem */}
+          <Link href="/" className="flex items-center gap-3 shrink-0 group py-1">
+            <Image
+              src={theme === "light" ? "/brand-icon-light.png" : "/brand-icon-dark.png"}
+              alt="MEND-X"
+              width={40}
+              height={40}
+              className="w-10 h-10 object-contain drop-shadow-sm group-hover:scale-105 transition-transform duration-200"
+              priority
+            />
+            <div className="flex flex-col leading-tight">
+              <span className="font-black text-xl sm:text-2xl tracking-tight text-slate-900 dark:text-white transition-colors flex items-center gap-0.5">
+                MEND<span className="text-teal-600 dark:text-teal-400">-X</span>
               </span>
-              <span className="font-mono text-[9px] text-[var(--text-muted)] tracking-widest uppercase font-bold">
+              <span className="font-mono text-[9px] text-slate-500 dark:text-slate-400 tracking-wider uppercase font-semibold">
                 From Failure to Function
               </span>
             </div>
           </Link>
 
           {/* Desktop Nav Links */}
-          <nav className="hidden md:flex items-center gap-1.5 p-1 rounded-2xl bg-[var(--bg-surface)]/60 backdrop-blur-md border border-[var(--border)] shadow-inner">
+          <nav className="hidden lg:flex items-center gap-1 bg-slate-100/80 dark:bg-white/[0.04] p-1.5 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] backdrop-blur-md shadow-sm">
             {NAV_LINKS.map((link) => {
               const active = pathname === link.href;
 
@@ -86,17 +82,14 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
                   >
                     <Link
                       href={link.href}
-                      className={`relative px-4 py-2 text-xs font-semibold rounded-xl transition-all duration-300 flex items-center gap-1.5 ${
+                      className={`px-3.5 py-1.5 text-xs font-semibold rounded-xl transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap ${
                         active
-                          ? "text-white font-bold bg-gradient-to-r from-indigo-600 to-violet-600 shadow-md shadow-indigo-600/30"
-                          : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/[0.06]"
+                          ? "text-white bg-indigo-600 shadow-sm"
+                          : "text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/[0.08]"
                       }`}
                     >
-                      {active && (
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                      )}
                       <span>{link.label}</span>
-                      <span className="font-mono text-[9px] px-1.5 py-0.2 rounded bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 font-bold border border-indigo-500/20">
+                      <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded-md ${active ? "bg-white/20 text-white" : "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold"}`}>
                         3
                       </span>
                       <svg
@@ -105,39 +98,37 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
                         viewBox="0 0 24 24"
                         stroke="currentColor"
                       >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
                       </svg>
                     </Link>
 
                     {/* Interactive Dropdown Preview */}
                     {modelsDropdownOpen && (
                       <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 w-80 z-50 animate-slide-down">
-                        <div className="rounded-2xl p-4 bg-white/95 dark:bg-[#12141c]/95 backdrop-blur-2xl border border-slate-200 dark:border-white/10 shadow-2xl space-y-3">
-                          <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-white/[0.06]">
-                            <span className="font-mono text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                              3-Tier Intelligence
-                            </span>
-                            <span className="font-mono text-[10px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
+                        <div className="rounded-2xl p-3 bg-white dark:bg-[#12141c] backdrop-blur-2xl border border-slate-200 dark:border-white/10 shadow-2xl space-y-1.5">
+                          <div className="flex items-center justify-between px-2.5 py-1.5 text-[10px] font-mono text-slate-400 uppercase tracking-wider border-b border-slate-100 dark:border-white/[0.06]">
+                            <span>Tiered AI Architecture</span>
+                            <span className="text-emerald-500 font-bold flex items-center gap-1">
                               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                              ONLINE
+                              Online
                             </span>
                           </div>
 
                           {/* NORD */}
                           <Link
                             href="/models"
-                            className="flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors group"
+                            className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors group"
                           >
                             <div className="flex items-center gap-2.5">
-                              <span className="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-[0_0_8px_#3b82f6]" />
+                              <span className="w-2.5 h-2.5 rounded-full bg-blue-500 shrink-0 shadow-[0_0_8px_#3b82f6]" />
                               <div>
                                 <div className="font-bold text-xs text-slate-900 dark:text-white group-hover:text-blue-500 transition-colors">
-                                  NORD · Low Tier
+                                  NORD
                                 </div>
-                                <div className="text-[10px] text-slate-500">Llama 3.1 8B (Groq) · Edge Triage</div>
+                                <div className="text-[10px] text-slate-500 dark:text-slate-400">Edge Triage · Llama 3.1</div>
                               </div>
                             </div>
-                            <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold border border-blue-500/20">
+                            <span className="font-mono text-[10px] px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold border border-blue-200 dark:border-blue-500/20 whitespace-nowrap">
                               &lt;100ms
                             </span>
                           </Link>
@@ -145,18 +136,18 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
                           {/* FORGE */}
                           <Link
                             href="/models"
-                            className="flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors group"
+                            className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors group"
                           >
                             <div className="flex items-center gap-2.5">
-                              <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-[0_0_8px_#f59e0b]" />
+                              <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0 shadow-[0_0_8px_#f59e0b]" />
                               <div>
                                 <div className="font-bold text-xs text-slate-900 dark:text-white group-hover:text-amber-500 transition-colors">
-                                  FORGE · Mid Tier
+                                  FORGE
                                 </div>
-                                <div className="text-[10px] text-slate-500">Gemini 2.0 Flash · Multi-Step Repairs</div>
+                                <div className="text-[10px] text-slate-500 dark:text-slate-400">Multi-Step Repair · Gemini 2.0</div>
                               </div>
                             </div>
-                            <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold border border-amber-500/20">
+                            <span className="font-mono text-[10px] px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold border border-amber-200 dark:border-amber-500/20 whitespace-nowrap">
                               1–3s
                             </span>
                           </Link>
@@ -164,18 +155,18 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
                           {/* APEX */}
                           <Link
                             href="/models"
-                            className="flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors group"
+                            className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors group"
                           >
                             <div className="flex items-center gap-2.5">
-                              <span className="w-2.5 h-2.5 rounded-full bg-violet-500 shadow-[0_0_8px_#8b5cf6]" />
+                              <span className="w-2.5 h-2.5 rounded-full bg-violet-500 shrink-0 shadow-[0_0_8px_#8b5cf6]" />
                               <div>
                                 <div className="font-bold text-xs text-slate-900 dark:text-white group-hover:text-violet-500 transition-colors">
-                                  APEX · High Tier
+                                  APEX
                                 </div>
-                                <div className="text-[10px] text-slate-500">Claude Sonnet 3.5 · Root Cause Analysis</div>
+                                <div className="text-[10px] text-slate-500 dark:text-slate-400">Root Cause · Claude 3.5</div>
                               </div>
                             </div>
-                            <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-violet-500/10 text-violet-600 dark:text-violet-400 font-bold border border-violet-500/20">
+                            <span className="font-mono text-[10px] px-2 py-0.5 rounded-md bg-violet-50 dark:bg-violet-500/10 text-violet-600 dark:text-violet-400 font-bold border border-violet-200 dark:border-violet-500/20 whitespace-nowrap">
                               3–8s
                             </span>
                           </Link>
@@ -183,9 +174,9 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
                           <div className="pt-2 border-t border-slate-100 dark:border-white/[0.06] text-center">
                             <Link
                               href="/models"
-                              className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 transition-colors flex items-center justify-center gap-1"
+                              className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center justify-center gap-1"
                             >
-                              Explore Full Model Matrix →
+                              Explore Model Matrix &amp; Simulator →
                             </Link>
                           </div>
                         </div>
@@ -199,15 +190,12 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`relative px-4 py-2 text-xs font-semibold rounded-xl transition-all duration-300 flex items-center gap-1.5 ${
+                  className={`px-3.5 py-1.5 text-xs font-semibold rounded-xl transition-all duration-200 whitespace-nowrap ${
                     active
-                      ? "text-white font-bold bg-gradient-to-r from-indigo-600 to-violet-600 shadow-md shadow-indigo-600/30"
-                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/[0.06]"
+                      ? "text-white bg-indigo-600 shadow-sm"
+                      : "text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/[0.08]"
                   }`}
                 >
-                  {active && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  )}
                   {link.label}
                 </Link>
               );
@@ -215,28 +203,33 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
           </nav>
 
           {/* Right Controls & CTAs */}
-          <div className="flex items-center gap-3">
-            <div className="hidden lg:flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 shadow-sm">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse shadow-[0_0_8px_#10b981]" />
-              <span className="font-mono text-[10px] text-emerald-600 dark:text-emerald-400 font-bold tracking-widest">SYSTEM ONLINE</span>
+          <div className="flex items-center gap-3 shrink-0">
+            {/* Status dot */}
+            <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-mono text-[10px] font-semibold tracking-wider whitespace-nowrap">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
+              ONLINE
             </div>
 
             {/* Theme Toggle */}
             <ThemeToggle />
 
+            <div className="hidden sm:block h-4 w-px bg-slate-200 dark:bg-white/10" />
+
+            {/* Sign In */}
             <Link
               href="/login"
-              className="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-white/[0.04] hover:bg-slate-200 dark:hover:bg-white/[0.08] border border-slate-200 dark:border-white/[0.08] transition-all duration-200"
+              className="text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white px-2.5 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/[0.05] transition-colors whitespace-nowrap shrink-0"
             >
               Sign In
             </Link>
 
+            {/* Console button */}
             <Link
               href="/dashboard"
-              className="relative group overflow-hidden px-4 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-indigo-600 via-violet-600 to-indigo-600 bg-[length:200%_auto] hover:bg-[position:right_center] shadow-lg shadow-indigo-600/30 transition-all duration-500 border border-indigo-400/30 flex items-center gap-2 transform hover:-translate-y-0.5"
+              className="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 shadow-md shadow-indigo-600/25 transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 hover:scale-[1.02] active:scale-95"
             >
               <span>Console</span>
-              <svg className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
             </Link>
@@ -244,7 +237,7 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
             {/* Mobile Menu Toggle */}
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="md:hidden p-2 rounded-xl bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08] text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+              className="lg:hidden p-2 rounded-xl bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08] text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
               aria-label="Toggle menu"
             >
               {mobileOpen ? (
@@ -291,15 +284,13 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
         <div className="absolute inset-0 bg-grid opacity-10 pointer-events-none" />
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-xs font-mono text-[var(--text-muted)] relative z-10">
           <div className="flex items-center gap-3">
-            <div className="w-7 h-7 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center">
-              <Image
-                src={theme === "light" ? "/logo-solid.png" : "/logo-dark.png"}
-                alt="MEND-X"
-                width={18}
-                height={18}
-                className="object-contain"
-              />
-            </div>
+            <Image
+              src={theme === "light" ? "/brand-icon-light.png" : "/brand-icon-dark.png"}
+              alt="MEND-X"
+              width={24}
+              height={24}
+              className="w-6 h-6 object-contain"
+            />
             <span className="font-bold text-[var(--text-primary)]">MEND-X v1.2.1</span>
             <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 border border-emerald-500/20 text-emerald-500">PROD</span>
           </div>

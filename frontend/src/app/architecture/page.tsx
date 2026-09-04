@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import LandingLayout from "@/components/landing/LandingLayout";
+import LiveArchitectureFlowchart from "@/components/architecture/LiveArchitectureFlowchart";
 
 const PIPELINE_STAGES = [
   {
@@ -134,6 +135,11 @@ export default function ArchitecturePage() {
         <p className="text-base sm:text-lg text-[var(--text-muted)] max-w-3xl leading-relaxed mb-8 animate-slide-up" style={{ animationDelay: "0.3s" }}>
           A deterministic, zero-hallucination RAG pipeline backed by pgvector ANN search. Every answer traces back to an OEM manual page. Every millisecond counts.
         </p>
+      </section>
+
+      {/* ── Live Workable System Architecture Flowchart ── */}
+      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto pb-16">
+        <LiveArchitectureFlowchart />
       </section>
 
       {/* Pipeline Visualization */}
