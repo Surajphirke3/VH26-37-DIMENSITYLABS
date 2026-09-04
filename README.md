@@ -375,8 +375,8 @@ VH26-37-DIMENSITYLABS/
 | :--- | :--- | :--- |
 | **James Lewis** | RAG Architecture, Tier Routing & Ingestion Pipeline | [@jameslewis](https://github.com) |
 | **Suraj Phirke** | Backend Services, DB Schemas & API Integration | [@Surajphirke3](https://github.com/Surajphirke3) |
-| **Deep** | Frontend Engineering & Industrial UI Dashboard | [@deep](https://github.com) |
-| **Rajvi** | Disambiguation Logic, Confidence Gate & Quality Testing | [@rajvi](https://github.com) |
+| **Deep Godhani** | Frontend Engineering & Industrial UI Dashboard | [@deep](https://github.com) |
+| **Rajvi Joshi** | Disambiguation Logic, Confidence Gate & Quality Testing | [@rajvi](https://github.com) |
 
 ---
 
