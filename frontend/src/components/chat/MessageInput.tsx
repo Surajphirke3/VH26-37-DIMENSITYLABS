@@ -33,44 +33,95 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
 
   const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setValue(e.target.value);
-    // Auto-grow
     const el = e.target;
     el.style.height = "auto";
     el.style.height = `${Math.min(el.scrollHeight, 120)}px`;
   };
 
   return (
-    <div className="border-t border-slate-200 bg-white px-4 py-3">
+    <div
+      className="shrink-0 px-4 py-4"
+      style={{
+        background: "rgba(15,17,23,0.95)",
+        borderTop: "1px solid rgba(255,255,255,0.06)",
+        backdropFilter: "blur(20px)",
+      }}
+    >
+      {/* Error Code Badge */}
       {hasErrorCode && (
-        <div className="mb-2">
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-indigo-100
-            text-indigo-700 text-xs font-semibold">
-            <span className="w-1.5 h-1.5 rounded-full bg-indigo-600" />
-            Error Code Detected
+        <div className="mb-2.5 animate-fade-in">
+          <span
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold"
+            style={{
+              background: "rgba(99,102,241,0.15)",
+              border: "1px solid rgba(99,102,241,0.35)",
+              color: "#a5b4fc",
+            }}
+          >
+            <span
+              className="w-2 h-2 rounded-full"
+              style={{ background: "#6366f1", boxShadow: "0 0 6px rgba(99,102,241,0.8)", animation: "statusBlink 1.5s ease infinite" }}
+            />
+            Error Code Detected — RAG search will activate
           </span>
         </div>
       )}
 
       <div className="flex items-end gap-3">
-        <textarea
-          ref={textareaRef}
-          value={value}
-          onChange={handleChange}
-          onKeyDown={handleKey}
-          disabled={isLoading}
-          rows={2}
-          placeholder="Enter error code (E101) or describe the symptom..."
-          className="flex-1 px-3 py-2 text-sm border border-slate-300 rounded-xl
-            focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
-            disabled:bg-slate-50 disabled:text-slate-400 transition-colors
-            min-h-[44px] max-h-[120px] leading-relaxed"
-        />
+        <div className="flex-1 relative">
+          <textarea
+            ref={textareaRef}
+            id="chat-input"
+            value={value}
+            onChange={handleChange}
+            onKeyDown={handleKey}
+            disabled={isLoading}
+            rows={2}
+            placeholder="Enter error code (E101) or describe the fault symptom…"
+            className="input-glow w-full px-4 py-3 text-sm rounded-xl leading-relaxed"
+            style={{
+              background: "rgba(255,255,255,0.04)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              color: "#f1f5f9",
+              minHeight: "52px",
+              maxHeight: "120px",
+              resize: "none",
+            }}
+          />
+          {isLoading && (
+            <div className="absolute right-3 bottom-3">
+              <div
+                className="w-4 h-4 rounded-full border-2"
+                style={{
+                  borderColor: "rgba(99,102,241,0.2)",
+                  borderTopColor: "#6366f1",
+                  animation: "spin 0.8s linear infinite",
+                }}
+              />
+            </div>
+          )}
+        </div>
+
         <button
+          id="send-btn"
           onClick={submit}
           disabled={isLoading || !value.trim()}
-          className="shrink-0 w-10 h-10 flex items-center justify-center
-            bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-200
-            text-white disabled:text-slate-400 rounded-xl transition-colors"
+          className="shrink-0 w-12 h-12 flex items-center justify-center rounded-xl font-bold transition-all"
+          style={
+            isLoading || !value.trim()
+              ? {
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  color: "#334155",
+                  cursor: "not-allowed",
+                }
+              : {
+                  background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+                  boxShadow: "0 0 20px rgba(99,102,241,0.4)",
+                  color: "#fff",
+                  transform: "scale(1.02)",
+                }
+          }
           aria-label="Send query"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -79,7 +130,12 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
           </svg>
         </button>
       </div>
-      <p className="mt-1.5 text-xs text-slate-400">Enter to send · Shift+Enter for new line</p>
+
+      <p className="mt-2 text-[10px]" style={{ color: "#1e293b" }}>
+        ↵ Enter to send &nbsp;·&nbsp; Shift+↵ for new line
+      </p>
+
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }

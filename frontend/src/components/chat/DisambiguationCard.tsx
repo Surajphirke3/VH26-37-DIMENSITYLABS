@@ -9,32 +9,78 @@ interface DisambiguationCardProps {
 
 export default function DisambiguationCard({ options, onSelect }: DisambiguationCardProps) {
   return (
-    <div className="rounded-xl border border-indigo-200 bg-indigo-50 p-4 space-y-4">
-      <div className="flex items-center gap-2">
-        <svg className="w-5 h-5 text-indigo-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-            d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <p className="text-sm font-semibold text-indigo-900">Multiple Machines Match This Error</p>
+    <div
+      className="rounded-2xl p-4 space-y-4 animate-scale-in"
+      style={{
+        background: "rgba(99,102,241,0.06)",
+        border: "1px solid rgba(99,102,241,0.2)",
+      }}
+    >
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <div
+          className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
+          style={{
+            background: "rgba(99,102,241,0.15)",
+            border: "1px solid rgba(99,102,241,0.3)",
+          }}
+        >
+          <svg className="w-4 h-4" fill="none" stroke="#6366f1" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+              d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div>
+          <p className="text-sm font-bold" style={{ color: "#a5b4fc" }}>
+            Multiple Machines Match
+          </p>
+          <p className="text-xs" style={{ color: "#6366f1" }}>
+            This error code appears in manuals for multiple machines
+          </p>
+        </div>
       </div>
-      <p className="text-sm text-indigo-800">
-        This error code appears in manuals for multiple machines. Which machine are you troubleshooting?
+
+      <p className="text-xs" style={{ color: "#64748b" }}>
+        Which machine are you troubleshooting?
       </p>
 
       <div className="space-y-2">
-        {options.map((opt) => (
+        {options.map((opt, i) => (
           <div
             key={opt.machine_id}
-            className="bg-white rounded-lg border border-indigo-100 p-3 flex items-start justify-between gap-3"
+            className="rounded-xl p-3 flex items-start justify-between gap-3 transition-all animate-fade-in"
+            style={{
+              background: "rgba(15,17,23,0.8)",
+              border: "1px solid rgba(255,255,255,0.07)",
+              animationDelay: `${i * 0.08}s`,
+            }}
           >
-            <div className="min-w-0">
-              <p className="text-sm font-semibold text-slate-800">{opt.machine_name}</p>
-              <p className="text-xs text-slate-500 mt-0.5 line-clamp-2">{opt.snippet}</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold" style={{ color: "#e2e8f0" }}>
+                {opt.machine_name}
+              </p>
+              <p className="text-xs mt-1 line-clamp-2" style={{ color: "#475569" }}>
+                {opt.snippet}
+              </p>
             </div>
             <button
               onClick={() => onSelect(opt.machine_id)}
-              className="shrink-0 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white
-                text-xs font-medium rounded-lg transition-colors"
+              className="shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all hover:scale-105"
+              style={{
+                background: "linear-gradient(135deg, rgba(99,102,241,0.3), rgba(139,92,246,0.3))",
+                border: "1px solid rgba(99,102,241,0.4)",
+                color: "#a5b4fc",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.background = "linear-gradient(135deg, #6366f1, #8b5cf6)";
+                (e.currentTarget as HTMLElement).style.color = "#fff";
+                (e.currentTarget as HTMLElement).style.boxShadow = "0 0 16px rgba(99,102,241,0.4)";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.background = "linear-gradient(135deg, rgba(99,102,241,0.3), rgba(139,92,246,0.3))";
+                (e.currentTarget as HTMLElement).style.color = "#a5b4fc";
+                (e.currentTarget as HTMLElement).style.boxShadow = "none";
+              }}
             >
               Select
             </button>
