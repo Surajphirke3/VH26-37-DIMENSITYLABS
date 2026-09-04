@@ -1,7 +1,7 @@
 .PHONY: help up down build logs migrate seed test lint install
 
 help:
-	@echo "MechMind Dev Commands"
+	@echo "MEND - X Dev Commands"
 	@echo "  make up        — start all Docker services"
 	@echo "  make down      — stop containers (keep data)"
 	@echo "  make down-v    — stop containers + delete volumes"

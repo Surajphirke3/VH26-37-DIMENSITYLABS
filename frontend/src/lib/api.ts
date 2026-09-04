@@ -91,6 +91,32 @@ export const deactivateMachine = (machineId: string): Promise<void> =>
 export const uploadManual = (formData: FormData): Promise<{ manual_id: string; ingestion_job_id: string; status: string }> =>
   apiFetch("/api/v1/manuals/upload", { method: "POST", body: formData });
 
+export interface ExtractedManualMetadata {
+  title: string;
+  machine_name: string;
+  machine_model: string;
+  manufacturer: string;
+  category: string;
+  manual_type: string;
+  version?: string;
+  document_number?: string;
+  page_count: number;
+  detected_error_codes: string[];
+  suggested_machine_id?: string;
+  suggested_machine_name?: string;
+  confidence: number;
+  extraction_method: string;
+}
+
+export const extractManualMetadata = (file: File): Promise<ExtractedManualMetadata> => {
+  const fd = new FormData();
+  fd.append("file", file);
+  return apiFetch<ExtractedManualMetadata>("/api/v1/manuals/extract-metadata", {
+    method: "POST",
+    body: fd,
+  });
+};
+
 // backend: {success, data: {items: Manual[]}}
 export const getManuals = (machineId?: string): Promise<Manual[]> => {
   const qs = machineId ? `?machine_id=${machineId}` : "";

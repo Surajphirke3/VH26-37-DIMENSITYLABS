@@ -10,12 +10,12 @@ from fastapi.responses import JSONResponse
 from app.core.config import settings
 from app.core.logging import get_logger
 
-logger = get_logger("mechmind.main")
+logger = get_logger("mend_x.main")
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    logger.info("MechMind starting", environment=settings.ENVIRONMENT)
+    logger.info("MEND - X starting", environment=settings.ENVIRONMENT)
 
     if settings.ENVIRONMENT == "development":
         from app.db.base import Base
@@ -28,14 +28,14 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
     yield
 
-    logger.info("MechMind shutting down")
+    logger.info("MEND - X shutting down")
 
 
 def create_app() -> FastAPI:
     app = FastAPI(
-        title="MechMind",
-        description="RAG-powered machine troubleshooting system",
-        version="1.0.0",
+        title="MEND - X",
+        description="From Failure to Function — Industrial RAG & Intelligent Machine Troubleshooting System",
+        version="1.0.1",
         docs_url="/api/docs",
         redoc_url="/api/redoc",
         openapi_url="/api/openapi.json",

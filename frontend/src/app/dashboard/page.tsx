@@ -46,12 +46,8 @@ export default function DashboardPage() {
     <div className="flex h-screen bg-slate-50 overflow-hidden">
       <aside className="w-64 shrink-0 bg-white border-r border-slate-200 flex flex-col">
         <div className="px-4 py-4 border-b border-slate-100 flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center">
-            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={GEAR_PATH} />
-            </svg>
-          </div>
-          <span className="font-bold text-slate-800 text-sm">MechMind</span>
+          <img src="/logo.png" alt="MEND - X" className="w-7 h-7 rounded-md object-contain" />
+          <span className="font-extrabold text-slate-900 text-sm tracking-tight">MEND - X</span>
         </div>
 
         <div className="px-3 py-3 border-b border-slate-100">
@@ -101,14 +97,19 @@ export default function DashboardPage() {
         {activeConvId === null ? (
           <div className="flex flex-col items-center justify-center flex-1 px-6 bg-slate-50">
             <div className="max-w-md text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-indigo-600 mb-6">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={GEAR_PATH} />
-                </svg>
+              <div className="flex justify-center mb-4">
+                <img 
+                  src="/logo.png" 
+                  alt="MEND - X" 
+                  className="h-20 w-auto object-contain drop-shadow-sm rounded-xl"
+                />
               </div>
-              <h2 className="text-2xl font-bold text-slate-900 mb-3">Welcome to MechMind</h2>
-              <p className="text-sm text-slate-500 mb-8">Select a machine and ask about any error code or maintenance procedure.</p>
-              <button onClick={startNewConversation} className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded-lg transition-colors">New Session</button>
+              <h2 className="text-2xl font-extrabold text-slate-900 mb-1">MEND - X</h2>
+              <p className="text-sm font-semibold text-emerald-600 mb-3">From Failure to Function.</p>
+              <p className="text-sm text-slate-500 mb-6">
+                Industrial RAG Troubleshooting System. Select a machine or ask about any alarm code, symptom, or repair procedure.
+              </p>
+              <button onClick={startNewConversation} className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded-lg transition-colors">New Troubleshooting Session</button>
             </div>
           </div>
         ) : (
