@@ -65,10 +65,10 @@ async def extract_manual_metadata(
 async def upload_manual(
     request: Request,
     file: UploadFile = File(...),
-    machine_id: Optional[UUID] = Form(None),
-    title: Optional[str] = Form(None),
+    machine_id: str | None = Form(None),
+    title: str | None = Form(None),
     manual_type: str = Form("service"),
-    version: Optional[str] = Form(None),
+    version: str | None = Form(None),
     auto_detect_metadata: bool = Form(True),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_manager_or_admin),
@@ -98,8 +98,16 @@ async def upload_manual(
         else:
             raise HTTPException(409, f"This file has already been uploaded as '{existing.title}' (duplicate detected)")
 
+    # Parse machine_id if provided
+    parsed_machine_id: UUID | None = None
+    if machine_id and str(machine_id).strip() and str(machine_id).strip().lower() not in ("null", "undefined", ""):
+        try:
+            parsed_machine_id = UUID(str(machine_id).strip())
+        except (ValueError, TypeError):
+            parsed_machine_id = None
+
     # Auto-detect metadata if machine_id or title is missing
-    if machine_id is None or not title:
+    if parsed_machine_id is None or not title:
         extractor = AutoMetadataExtractor()
         meta = await extractor.aextract_from_bytes(content, filename=file.filename or "")
 
@@ -110,7 +118,7 @@ async def upload_manual(
         if manual_type == "service" and meta.manual_type:
             manual_type = meta.manual_type
 
-        if machine_id is None:
+        if parsed_machine_id is None:
             # Search for existing machine by model or name
             stmt = select(Machine).where(
                 Machine.is_active == True,
@@ -119,7 +127,7 @@ async def upload_manual(
             res = await db.execute(stmt)
             matched = res.scalars().first()
             if matched:
-                machine_id = matched.id
+                parsed_machine_id = matched.id
             else:
                 # Automatically register machine in database
                 new_machine = Machine(
@@ -132,8 +140,8 @@ async def upload_manual(
                 )
                 db.add(new_machine)
                 await db.flush()
-                machine_id = new_machine.id
-                logger.info("machine.auto_created", machine_id=str(machine_id), name=new_machine.name)
+                parsed_machine_id = new_machine.id
+                logger.info("machine.auto_created", machine_id=str(parsed_machine_id), name=new_machine.name)
 
     # Persist to disk
     os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
@@ -143,7 +151,7 @@ async def upload_manual(
         await f.write(content)
 
     manual = Manual(
-        machine_id=machine_id,
+        machine_id=parsed_machine_id,
         title=title,
         manual_type=manual_type,
         version=version,
