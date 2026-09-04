@@ -10,6 +10,7 @@ import { useTheme } from "@/lib/theme-context";
 const NAV_LINKS = [
   { href: "/", label: "Home" },
   { href: "/problem", label: "Problem & Solution" },
+  { href: "/models", label: "Our Models", isModels: true },
   { href: "/architecture", label: "Architecture" },
   { href: "/workflow", label: "How It Works" },
 ];
@@ -19,6 +20,7 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
   const { theme } = useTheme();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [modelsDropdownOpen, setModelsDropdownOpen] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -28,6 +30,7 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
 
   useEffect(() => {
     setMobileOpen(false);
+    setModelsDropdownOpen(false);
   }, [pathname]);
 
   return (
@@ -72,6 +75,126 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
           <nav className="hidden md:flex items-center gap-1.5 p-1 rounded-2xl bg-[var(--bg-surface)]/60 backdrop-blur-md border border-[var(--border)] shadow-inner">
             {NAV_LINKS.map((link) => {
               const active = pathname === link.href;
+
+              if (link.isModels) {
+                return (
+                  <div
+                    key={link.href}
+                    className="relative"
+                    onMouseEnter={() => setModelsDropdownOpen(true)}
+                    onMouseLeave={() => setModelsDropdownOpen(false)}
+                  >
+                    <Link
+                      href={link.href}
+                      className={`relative px-4 py-2 text-xs font-semibold rounded-xl transition-all duration-300 flex items-center gap-1.5 ${
+                        active
+                          ? "text-white font-bold bg-gradient-to-r from-indigo-600 to-violet-600 shadow-md shadow-indigo-600/30"
+                          : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/[0.06]"
+                      }`}
+                    >
+                      {active && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      )}
+                      <span>{link.label}</span>
+                      <span className="font-mono text-[9px] px-1.5 py-0.2 rounded bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 font-bold border border-indigo-500/20">
+                        3
+                      </span>
+                      <svg
+                        className={`w-3 h-3 transition-transform duration-200 ${modelsDropdownOpen ? "rotate-180" : ""}`}
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </Link>
+
+                    {/* Interactive Dropdown Preview */}
+                    {modelsDropdownOpen && (
+                      <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 w-80 z-50 animate-slide-down">
+                        <div className="rounded-2xl p-4 bg-white/95 dark:bg-[#12141c]/95 backdrop-blur-2xl border border-slate-200 dark:border-white/10 shadow-2xl space-y-3">
+                          <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-white/[0.06]">
+                            <span className="font-mono text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                              3-Tier Intelligence
+                            </span>
+                            <span className="font-mono text-[10px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                              ONLINE
+                            </span>
+                          </div>
+
+                          {/* NORD */}
+                          <Link
+                            href="/models"
+                            className="flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors group"
+                          >
+                            <div className="flex items-center gap-2.5">
+                              <span className="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-[0_0_8px_#3b82f6]" />
+                              <div>
+                                <div className="font-bold text-xs text-slate-900 dark:text-white group-hover:text-blue-500 transition-colors">
+                                  NORD · Low Tier
+                                </div>
+                                <div className="text-[10px] text-slate-500">Llama 3.1 8B (Groq) · Edge Triage</div>
+                              </div>
+                            </div>
+                            <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold border border-blue-500/20">
+                              &lt;100ms
+                            </span>
+                          </Link>
+
+                          {/* FORGE */}
+                          <Link
+                            href="/models"
+                            className="flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors group"
+                          >
+                            <div className="flex items-center gap-2.5">
+                              <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-[0_0_8px_#f59e0b]" />
+                              <div>
+                                <div className="font-bold text-xs text-slate-900 dark:text-white group-hover:text-amber-500 transition-colors">
+                                  FORGE · Mid Tier
+                                </div>
+                                <div className="text-[10px] text-slate-500">Gemini 2.0 Flash · Multi-Step Repairs</div>
+                              </div>
+                            </div>
+                            <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold border border-amber-500/20">
+                              1–3s
+                            </span>
+                          </Link>
+
+                          {/* APEX */}
+                          <Link
+                            href="/models"
+                            className="flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors group"
+                          >
+                            <div className="flex items-center gap-2.5">
+                              <span className="w-2.5 h-2.5 rounded-full bg-violet-500 shadow-[0_0_8px_#8b5cf6]" />
+                              <div>
+                                <div className="font-bold text-xs text-slate-900 dark:text-white group-hover:text-violet-500 transition-colors">
+                                  APEX · High Tier
+                                </div>
+                                <div className="text-[10px] text-slate-500">Claude Sonnet 3.5 · Root Cause Analysis</div>
+                              </div>
+                            </div>
+                            <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-violet-500/10 text-violet-600 dark:text-violet-400 font-bold border border-violet-500/20">
+                              3–8s
+                            </span>
+                          </Link>
+
+                          <div className="pt-2 border-t border-slate-100 dark:border-white/[0.06] text-center">
+                            <Link
+                              href="/models"
+                              className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 transition-colors flex items-center justify-center gap-1"
+                            >
+                              Explore Full Model Matrix →
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+
               return (
                 <Link
                   key={link.href}

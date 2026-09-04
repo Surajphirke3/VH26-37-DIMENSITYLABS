@@ -1,263 +1,603 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
+import Image from "next/image";
 import LandingLayout from "@/components/landing/LandingLayout";
-import { MODELS } from "@/lib/models";
 import { useTheme } from "@/lib/theme-context";
 
-const TIER_COMPARISON = [
-  { metric: "Response Time", nord: "<100ms", forge: "1–3s", apex: "3–8s" },
-  { metric: "Throughput", nord: "14,900 q/s", forge: "542 q/s", apex: "189 q/s" },
-  { metric: "Accuracy", nord: "99.2%", forge: "97.8%", apex: "99.7%" },
-  { metric: "Context Window", nord: "8,192 tokens", forge: "1M tokens", apex: "200K tokens" },
-  { metric: "Chunks Retrieved", nord: "3", forge: "8", apex: "16" },
-  { metric: "Deployment", nord: "Edge / Air-gap", forge: "Cloud / VPC", apex: "Dedicated VPC" },
-  { metric: "Embedding Dims", nord: "384 (edge)", forge: "1,536", apex: "3,072" },
-  { metric: "Compliance", nord: "Zero egress", forge: "SOC 2 / GDPR", apex: "DO-254 / IEC-61508" },
+interface ModelSpec {
+  name: "NORD" | "FORGE" | "APEX";
+  tierLabel: string;
+  tagline: string;
+  accentColor: string;
+  accentBg: string;
+  accentBorder: string;
+  engine: string;
+  latency: string;
+  contextWindow: string;
+  hardwareTarget: string;
+  logoLight: string;
+  logoDark: string;
+  summary: string;
+  keyStrengths: string[];
+  idealQueries: string[];
+  deploymentSpecs: {
+    memory: string;
+    throughput: string;
+    protocol: string;
+    edgeReady: boolean;
+  };
+}
+
+const MODELS_DATA: Record<"NORD" | "FORGE" | "APEX", ModelSpec> = {
+  NORD: {
+    name: "NORD",
+    tierLabel: "TIER 01 · LOW LATENCY",
+    tagline: "Instant Edge Triage & Error Code Matching",
+    accentColor: "#3b82f6",
+    accentBg: "rgba(59,130,246,0.08)",
+    accentBorder: "rgba(59,130,246,0.25)",
+    engine: "Groq LPU / Llama 3.1 8B Instant",
+    latency: "< 100ms",
+    contextWindow: "8,192 tokens",
+    hardwareTarget: "Edge IPC, Siemens SIMATIC IPC, Raspberry Pi 5 CM4",
+    logoLight: "/nord-light.png",
+    logoDark: "/nord-dark.png",
+    summary:
+      "Engineered for sub-second frontline operations where speed is paramount. NORD immediately resolves single-point error codes, binary status checks, and straightforward manual lookups directly on the factory line.",
+    keyStrengths: [
+      "Sub-100 millisecond response time",
+      "Runs on local edge hardware without cloud dependency",
+      "High-throughput concurrent polling for line controllers",
+      "Deterministic error-code to manual page mapping",
+    ],
+    idealQueries: [
+      "Fanuc error SRVO-006 Hand broken",
+      "Haas VF-4 Alarm 102 meaning",
+      "KUKA KRC4 fuse rating for drive controller",
+      "Siemens S7-1500 LED red blink code 0x8090",
+    ],
+    deploymentSpecs: {
+      memory: "8 GB RAM / 4-core Edge CPU",
+      throughput: "140+ tokens/sec",
+      protocol: "Local gRPC / Edge WebSocket",
+      edgeReady: true,
+    },
+  },
+  FORGE: {
+    name: "FORGE",
+    tierLabel: "TIER 02 · PRODUCTION WORKHORSE",
+    tagline: "Multi-Step Repair & Component Cross-Reference",
+    accentColor: "#f59e0b",
+    accentBg: "rgba(245,158,11,0.08)",
+    accentBorder: "rgba(245,158,11,0.25)",
+    engine: "Google Gemini 2.0 Flash",
+    latency: "1.2s – 2.4s",
+    contextWindow: "1,000,000 tokens",
+    hardwareTarget: "Plant Floor Server, On-Prem Linux Workstation, Hybrid Cloud",
+    logoLight: "/forge-light.png",
+    logoDark: "/forge-dark.png",
+    summary:
+      "The heavy-duty core of MEND-X. FORGE interprets multi-page troubleshooting workflows, cross-references wiring schematics with physical part numbers, and formats step-by-step repair instructions for technicians.",
+    keyStrengths: [
+      "Massive multi-page context ingestion (entire chapter cross-referencing)",
+      "Strict sequence ordering for maintenance procedures",
+      "Extracts torque ratings, calibration tables, and tool requirements",
+      "Pin-accurate wiring harness and connector trace analysis",
+    ],
+    idealQueries: [
+      "How to disassemble and repack Haas VF-4 spindle bearings",
+      "Step-by-step calibration procedure for KUKA axis 4 resolver",
+      "Siemens Profinet cyclic communication timeout troubleshooting",
+      "Torque specs and gasket replacement order for hydraulic manifold",
+    ],
+    deploymentSpecs: {
+      memory: "16 GB RAM / Hybrid Gateway",
+      throughput: "95 tokens/sec",
+      protocol: "Secure REST / SSE Stream",
+      edgeReady: true,
+    },
+  },
+  APEX: {
+    name: "APEX",
+    tierLabel: "TIER 03 · DEEP REASONING",
+    tagline: "Root-Cause Analysis & Safety-Critical Diagnostics",
+    accentColor: "#8b5cf6",
+    accentBg: "rgba(139,92,246,0.08)",
+    accentBorder: "rgba(139,92,246,0.25)",
+    engine: "Anthropic Claude Sonnet 3.5",
+    latency: "3.2s – 6.5s",
+    contextWindow: "200,000 tokens",
+    hardwareTarget: "High-Security Plant VPC / Isolated On-Prem Cluster",
+    logoLight: "/apex-light.png",
+    logoDark: "/apex-dark.png",
+    summary:
+      "The pinnacle of industrial diagnostic intelligence. APEX activates for complex cascading faults, unknown multi-subsystem breakdowns, and safety-critical operations where any mistake risks catastrophic equipment failure or human injury.",
+    keyStrengths: [
+      "Rigorous deductive reasoning across multiple interconnected systems",
+      "Mandatory hazard identification (arc-flash, thermal, pressure, chemical)",
+      "Synthesizes conflicting symptoms into verified root-cause hypotheses",
+      "Generates OSHA and ISO-compliant maintenance audit protocols",
+    ],
+    idealQueries: [
+      "Spindle seized with simultaneous encoder failure and bus under-voltage",
+      "Emergency shutdown sequence after coolant reservoir leak onto high-voltage bus",
+      "Harmonic drive backlash with abnormal thermal expansion at full load",
+      "Comprehensive failure mode & effects analysis (FMEA) for robot arm collapse",
+    ],
+    deploymentSpecs: {
+      memory: "Enterprise Cloud / Dedicated Secure GPU",
+      throughput: "65 tokens/sec",
+      protocol: "Mutual TLS 1.3 / Air-Gapped Option",
+      edgeReady: false,
+    },
+  },
+};
+
+const SIMULATOR_PRESETS = [
+  {
+    query: "Fanuc SRVO-006 alarm lookup",
+    machine: "Fanuc M20iA",
+    routedTo: "NORD" as const,
+    complexityScore: 0.18,
+    reasoning: "Keyword-exact fault code inquiry. Requires direct catalog retrieval without multi-step procedural synthesis. Instant edge response.",
+  },
+  {
+    query: "Haas VF-4 Spindle Overheat: Step-by-step chiller filter flush and thermistor pin test",
+    machine: "Haas VF-4 CNC",
+    routedTo: "FORGE" as const,
+    complexityScore: 0.58,
+    reasoning: "Multi-step mechanical maintenance procedure requiring sequential action items, tool specs, and component cross-referencing.",
+  },
+  {
+    query: "Cascading bus fault and hydraulic pressure collapse with burning odor after power surge",
+    machine: "KUKA KR210 & Siemens S7",
+    routedTo: "APEX" as const,
+    complexityScore: 0.89,
+    reasoning: "Complex cross-subsystem incident involving electrical surge and physical hydraulic hazard. Requires root-cause deduction and safety PPE protocol.",
+  },
 ];
 
 export default function ModelsPage() {
   const { theme } = useTheme();
-  const [selectedModel, setSelectedModel] = useState(0);
+  const [selectedModel, setSelectedModel] = useState<"NORD" | "FORGE" | "APEX">("FORGE");
+  const [activePreset, setActivePreset] = useState(1);
+  const activeSpec = MODELS_DATA[selectedModel];
+  const sim = SIMULATOR_PRESETS[activePreset];
 
   return (
     <LandingLayout>
-      {/* Ambient Background */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden bg-grid">
-        <div className="absolute top-1/4 -right-1/4 w-[800px] h-[800px] rounded-full orb opacity-15" style={{ background: "radial-gradient(circle, #8b5cf6 0%, transparent 70%)" }} />
-        <div className="absolute bottom-1/4 -left-1/4 w-[600px] h-[600px] rounded-full orb opacity-12" style={{ background: "radial-gradient(circle, #3b82f6 0%, transparent 70%)", animationDelay: "-5s" }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full orb opacity-8" style={{ background: "radial-gradient(circle, #f59e0b 0%, transparent 70%)", animationDelay: "-8s" }} />
+      {/* ─── Background Grid & Ambient Glows ─── */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute top-0 left-0 w-full h-full bg-grid opacity-15" />
+        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[160px]" />
+        <div className="absolute top-1/2 right-1/4 w-[600px] h-[600px] bg-amber-500/10 rounded-full blur-[180px]" />
+        <div className="absolute bottom-1/4 left-1/3 w-[550px] h-[550px] bg-violet-600/10 rounded-full blur-[170px]" />
       </div>
 
-      {/* Hero */}
-      <section className="relative z-10 pt-40 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col items-center text-center">
-        <div className="inline-flex items-center gap-3 mb-8 px-4 py-2 rounded-full glass border border-[var(--border)] animate-slide-up" style={{ animationDelay: "0.1s" }}>
-          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/25">
-            <span className="w-2 h-2 rounded-full bg-violet-500 shadow-[0_0_8px_#8b5cf6] animate-pulse" />
-            <span className="font-mono text-[10px] font-bold text-violet-600 dark:text-violet-400 tracking-widest uppercase">AI Intelligence</span>
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-24">
+        {/* ─── Header Badge & Title ─── */}
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/25 text-indigo-600 dark:text-indigo-400 font-mono text-[11px] font-bold tracking-widest uppercase mb-6">
+            <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 dark:bg-indigo-400 animate-pulse" />
+            MEND - X · MULTI-MODEL INFERENCE MATRIX
+          </div>
+          <h1 className="font-black text-4xl sm:text-6xl text-slate-900 dark:text-white tracking-tight leading-tight mb-6">
+            Three Intelligence Tiers.<br />
+            <span
+              style={{
+                background: "linear-gradient(135deg, #3b82f6, #f59e0b, #8b5cf6)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
+            >
+              Zero Hallucination.
+            </span>
+          </h1>
+          <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
+            One generic LLM cannot solve factory downtime. PLCs demand sub-100ms edge speed; complex breakdowns require deep deductive reasoning. MEND-X dynamically routes every query to the exact intelligence tier needed.
+          </p>
+
+          {/* Quick Metrics Banner */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-10 p-2 rounded-2xl bg-white/70 dark:bg-white/[0.02] border border-slate-200 dark:border-white/[0.08] shadow-sm">
+            <div className="p-3 text-center">
+              <div className="font-mono font-black text-2xl text-blue-600 dark:text-blue-400">&lt; 100ms</div>
+              <div className="text-[11px] text-slate-500 mt-0.5">Minimum Latency</div>
+            </div>
+            <div className="p-3 text-center border-l border-slate-100 dark:border-white/[0.06]">
+              <div className="font-mono font-black text-2xl text-amber-600 dark:text-amber-400">100%</div>
+              <div className="text-[11px] text-slate-500 mt-0.5">Manual Grounded</div>
+            </div>
+            <div className="p-3 text-center border-l border-slate-100 dark:border-white/[0.06]">
+              <div className="font-mono font-black text-2xl text-violet-600 dark:text-violet-400">3 Tiers</div>
+              <div className="text-[11px] text-slate-500 mt-0.5">Dynamic Routing</div>
+            </div>
+            <div className="p-3 text-center border-l border-slate-100 dark:border-white/[0.06]">
+              <div className="font-mono font-black text-2xl text-emerald-600 dark:text-emerald-400">0.0%</div>
+              <div className="text-[11px] text-slate-500 mt-0.5">Hallucination Target</div>
+            </div>
           </div>
         </div>
 
-        <h1 className="font-black text-[clamp(3rem,8vw,6rem)] leading-[1] tracking-tighter uppercase text-[var(--text-primary)] mb-6 animate-slide-up" style={{ animationDelay: "0.2s" }}>
-          Three Engines.<br />
-          <span className="gradient-text">One Mission.</span>
-        </h1>
-
-        <p className="text-base sm:text-lg text-[var(--text-muted)] max-w-3xl leading-relaxed mb-10 animate-slide-up" style={{ animationDelay: "0.3s" }}>
-          MEND-X routes every diagnostic query to the right model. Not the most powerful model — the right model. NORD for instant answers. FORGE for multi-step reasoning. APEX for critical systems.
-        </p>
-
-        <div className="flex items-center gap-2 animate-slide-up" style={{ animationDelay: "0.4s" }}>
-          <Link href="/dashboard" className="px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold text-sm shadow-lg shadow-indigo-500/30 hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-            Try Console
-          </Link>
+        {/* ─── Model Tier Switcher Tabs ─── */}
+        <div className="flex justify-center mb-10">
+          <div className="p-1.5 rounded-2xl bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08] flex items-center gap-2">
+            {(["NORD", "FORGE", "APEX"] as const).map((mName) => {
+              const item = MODELS_DATA[mName];
+              const isSelected = selectedModel === mName;
+              return (
+                <button
+                  key={mName}
+                  onClick={() => setSelectedModel(mName)}
+                  className={`px-6 py-3 rounded-xl font-bold text-xs transition-all flex items-center gap-3 cursor-pointer ${
+                    isSelected
+                      ? "bg-white dark:bg-[#161822] text-slate-900 dark:text-white shadow-md border"
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                  }`}
+                  style={{
+                    borderColor: isSelected ? item.accentColor : "transparent",
+                  }}
+                >
+                  <span
+                    className="w-2.5 h-2.5 rounded-full"
+                    style={{ background: item.accentColor }}
+                  />
+                  <span>{item.name}</span>
+                  <span
+                    className="hidden sm:inline font-mono text-[10px] px-2 py-0.5 rounded-md"
+                    style={{
+                      background: isSelected ? item.accentBg : "transparent",
+                      color: item.accentColor,
+                    }}
+                  >
+                    {item.latency}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </section>
 
-      {/* Model Cards */}
-      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {MODELS.map((model, idx) => (
-            <button
-              key={model.id}
-              onClick={() => setSelectedModel(idx)}
-              className={`group relative p-8 rounded-3xl border-2 transition-all duration-500 text-left animate-slide-up ${
-                selectedModel === idx
-                  ? "border-opacity-100 shadow-2xl scale-[1.02]"
-                  : "border-opacity-40 hover:border-opacity-80 hover:scale-[1.01]"
-              }`}
-              style={{
-                animationDelay: `${0.1 * idx}s`,
-                background: model.colorBg,
-                borderColor: model.color,
-                boxShadow: selectedModel === idx ? `0 0 60px ${model.glowColor}, 0 20px 60px ${model.glowColor}` : `0 4px 20px ${model.glowColor}`,
-              }}
-            >
-              {/* Glow orb */}
-              <div
-                className="absolute -top-20 -right-20 w-40 h-40 rounded-full blur-3xl opacity-20 transition-opacity duration-500"
-                style={{ background: model.color }}
-              />
+        {/* ─── Active Model Showcase Card ─── */}
+        <div
+          className="rounded-3xl p-8 sm:p-12 border bg-white dark:bg-[#0f1118]/80 backdrop-blur-xl shadow-xl transition-all duration-300 relative overflow-hidden mb-20"
+          style={{
+            borderColor: activeSpec.accentBorder,
+            boxShadow: `0 8px 32px ${activeSpec.accentColor}12`,
+          }}
+        >
+          {/* Ambient Glow */}
+          <div
+            className="absolute top-0 right-0 w-96 h-96 rounded-full blur-[140px] pointer-events-none opacity-20"
+            style={{ background: activeSpec.accentColor }}
+          />
 
-              {/* Tier badge */}
-              <div className="flex items-center justify-between mb-8">
-                <span className="font-mono text-[10px] font-black tracking-widest uppercase px-2 py-1 rounded" style={{ color: model.color, backgroundColor: `${model.color}20`, border: `1px solid ${model.color}40` }}>
-                  {model.tier}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 relative z-10 items-start">
+            {/* Left Column: Brand, Tagline, Latency & Target */}
+            <div className="lg:col-span-5 space-y-6">
+              <div className="flex items-center gap-3">
+                <span
+                  className="font-mono text-xs font-black tracking-widest uppercase px-3 py-1 rounded-md border"
+                  style={{
+                    color: activeSpec.accentColor,
+                    background: activeSpec.accentBg,
+                    borderColor: activeSpec.accentBorder,
+                  }}
+                >
+                  {activeSpec.tierLabel}
                 </span>
-                {selectedModel === idx && (
-                  <span className="text-xs font-bold uppercase tracking-widest" style={{ color: model.color }}>
-                    Active
+                {activeSpec.deploymentSpecs.edgeReady && (
+                  <span className="font-mono text-[10px] px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25 font-bold">
+                    EDGE DEPLOYABLE
                   </span>
                 )}
               </div>
 
-              {/* Logo */}
-              <div className="h-16 mb-6 flex items-center">
-                <Image
-                  src={theme === "light" ? `/${model.id}-light.png` : `/${model.id}-dark.png`}
-                  alt={model.name}
-                  width={140}
-                  height={60}
-                  className="object-contain"
-                />
-              </div>
-
-              {/* Model info */}
-              <div className="mb-6">
-                <h2 className="text-2xl font-black text-[var(--text-primary)] mb-1">{model.name}</h2>
-                <p className="text-sm font-medium" style={{ color: model.color }}>{model.tagline}</p>
-              </div>
-
-              <p className="text-sm text-[var(--text-muted)] leading-relaxed mb-6">
-                {model.useCase}
-              </p>
-
-              {/* Latency pill */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: model.color, boxShadow: `0 0 8px ${model.color}` }} />
-                  <span className="font-mono text-sm font-bold" style={{ color: model.color }}>{model.latency}</span>
+              {/* Logo & Headline */}
+              <div className="space-y-3">
+                <div className="h-16 flex items-center">
+                  <Image
+                    src={theme === "light" ? activeSpec.logoLight : activeSpec.logoDark}
+                    alt={activeSpec.name}
+                    width={140}
+                    height={55}
+                    className="object-contain"
+                  />
                 </div>
-                <span className="text-xs font-semibold text-[var(--text-secondary)] group-hover:translate-x-1 transition-transform flex items-center gap-1">
-                  Explore
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
-                </span>
+                <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
+                  {activeSpec.tagline}
+                </h2>
+                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                  {activeSpec.summary}
+                </p>
               </div>
-            </button>
-          ))}
-        </div>
-      </section>
 
-      {/* Selected Model Detail */}
-      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-16">
-        <div
-          className="rounded-3xl p-10 border transition-all duration-500 animate-scale-in"
-          style={{
-            background: MODELS[selectedModel].colorBg,
-            borderColor: MODELS[selectedModel].color,
-            boxShadow: `0 0 80px ${MODELS[selectedModel].glowColor}`,
-          }}
-        >
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Left: Info */}
-            <div>
-              <div className="flex items-center gap-3 mb-4">
-                <Image
-                  src={theme === "light" ? `/${MODELS[selectedModel].id}-light.png` : `/${MODELS[selectedModel].id}-dark.png`}
-                  alt={MODELS[selectedModel].name}
-                  width={120}
-                  height={50}
-                  className="object-contain"
-                />
-                <div>
-                  <h2 className="text-3xl font-black text-[var(--text-primary)]">{MODELS[selectedModel].name}</h2>
-                  <p className="text-sm font-semibold" style={{ color: MODELS[selectedModel].color }}>{MODELS[selectedModel].model} · {MODELS[selectedModel].provider}</p>
+              {/* Hardware & Spec Callouts */}
+              <div className="space-y-2.5 pt-4 border-t border-slate-100 dark:border-white/[0.08]">
+                <div className="flex items-center justify-between text-xs py-1">
+                  <span className="text-slate-500 font-mono">Underlying LLM Engine</span>
+                  <span className="font-semibold text-slate-900 dark:text-slate-200">{activeSpec.engine}</span>
+                </div>
+                <div className="flex items-center justify-between text-xs py-1">
+                  <span className="text-slate-500 font-mono">Average Latency</span>
+                  <span className="font-mono font-bold" style={{ color: activeSpec.accentColor }}>
+                    {activeSpec.latency}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-xs py-1">
+                  <span className="text-slate-500 font-mono">Context Window</span>
+                  <span className="font-mono text-slate-700 dark:text-slate-300">{activeSpec.contextWindow}</span>
+                </div>
+                <div className="flex items-center justify-between text-xs py-1">
+                  <span className="text-slate-500 font-mono">Inference Throughput</span>
+                  <span className="font-mono text-slate-700 dark:text-slate-300">{activeSpec.deploymentSpecs.throughput}</span>
+                </div>
+                <div className="flex items-center justify-between text-xs py-1">
+                  <span className="text-slate-500 font-mono">Recommended Host</span>
+                  <span className="text-slate-700 dark:text-slate-300 truncate max-w-[220px]" title={activeSpec.hardwareTarget}>
+                    {activeSpec.hardwareTarget}
+                  </span>
                 </div>
               </div>
-
-              <p className="text-[var(--text-muted)] leading-relaxed mb-8 mt-6">
-                {MODELS[selectedModel].longDesc}
-              </p>
-
-              <Link
-                href={`/models/${MODELS[selectedModel].id}`}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm text-white transition-all hover:scale-105 active:scale-95"
-                style={{ background: MODELS[selectedModel].gradient, boxShadow: `0 0 30px ${MODELS[selectedModel].glowColor}` }}
-              >
-                Explore {MODELS[selectedModel].name}
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
-              </Link>
             </div>
 
-            {/* Right: Key Metrics */}
-            <div>
-              <h3 className="text-xs font-mono font-bold uppercase tracking-widest text-[var(--text-secondary)] mb-6">Performance Metrics</h3>
-              <div className="grid grid-cols-2 gap-4">
-                {MODELS[selectedModel].metrics.map((m, i) => (
-                  <div key={i} className="p-4 rounded-xl border border-[var(--border)]" style={{ background: "var(--bg-surface)" }}>
-                    <p className="font-mono text-[10px] text-[var(--text-secondary)] uppercase tracking-wider mb-1">{m.label}</p>
-                    <p className="text-2xl font-black text-[var(--text-primary)] font-mono">{m.value}</p>
-                    {m.unit && <p className="text-xs text-[var(--text-muted)]">{m.unit}</p>}
+            {/* Right Column: Strengths & Sample Queries */}
+            <div className="lg:col-span-7 space-y-6">
+              {/* Strengths */}
+              <div className="p-6 rounded-2xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200 dark:border-white/[0.06]">
+                <h3 className="font-mono text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-4 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full" style={{ background: activeSpec.accentColor }} />
+                  Engineered Superpowers
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {activeSpec.keyStrengths.map((str, i) => (
+                    <div key={i} className="flex items-start gap-2.5 text-xs text-slate-700 dark:text-slate-300">
+                      <svg
+                        className="w-4 h-4 shrink-0 mt-0.5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke={activeSpec.accentColor}
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span>{str}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Sample Queries Handled */}
+              <div className="p-6 rounded-2xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200 dark:border-white/[0.06]">
+                <h3 className="font-mono text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-4 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full" style={{ background: activeSpec.accentColor }} />
+                  Target Real-World Queries
+                </h3>
+                <div className="space-y-2">
+                  {activeSpec.idealQueries.map((q, i) => (
+                    <div
+                      key={i}
+                      className="px-4 py-2.5 rounded-xl bg-white dark:bg-[#12141c] border border-slate-200 dark:border-white/[0.06] text-xs font-mono text-slate-800 dark:text-slate-200 flex items-center justify-between gap-3 group"
+                    >
+                      <span className="truncate">&gt; {q}</span>
+                      <span className="text-[10px] font-sans font-semibold shrink-0 px-2 py-0.5 rounded bg-slate-100 dark:bg-white/[0.05] text-slate-500">
+                        {activeSpec.name} Handled
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ─── Interactive Query Routing Simulator ─── */}
+        <section className="mb-24">
+          <div className="text-center max-w-2xl mx-auto mb-10">
+            <span className="font-mono text-[10px] text-slate-500 uppercase tracking-[0.3em]">
+              LIVE INFERENCE ROUTER
+            </span>
+            <h2 className="font-black text-3xl sm:text-4xl text-slate-900 dark:text-white mt-2 mb-3">
+              How MEND-X Decides the Tier
+            </h2>
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              Click a real maintenance scenario below to see the heuristic complexity analyzer evaluate the query and dynamically activate the optimal model.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+            {/* Scenarios List */}
+            <div className="lg:col-span-5 space-y-3">
+              {SIMULATOR_PRESETS.map((p, idx) => {
+                const isActive = activePreset === idx;
+                const targetModel = MODELS_DATA[p.routedTo];
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => setActivePreset(idx)}
+                    className={`w-full text-left p-4 rounded-2xl border transition-all cursor-pointer ${
+                      isActive
+                        ? "bg-white dark:bg-[#141620] shadow-md border-indigo-500/50 scale-[1.02]"
+                        : "bg-white/60 dark:bg-white/[0.02] border-slate-200 dark:border-white/[0.06] hover:bg-slate-50 dark:hover:bg-white/[0.04]"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[11px] font-mono text-slate-500 font-semibold">{p.machine}</span>
+                      <span
+                        className="font-mono text-[10px] font-bold px-2 py-0.5 rounded"
+                        style={{
+                          background: targetModel.accentBg,
+                          color: targetModel.accentColor,
+                        }}
+                      >
+                        {p.routedTo}
+                      </span>
+                    </div>
+                    <p className="text-xs font-semibold text-slate-900 dark:text-slate-200 leading-snug">
+                      "{p.query}"
+                    </p>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Simulated Routing Engine Terminal */}
+            <div className="lg:col-span-7 rounded-2xl bg-slate-950 text-slate-200 p-6 font-mono text-xs border border-indigo-500/30 shadow-2xl flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between pb-3 mb-4 border-b border-white/10">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
+                    <span className="text-[11px] text-slate-400 ml-2">ROUTER_TRACE // CLASSIFIER_V2</span>
                   </div>
-                ))}
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300">
+                    REALTIME ANALYSIS
+                  </span>
+                </div>
+
+                <div className="space-y-3">
+                  <div>
+                    <span className="text-slate-500">INPUT_PROMPT: </span>
+                    <span className="text-slate-100">"{sim.query}"</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-500">TARGET_MACHINE: </span>
+                    <span className="text-indigo-400">{sim.machine}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-500">COMPLEXITY_METRIC: </span>
+                    <span className="text-amber-400 font-bold">{sim.complexityScore.toFixed(2)} / 1.00</span>
+                    <span className="text-slate-500 ml-2">
+                      ({sim.complexityScore < 0.35 ? "Single Lookup" : sim.complexityScore < 0.70 ? "Procedural Repair" : "Critical Reasoning"})
+                    </span>
+                  </div>
+
+                  {/* Progress Bar */}
+                  <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden mt-1">
+                    <div
+                      className="h-full rounded-full transition-all duration-500"
+                      style={{
+                        width: `${sim.complexityScore * 100}%`,
+                        background:
+                          sim.complexityScore < 0.35
+                            ? "#3b82f6"
+                            : sim.complexityScore < 0.70
+                            ? "#f59e0b"
+                            : "#8b5cf6",
+                      }}
+                    />
+                  </div>
+
+                  <div className="p-3 rounded-lg bg-white/[0.04] border border-white/10 mt-3 text-slate-300 text-[11px] leading-relaxed">
+                    <span className="text-emerald-400 font-bold">DECISION_RATIONALE: </span>
+                    {sim.reasoning}
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-4 mt-4 border-t border-white/10 flex items-center justify-between text-slate-400 text-[11px]">
+                <span>ROUTED_LLM: <strong className="text-white">{MODELS_DATA[sim.routedTo].engine}</strong></span>
+                <span className="text-emerald-400 font-bold">LATENCY: {MODELS_DATA[sim.routedTo].latency}</span>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Feature Cards */}
-      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {MODELS[selectedModel].features.map((feat, i) => (
-            <div key={i} className="p-6 rounded-2xl border border-[var(--border)] glass-hover" style={{ background: "var(--bg-surface)" }}>
-              <div className="text-2xl mb-3">{feat.icon}</div>
-              <h4 className="font-bold text-[var(--text-primary)] mb-2">{feat.title}</h4>
-              <p className="text-sm text-[var(--text-muted)]">{feat.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+        {/* ─── Comparative Specifications Matrix ─── */}
+        <section className="mb-24">
+          <div className="text-center max-w-2xl mx-auto mb-10">
+            <span className="font-mono text-[10px] text-slate-500 uppercase tracking-[0.3em]">
+              TECHNICAL SPECIFICATIONS
+            </span>
+            <h2 className="font-black text-3xl sm:text-4xl text-slate-900 dark:text-white mt-2">
+              Side-by-Side Comparison
+            </h2>
+          </div>
 
-      {/* Tier Comparison Table */}
-      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-16 border-t border-[var(--border)]">
-        <div className="text-center mb-12">
-          <span className="inline-block font-mono text-[10px] uppercase font-bold text-indigo-500 tracking-widest bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20 mb-4">
-            Side by Side
-          </span>
-          <h2 className="font-black text-3xl sm:text-4xl text-[var(--text-primary)] tracking-tight">
-            How They Compare
-          </h2>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b-2 border-[var(--border)]">
-                <th className="text-left px-4 py-4 font-black text-[var(--text-primary)]">Metric</th>
-                <th className="text-center px-4 py-4 font-mono text-[10px] font-bold text-blue-500 uppercase tracking-widest">NORD</th>
-                <th className="text-center px-4 py-4 font-mono text-[10px] font-bold text-amber-500 uppercase tracking-widest">FORGE</th>
-                <th className="text-center px-4 py-4 font-mono text-[10px] font-bold text-violet-500 uppercase tracking-widest">APEX</th>
-              </tr>
-            </thead>
-            <tbody>
-              {TIER_COMPARISON.map((row, i) => (
-                <tr key={i} className="border-b border-[var(--border)] hover:bg-[var(--bg-surface)]/30 transition-colors">
-                  <td className="px-4 py-4 font-semibold text-[var(--text-primary)]">{row.metric}</td>
-                  <td className="text-center px-4 py-4 font-mono text-xs text-blue-400">{row.nord}</td>
-                  <td className="text-center px-4 py-4 font-mono text-xs text-amber-400">{row.forge}</td>
-                  <td className="text-center px-4 py-4 font-mono text-xs text-violet-400">{row.apex}</td>
+          <div className="overflow-x-auto rounded-2xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#0f1118]/80 shadow-md">
+            <table className="w-full text-left text-xs">
+              <thead>
+                <tr className="border-b border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-white/[0.02]">
+                  <th className="p-4 font-mono font-bold text-slate-500">Metric / Capability</th>
+                  <th className="p-4 font-bold text-blue-600 dark:text-blue-400">NORD (Tier 01)</th>
+                  <th className="p-4 font-bold text-amber-600 dark:text-amber-400">FORGE (Tier 02)</th>
+                  <th className="p-4 font-bold text-violet-600 dark:text-violet-400">APEX (Tier 03)</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-white/[0.05]">
+                <tr>
+                  <td className="p-4 font-medium text-slate-600 dark:text-slate-400">Primary Objective</td>
+                  <td className="p-4 text-slate-800 dark:text-slate-200 font-semibold">Sub-100ms Error Code Triage</td>
+                  <td className="p-4 text-slate-800 dark:text-slate-200 font-semibold">Multi-Step Repair Sequences</td>
+                  <td className="p-4 text-slate-800 dark:text-slate-200 font-semibold">Root Cause & Safety Critical</td>
+                </tr>
+                <tr>
+                  <td className="p-4 font-medium text-slate-600 dark:text-slate-400">Base LLM Engine</td>
+                  <td className="p-4 font-mono text-slate-700 dark:text-slate-300">Llama 3.1 8B Instant (Groq)</td>
+                  <td className="p-4 font-mono text-slate-700 dark:text-slate-300">Google Gemini 2.0 Flash</td>
+                  <td className="p-4 font-mono text-slate-700 dark:text-slate-300">Claude Sonnet 3.5 (Anthropic)</td>
+                </tr>
+                <tr>
+                  <td className="p-4 font-medium text-slate-600 dark:text-slate-400">Response Latency</td>
+                  <td className="p-4 font-mono font-bold text-blue-600 dark:text-blue-400">&lt; 100ms</td>
+                  <td className="p-4 font-mono font-bold text-amber-600 dark:text-amber-400">1.2s – 2.4s</td>
+                  <td className="p-4 font-mono font-bold text-violet-600 dark:text-violet-400">3.2s – 6.5s</td>
+                </tr>
+                <tr>
+                  <td className="p-4 font-medium text-slate-600 dark:text-slate-400">Context Window</td>
+                  <td className="p-4 font-mono text-slate-700 dark:text-slate-300">8,192 tokens</td>
+                  <td className="p-4 font-mono text-slate-700 dark:text-slate-300">1,000,000 tokens</td>
+                  <td className="p-4 font-mono text-slate-700 dark:text-slate-300">200,000 tokens</td>
+                </tr>
+                <tr>
+                  <td className="p-4 font-medium text-slate-600 dark:text-slate-400">Edge / Offline Capable</td>
+                  <td className="p-4 text-emerald-600 dark:text-emerald-400 font-bold">Yes (Local IPC / ONNX)</td>
+                  <td className="p-4 text-emerald-600 dark:text-emerald-400 font-bold">Yes (Plant Server)</td>
+                  <td className="p-4 text-slate-500">Air-Gapped Private VPC</td>
+                </tr>
+                <tr>
+                  <td className="p-4 font-medium text-slate-600 dark:text-slate-400">Hallucination Mitigation</td>
+                  <td className="p-4 text-slate-700 dark:text-slate-300">Strict RAG Masking</td>
+                  <td className="p-4 text-slate-700 dark:text-slate-300">Page Citation Grounding</td>
+                  <td className="p-4 text-slate-700 dark:text-slate-300">Refusal Circuit + Thresholds</td>
+                </tr>
+                <tr>
+                  <td className="p-4 font-medium text-slate-600 dark:text-slate-400">Trigger Threshold</td>
+                  <td className="p-4 font-mono text-slate-700 dark:text-slate-300">complexity &lt; 0.35</td>
+                  <td className="p-4 font-mono text-slate-700 dark:text-slate-300">0.35 &le; complexity &lt; 0.70</td>
+                  <td className="p-4 font-mono text-slate-700 dark:text-slate-300">complexity &ge; 0.70</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
 
-      {/* CTA */}
-      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto py-16">
-        <div className="glass rounded-[2rem] p-10 sm:p-16 text-center border-indigo-500/20 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/10 to-transparent pointer-events-none" />
-          <h2 className="font-black text-3xl sm:text-4xl text-[var(--text-primary)] mb-4 relative z-10">
-            Choose the right tier for every query.
-          </h2>
-          <p className="text-[var(--text-muted)] text-sm sm:text-base max-w-xl mx-auto mb-8 relative z-10">
-            MEND-X routes automatically. But you can also manually select a model tier in the console for fine-grained control.
+        {/* ─── Bottom CTA ─── */}
+        <div className="p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-indigo-900/30 via-slate-900/40 to-violet-900/30 border border-indigo-500/30 text-center relative overflow-hidden">
+          <h3 className="font-black text-2xl sm:text-3xl text-slate-900 dark:text-white mb-3">
+            Experience the Inference Routing in Real-Time
+          </h3>
+          <p className="text-sm text-slate-600 dark:text-slate-400 max-w-xl mx-auto mb-6">
+            Test how MEND-X queries live OEM manuals and streams citation-verified repair protocols to line operators in under 8 seconds.
           </p>
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 relative z-10">
-            <Link href="/dashboard" className="px-8 py-4 rounded-xl font-black text-sm text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
-              Launch Console
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+          <div className="flex justify-center gap-4 flex-wrap">
+            <Link
+              href="/dashboard"
+              className="px-6 py-3 rounded-xl font-bold text-xs text-white bg-indigo-600 hover:bg-indigo-500 shadow-lg shadow-indigo-600/30 transition-all hover:scale-105"
+            >
+              Launch Troubleshooting Console
             </Link>
-            <Link href="/architecture" className="px-8 py-4 rounded-xl font-black text-sm border border-[var(--border)] text-[var(--text-primary)] hover:border-indigo-500/50 transition-colors flex items-center gap-2">
-              View Architecture
+            <Link
+              href="/architecture"
+              className="px-6 py-3 rounded-xl font-semibold text-xs text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-white/[0.05] hover:bg-slate-200 dark:hover:bg-white/[0.08] border border-slate-200 dark:border-white/[0.08] transition-all"
+            >
+              Inspect pgvector Pipeline
             </Link>
           </div>
         </div>
-      </section>
+      </div>
     </LandingLayout>
   );
 }
