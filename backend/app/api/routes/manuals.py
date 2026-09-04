@@ -13,7 +13,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.deps import get_current_user, require_manager_or_admin
 from app.core.config import settings
 from app.core.logging import get_logger
+from app.db.chroma import ChromaRepository
 from app.db.session import get_db
+from app.models.chunk import Chunk
 from app.models.ingestion_job import IngestionJob
 from app.models.machine import Machine
 from app.models.manual import Manual
@@ -200,17 +202,183 @@ async def list_manuals(
         q = q.where(Manual.machine_id == machine_id)
     result = await db.execute(q.order_by(Manual.created_at.desc()))
     manuals = result.scalars().all()
-    return {"success": True, "data": {"items": [
-        {
+
+    items = []
+    for m in manuals:
+        machine_name = None
+        if m.machine_id:
+            m_res = await db.execute(select(Machine).where(Machine.id == m.machine_id))
+            mach = m_res.scalar_one_or_none()
+            if mach:
+                machine_name = mach.name
+
+        # Count chunks
+        c_res = await db.execute(select(Chunk.id).where(Chunk.manual_id == m.id))
+        chunk_count = len(c_res.scalars().all())
+
+        items.append({
             "id": str(m.id),
             "title": m.title,
-            "processing_status": m.processing_status,
-            "machine_id": str(m.machine_id),
+            "processing_status": m.processing_status.value if hasattr(m.processing_status, "value") else str(m.processing_status),
+            "machine_id": str(m.machine_id) if m.machine_id else None,
+            "machine_name": machine_name,
+            "manual_type": m.manual_type.value if hasattr(m.manual_type, "value") else str(m.manual_type),
+            "version": m.version,
+            "language": m.language,
             "original_filename": m.original_filename,
+            "file_size_bytes": m.file_size_bytes,
+            "page_count": m.page_count,
+            "chunk_count": chunk_count,
             "created_at": str(m.created_at),
-        }
-        for m in manuals
-    ]}}
+        })
+
+    return {"success": True, "data": {"items": items}}
+
+
+@router.get("/manuals/{manual_id}", response_model=dict)
+async def get_manual_detail(
+    manual_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get single manual details with machine metadata and chunk count."""
+    res = await db.execute(select(Manual).where(Manual.id == manual_id))
+    m = res.scalar_one_or_none()
+    if not m:
+        raise HTTPException(404, "Manual not found")
+
+    machine = None
+    if m.machine_id:
+        m_res = await db.execute(select(Machine).where(Machine.id == m.machine_id))
+        mach = m_res.scalar_one_or_none()
+        if mach:
+            machine = {
+                "id": str(mach.id),
+                "name": mach.name,
+                "model": mach.model,
+                "manufacturer": mach.manufacturer,
+                "category": mach.category,
+            }
+
+    c_res = await db.execute(select(Chunk.id).where(Chunk.manual_id == m.id))
+    chunk_count = len(c_res.scalars().all())
+
+    return {"success": True, "data": {
+        "id": str(m.id),
+        "title": m.title,
+        "processing_status": m.processing_status.value if hasattr(m.processing_status, "value") else str(m.processing_status),
+        "machine_id": str(m.machine_id) if m.machine_id else None,
+        "machine": machine,
+        "manual_type": m.manual_type.value if hasattr(m.manual_type, "value") else str(m.manual_type),
+        "version": m.version,
+        "language": m.language,
+        "original_filename": m.original_filename,
+        "file_size_bytes": m.file_size_bytes,
+        "page_count": m.page_count,
+        "chunk_count": chunk_count,
+        "file_hash": m.file_hash,
+        "created_at": str(m.created_at),
+        "processing_error": m.processing_error,
+    }}
+
+
+@router.get("/manuals/{manual_id}/chunks", response_model=dict)
+async def get_manual_chunks(
+    manual_id: UUID,
+    page: int = 1,
+    page_size: int = 50,
+    search: str | None = None,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Fetch chunk list for a manual for deep inspection."""
+    q = select(Chunk).where(Chunk.manual_id == manual_id)
+    if search and search.strip():
+        q = q.where(Chunk.content.ilike(f"%{search.strip()}%"))
+
+    q = q.order_by(Chunk.chunk_index)
+    offset = max(0, (page - 1) * page_size)
+    q = q.offset(offset).limit(page_size)
+
+    res = await db.execute(q)
+    chunks = res.scalars().all()
+
+    # Total count
+    tot_q = select(Chunk.id).where(Chunk.manual_id == manual_id)
+    if search and search.strip():
+        tot_q = tot_q.where(Chunk.content.ilike(f"%{search.strip()}%"))
+    tot_res = await db.execute(tot_q)
+    total_count = len(tot_res.scalars().all())
+
+    return {"success": True, "data": {
+        "manual_id": str(manual_id),
+        "total_chunks": total_count,
+        "page": page,
+        "page_size": page_size,
+        "chunks": [
+            {
+                "id": str(c.id),
+                "chunk_index": c.chunk_index,
+                "chunk_type": c.chunk_type.value if hasattr(c.chunk_type, "value") else str(c.chunk_type),
+                "content": c.content,
+                "content_tokens": c.content_tokens,
+                "page_start": c.page_start,
+                "page_end": c.page_end,
+                "section_path": c.section_path,
+                "error_codes_present": c.error_codes_present or [],
+            }
+            for c in chunks
+        ],
+    }}
+
+
+@router.post("/manuals/{manual_id}/reprocess", response_model=dict)
+async def reprocess_manual(
+    manual_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_manager_or_admin),
+):
+    """Reprocess an existing manual from scratch."""
+    res = await db.execute(select(Manual).where(Manual.id == manual_id))
+    manual = res.scalar_one_or_none()
+    if not manual:
+        raise HTTPException(404, "Manual not found")
+
+    if not manual.file_path or not os.path.exists(manual.file_path):
+        raise HTTPException(400, "Original manual file no longer exists on disk")
+
+    # Clear old vectors from ChromaDB
+    ChromaRepository.delete_by_manual_id(manual.id)
+
+    # Delete existing DB chunks
+    del_chunks = await db.execute(select(Chunk).where(Chunk.manual_id == manual.id))
+    for c in del_chunks.scalars().all():
+        await db.delete(c)
+
+    manual.processing_status = "reprocessing"
+    manual.processing_error = None
+    job = IngestionJob(manual_id=manual.id)
+    db.add(job)
+    await db.commit()
+    await db.refresh(manual)
+    await db.refresh(job)
+
+    # Background ingestion
+    async def _run_ingestion(mid: UUID, jid: UUID) -> None:
+        from app.db.session import AsyncSessionLocal
+        from app.services.ingestion.pipeline import IngestionPipeline
+        async with AsyncSessionLocal() as bg_db:
+            pipeline = IngestionPipeline(bg_db)
+            await pipeline.run(mid, jid)
+
+    asyncio.create_task(_run_ingestion(manual.id, job.id))
+    logger.info("manual.reprocessing_triggered", manual_id=str(manual.id))
+
+    return {"success": True, "data": {
+        "manual_id": str(manual.id),
+        "ingestion_job_id": str(job.id),
+        "status": "reprocessing",
+    }}
 
 
 @router.get("/manuals/{manual_id}/status", response_model=dict)
@@ -244,11 +412,17 @@ async def delete_manual(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_manager_or_admin),
 ):
-    """Delete a manual, its file, chunks, and ingestion jobs."""
+    """Delete a manual, its file, chunks, ingestion jobs, and Chroma vectors."""
     result = await db.execute(select(Manual).where(Manual.id == manual_id))
     manual = result.scalar_one_or_none()
     if not manual:
         raise HTTPException(404, "Manual not found")
+
+    # Clean up Chroma vectors
+    try:
+        ChromaRepository.delete_by_manual_id(manual.id)
+    except Exception as exc:
+        logger.warning("manual.chroma_delete_failed", error=str(exc))
 
     if manual.file_path and os.path.exists(manual.file_path):
         try:

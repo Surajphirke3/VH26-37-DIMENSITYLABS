@@ -1,0 +1,6 @@
+{
+  "similarity_metric": "cosine",
+  "initial_top_k": 20,
+  "rerank_top_k": 8,
+  "final_context_k": 5
+}

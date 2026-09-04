@@ -41,6 +41,13 @@ const statusConfig: Record<
     color: "#fca5a5",
     dot: "#ef4444",
   },
+  reprocessing: {
+    label: "Reprocessing",
+    bg: "rgba(99,102,241,0.1)",
+    border: "rgba(99,102,241,0.25)",
+    color: "#a5b4fc",
+    dot: "#6366f1",
+  },
 };
 
 function StatusBadge({

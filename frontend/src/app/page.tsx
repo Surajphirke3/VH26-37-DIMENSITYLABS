@@ -268,7 +268,8 @@ export default function HomePage() {
                   alt={model.name}
                   width={100}
                   height={40}
-                  className="object-contain group-hover:scale-105 transition-transform origin-left"
+                  style={{ width: "auto", height: "auto" }}
+                  className="object-contain transition-opacity"
                 />
               </div>
 

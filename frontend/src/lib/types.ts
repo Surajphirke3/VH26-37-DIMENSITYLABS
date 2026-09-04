@@ -17,10 +17,18 @@ export interface Machine {
 export interface Manual {
   id: string;
   title: string;
-  machine_id: string;
-  processing_status: "pending" | "processing" | "completed" | "failed";
+  machine_id?: string | null;
+  machine_name?: string | null;
+  processing_status: "pending" | "processing" | "completed" | "failed" | "reprocessing";
+  manual_type?: string;
+  version?: string | null;
+  language?: string;
   original_filename: string;
+  file_size_bytes?: number | null;
+  page_count?: number | null;
+  chunk_count?: number;
   created_at: string;
+  processing_error?: string | null;
 }
 
 export interface CorrectionStep {
@@ -33,6 +41,7 @@ export interface CorrectionStep {
 export interface Citation {
   citation_id: string;
   chunk_id: string;
+  manual_id?: string;
   manual_name: string;
   machine_name: string;
   page_start: number;
@@ -57,6 +66,7 @@ export interface TroubleshootingResponse {
     | "out_of_scope"
     | "error";
   summary: string;
+  answer?: string;
   error_meaning?: string;
   probable_causes: string[];
   corrective_steps: CorrectionStep[];
@@ -66,14 +76,106 @@ export interface TroubleshootingResponse {
   notes?: string;
   follow_up_suggestions: string[];
   disambiguation_options?: DisambiguationOption[];
+  language_detected?: string;
+  language?: string;
+  model_used?: string;
+  model?: string;
   retrieval_latency_ms?: number;
+  rerank_latency_ms?: number;
+  llm_latency_ms?: number;
   total_latency_ms?: number;
+  latency_breakdown?: {
+    retrieval_ms?: number;
+    rerank_ms?: number;
+    llm_ms?: number;
+  };
+  metadata?: Record<string, any>;
 }
 
 export interface Message {
   id: string;
   role: "user" | "assistant";
   content: string;
+  image_data?: string;
+  model?: string;
   response?: TroubleshootingResponse;
   timestamp: string;
+}
+
+export interface AIModel {
+  id: string;
+  name: string;
+  type: string;
+  speed: string;
+  max_tokens?: number;
+  description?: string;
+  context_window?: number;
+  recommended_for?: string;
+  supports_vision?: boolean;
+  provider: string;
+}
+
+export interface SystemStatusData {
+  chromadb: {
+    status: string;
+    collection: string;
+    metric: string;
+    vector_count: number;
+    latency_ms: number;
+    persist_dir?: string;
+  };
+  database: {
+    status: string;
+    latency_ms?: number;
+    error?: string;
+  };
+  redis: {
+    status: string;
+    latency_ms?: number;
+    detail?: string;
+  };
+  cache: {
+    status: string;
+    embedding_cache_ttl: number;
+    retrieval_cache_ttl: number;
+    strategy: string;
+  };
+  groq: {
+    status: string;
+    default_model: string;
+    models_available: number;
+  };
+  runtime: {
+    app_name: string;
+    version: string;
+    environment: string;
+    python_version: string;
+    os: string;
+    uptime_seconds: number;
+  };
+}
+
+export interface ManualChunk {
+  id: string;
+  chunk_index: number;
+  chunk_type: string;
+  content: string;
+  content_tokens?: number;
+  page_start?: number;
+  page_end?: number;
+  section_path?: string;
+  error_codes_present: string[];
+}
+
+export interface SearchResultItem {
+  chunk_id: string;
+  manual_id: string;
+  manual_title: string;
+  machine_id?: string | null;
+  machine_name?: string | null;
+  page_start: number;
+  page_end: number;
+  section_path?: string | null;
+  similarity_score: number;
+  excerpt: string;
 }

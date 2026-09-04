@@ -317,58 +317,60 @@ export default function ArchitecturePage() {
           </h2>
         </div>
 
-        <div className="overflow-x-auto mt-8">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-[var(--border)]">
-                <th className="text-left px-4 py-3 font-black text-[var(--text-primary)]">Scenario</th>
-                <th className="text-center px-4 py-3 font-mono text-[10px] font-bold text-amber-500 uppercase tracking-widest">Avg Latency</th>
-                <th className="text-center px-4 py-3 font-mono text-[10px] font-bold text-amber-500 uppercase tracking-widest">P99</th>
-                <th className="text-center px-4 py-3 font-mono text-[10px] font-bold text-amber-500 uppercase tracking-widest">Throughput</th>
-                <th className="text-center px-4 py-3 font-mono text-[10px] font-bold text-amber-500 uppercase tracking-widest">Accuracy</th>
-              </tr>
-            </thead>
-            <tbody>
-              {BENCHMARKS.map((row, i) => (
-                <tr key={i} className="border-b border-[var(--border)] hover:bg-[var(--bg-surface)]/30 transition-colors">
-                  <td className="px-4 py-4 font-semibold text-[var(--text-primary)]">{row.scenario}</td>
-                  <td className="text-center px-4 py-4 font-mono font-bold text-amber-400">{row.avgTime}</td>
-                  <td className="text-center px-4 py-4 font-mono text-amber-300">{row.p99}</td>
-                  <td className="text-center px-4 py-4 font-mono text-slate-400">{row.throughput}</td>
-                  <td className="text-center px-4 py-4 font-mono font-bold text-emerald-400">{row.accuracy}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        {/* Tab selectors */}
+        <div className="flex items-center gap-3 mb-8 flex-wrap">
+          {MODELS.map((m) => (
+            <button
+              key={m.name}
+              onClick={() => setSelectedModel(m.name)}
+              className={`flex items-center gap-2.5 px-5 py-2.5 rounded-xl border text-sm font-bold transition-all ${
+                selectedModel === m.name
+                  ? "text-slate-900 dark:text-white border-indigo-400/50 dark:border-white/[0.15] bg-indigo-50 dark:bg-white/[0.06] shadow-sm dark:shadow-none"
+                  : "text-slate-500 border-slate-200 dark:border-white/[0.05] hover:text-slate-900 dark:hover:text-slate-300 hover:border-slate-300 dark:hover:border-white/[0.1]"
+              }`}
+            >
+              <Image
+                src={theme === "light" ? m.logoLight : m.logoDark}
+                alt={m.name}
+                width={52}
+                height={22}
+                style={{ width: "auto", height: "auto" }}
+                className="object-contain"
+              />
+            </button>
+          ))}
         </div>
       </section>
 
-      {/* Multi-Tenant Isolation */}
-      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-24 border-t border-[var(--border)]">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <div className="animate-slide-in-left">
-            <span className="inline-block font-mono text-[10px] uppercase font-bold text-indigo-500 tracking-widest bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20 mb-4">
-              Multi-Tenant Design
-            </span>
-            <h2 className="font-black text-3xl sm:text-5xl text-[var(--text-primary)] tracking-tight leading-tight mb-6">
-              Your Data is <span className="gradient-text">Isolated.</span>
-            </h2>
-            <p className="text-[var(--text-muted)] leading-relaxed mb-6">
-              Every query is scoped to a single <code className="bg-indigo-500/10 px-2 py-1 rounded text-indigo-300 font-mono text-sm">machine_id</code>. The pgvector ANN search respects tenant boundaries: vectors from Machine A are never candidates for Machine B queries, no matter the semantic similarity.
-            </p>
-            <ul className="space-y-3">
-              <li className="flex items-start gap-3 text-sm text-[var(--text-secondary)]">
-                <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-1.5 flex-shrink-0" />
-                <span><span className="font-semibold text-[var(--text-primary)]">Query-time filtering:</span> machine_id passed with every query</span>
-              </li>
-              <li className="flex items-start gap-3 text-sm text-[var(--text-secondary)]">
-                <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-1.5 flex-shrink-0" />
-                <span><span className="font-semibold text-[var(--text-primary)]">Vector metadata:</span> every chunk tagged with owning machine_id</span>
-              </li>
-              <li className="flex items-start gap-3 text-sm text-[var(--text-secondary)]">
-                <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-1.5 flex-shrink-0" />
-                <span><span className="font-semibold text-[var(--text-primary)]">Audit logs:</span> every access tagged and immutable</span>
-              </li>
+        {/* Active model detail */}
+        <div
+          className="rounded-2xl p-7 sm:p-10 border grid grid-cols-1 md:grid-cols-2 gap-8 transition-all bg-white dark:bg-transparent shadow-sm dark:shadow-none"
+          style={{ borderColor: `${model.color}30` }}
+        >
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <Image
+                src={theme === "light" ? model.logoLight : model.logoDark}
+                alt={model.name}
+                width={100}
+                height={44}
+                style={{ width: "auto", height: "auto" }}
+                className="object-contain"
+              />
+            </div>
+            <div className="font-mono text-xs text-slate-500 mb-1">Underlying Model</div>
+            <div className="font-bold text-sm text-slate-900 dark:text-white mb-4">{model.model}</div>
+            <div className="font-mono text-xs text-slate-500 mb-1">Typical Latency</div>
+            <div className="font-black text-2xl font-mono mb-6" style={{ color: model.color }}>{model.latency}</div>
+
+            <div className="font-mono text-[10px] text-slate-500 uppercase tracking-widest mb-3">Best used for</div>
+            <ul className="space-y-2">
+              {model.useCases.map((u) => (
+                <li key={u} className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300">
+                  <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: model.color }} />
+                  {u}
+                </li>
+              ))}
             </ul>
           </div>
 

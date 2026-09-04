@@ -6,7 +6,9 @@ from uuid import UUID
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
 from app.core.logging import get_logger
+from app.db.chroma import ChromaRepository
 
 logger = get_logger("rag.retriever")
 
@@ -36,12 +38,13 @@ class HybridRetriever:
         query_embedding: list[float],
         query_text: str,
         machine_id: UUID | None = None,
-        top_k: int = 20,
+        top_k: int | None = None,
     ) -> list[tuple[UUID, float]]:
-        """Return RRF-fused (chunk_id, score) list."""
-        vector_results = await self._vector_search(query_embedding, machine_id, top_k)
-        keyword_results = await self._keyword_search(query_text, machine_id, top_k)
-        return self._rrf_fuse(vector_results, keyword_results, top_k)
+        """Return RRF-fused (chunk_id, score) list from ChromaDB and keyword search."""
+        actual_top_k = top_k or settings.INITIAL_TOP_K
+        vector_results = await self._vector_search(query_embedding, machine_id, actual_top_k)
+        keyword_results = await self._keyword_search(query_text, machine_id, actual_top_k)
+        return self._rrf_fuse(vector_results, keyword_results, actual_top_k)
 
     async def _vector_search(
         self,
@@ -49,20 +52,28 @@ class HybridRetriever:
         machine_id: UUID | None,
         top_k: int,
     ) -> list[tuple[UUID, float]]:
-        vec_str = "[" + ",".join(str(v) for v in embedding) + "]"
-        machine_filter = "AND c.machine_id = :machine_id" if machine_id else ""
-        sql = text(f"""
-            SELECT c.id, 1 - (c.embedding <=> CAST(:embedding AS vector)) AS score
-            FROM chunks c
-            WHERE c.embedding IS NOT NULL {machine_filter}
-            ORDER BY c.embedding <=> CAST(:embedding AS vector)
-            LIMIT :top_k
-        """)
-        params: dict = {"embedding": vec_str, "top_k": top_k}
-        if machine_id:
-            params["machine_id"] = str(machine_id)
-        result = await self.db.execute(sql, params)
-        return [(row[0], row[1]) for row in result.fetchall()]
+        """Query ChromaDB using Cosine Similarity."""
+        try:
+            # Run blocking chroma search in thread pool or keep synchronous for now since it's local
+            res = ChromaRepository.similarity_search(
+                query_embedding=embedding,
+                top_k=top_k,
+                machine_id=machine_id
+            )
+
+            ids = res.get("ids", [[]])[0]
+            distances = res.get("distances", [[]])[0]
+
+            scored_results = []
+            for i, chunk_id in enumerate(ids):
+                # ChromaDB returns cosine distance. similarity = 1 - distance
+                similarity = 1.0 - float(distances[i])
+                scored_results.append((UUID(chunk_id), similarity))
+
+            return scored_results
+        except Exception as exc:
+            logger.error("retriever.vector_search.failed", error=str(exc))
+            return []
 
     async def _keyword_search(
         self,
@@ -70,6 +81,7 @@ class HybridRetriever:
         machine_id: UUID | None,
         top_k: int,
     ) -> list[tuple[UUID, float]]:
+        """Postgres TSVector keyword search."""
         machine_filter = "AND c.machine_id = :machine_id" if machine_id else ""
         sql = text(f"""
             SELECT c.id,
@@ -116,9 +128,9 @@ class HybridRetriever:
                    m.title  AS manual_name,
                    mc.name  AS machine_name
             FROM   chunks c
-            JOIN   manuals  m  ON c.manual_id  = m.id
-            JOIN   machines mc ON c.machine_id = mc.id
-            WHERE  c.id = ANY(:ids)
+            LEFT JOIN manuals  m  ON c.manual_id  = m.id
+            LEFT JOIN machines mc ON c.machine_id = mc.id
+            WHERE  c.id::text = ANY(:ids)
         """)
         result = await self.db.execute(sql, {"ids": ids})
         chunks: list[RetrievedChunk] = []

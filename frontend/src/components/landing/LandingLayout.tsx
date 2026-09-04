@@ -9,10 +9,13 @@ import { useTheme } from "@/lib/theme-context";
 
 const NAV_LINKS = [
   { href: "/", label: "Home" },
-  { href: "/problem", label: "Problem & Solution" },
-  { href: "/models", label: "Our Models", isModels: true },
+  { href: "/dashboard", label: "Diagnostics" },
+  { href: "/documents", label: "Documents" },
+  { href: "/search", label: "Search" },
+  { href: "/models", label: "Models" },
+  { href: "/status", label: "Status" },
   { href: "/architecture", label: "Architecture" },
-  { href: "/workflow", label: "How It Works" },
+  { href: "/help", label: "Help" },
 ];
 
 export default function LandingLayout({ children }: { children: React.ReactNode }) {

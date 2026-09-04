@@ -7,26 +7,35 @@ from app.services.ai.factory import get_llm_provider
 
 logger = get_logger("rag.generator")
 
-_SYSTEM_PROMPT = """You are an expert industrial maintenance assistant for MEND - X (From Failure to Function).
+_SYSTEM_PROMPT = """You are an expert industrial diagnostics engineer and maintenance assistant for MEND - X (From Failure to Function).
 
-HARD RULES:
-1. Only answer from the provided context. Never invent procedures, specifications, or error meanings.
-2. Every factual claim must cite a source using [N] notation matching the context sections.
-3. If context is insufficient, respond with answer_type="insufficient_information" and explain why.
-4. Safety warnings from the source must be preserved exactly and marked in corrective_steps.
-5. Do not guess. Do not extrapolate beyond what the documents state.
+MISSION & CAPABILITIES:
+1. Natural Language Symptom Understanding: Comprehend natural language descriptions of industrial equipment failures, unusual sounds, overheating, vibration, pressure drops, leakage, or maintenance routines in addition to exact alphanumeric fault codes (e.g. E101, F204).
+2. Deep Diagnostic Synthesis: Synthesize the technical context from parsed OEM manuals and tables into an intelligible, actionable diagnosis.
+3. Strict Grounding Guardrails:
+   - ONLY answer using facts, steps, and specifications found in the retrieved context. Never fabricate mechanical or electrical fixes.
+   - Every step and assertion must cite its source passage using [1], [2], etc., matching the context blocks.
+   - Preserve all safety precautions, warnings (DANGER, WARNING, CAUTION), PPE requirements, and lockout/tagout (LOTO) protocols.
+   - If the manual lacks information to solve the specific symptom, set answer_type="insufficient_information", explain what is known from the manual, and recommend specific inspection points or OEM contact in notes.
 """
 
 _RESPONSE_SCHEMA = """{
   "answer_type": "solution" | "insufficient_information" | "disambiguation_required",
-  "summary": "string",
-  "error_meaning": "string or null",
-  "probable_causes": ["string"],
-  "corrective_steps": [{"step_number": 1, "action": "string", "warning": "string or null", "citation_ids": ["1"]}],
+  "summary": "Detailed natural-language breakdown explaining the problem, operating conditions, and overview of the resolution according to the manual.",
+  "error_meaning": "Formal fault definition or operational condition (or null if purely symptom-based)",
+  "probable_causes": ["Detailed probable cause 1 with root mechanism", "Probable cause 2"],
+  "corrective_steps": [
+    {
+      "step_number": 1,
+      "action": "Clear, sequential directive including specific components, parameters, or measurements from the manual [N]",
+      "warning": "Critical safety warning or cautionary note, e.g. LOTO or high-voltage discharge (or null)",
+      "citation_ids": ["1"]
+    }
+  ],
   "citations": [{"id": "1", "chunk_id": "from context"}],
   "confidence_level": "HIGH" | "MEDIUM" | "LOW",
-  "notes": "string or null",
-  "follow_up_suggestions": ["string"]
+  "notes": "Important operational context, maintenance schedule reminders, or inspection notes",
+  "follow_up_suggestions": ["Actionable follow-up query or verification check 1", "Follow-up check 2"]
 }"""
 
 
@@ -81,12 +90,23 @@ class LLMGenerator:
         chunks: list,
         machine_name: str,
         conversation_history: list,
+        model: str | None = None,
+        image_data: str | None = None,
     ) -> dict:
         prompt = _build_prompt(query, chunks, machine_name, conversation_history)
 
         for attempt in range(2):
             try:
-                raw = await self._provider.generate_json(prompt)
+                # Check if provider accepts model and image_data
+                import inspect
+                sig = inspect.signature(self._provider.generate_json)
+                kwargs = {}
+                if "model" in sig.parameters:
+                    kwargs["model"] = model
+                if "image_data" in sig.parameters:
+                    kwargs["image_data"] = image_data
+
+                raw = await self._provider.generate_json(prompt, **kwargs)
                 return json.loads(_strip_markdown_fences(raw))
             except json.JSONDecodeError as exc:
                 logger.warning("generator.json_parse_failed", attempt=attempt, error=str(exc))

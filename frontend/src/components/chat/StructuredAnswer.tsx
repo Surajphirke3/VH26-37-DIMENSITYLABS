@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { Copy, Check, ExternalLink, Clock, Cpu, Languages, Layers } from "lucide-react";
 import type { TroubleshootingResponse } from "@/lib/types";
 import ConfidenceBadge from "@/components/ui/ConfidenceBadge";
 
@@ -11,20 +13,71 @@ interface Props {
 
 export default function StructuredAnswer({ response, onSuggestionClick }: Props) {
   const [citationsOpen, setCitationsOpen] = useState(false);
+  const [showTimings, setShowTimings] = useState(false);
+  const [copiedCitationId, setCopiedCitationId] = useState<string | null>(null);
+
+  const copyCitation = (text: string, id: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedCitationId(id);
+    setTimeout(() => setCopiedCitationId(null), 2000);
+  };
+
+  const latencyBreakdown =
+    response.latency_breakdown || (response.metadata?.latency_breakdown as any);
+  const modelUsed = response.model || (response.metadata?.model as string | undefined);
+  const language = response.language || (response.metadata?.language as string | undefined);
 
   return (
     <div className="space-y-4 text-sm">
       {/* Header row */}
-      <div className="flex items-start justify-between gap-3 flex-wrap">
-        <ConfidenceBadge level={response.confidence_level} />
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap">
+          <ConfidenceBadge level={response.confidence_level} />
+          {modelUsed && (
+            <span className="inline-flex items-center gap-1 text-[11px] font-mono px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-500 border border-amber-500/20 font-medium">
+              <Cpu className="w-3 h-3" />
+              {modelUsed}
+            </span>
+          )}
+          {language && language !== "en" && (
+            <span className="inline-flex items-center gap-1 text-[11px] uppercase font-mono px-2 py-0.5 rounded-md bg-secondary text-secondary-foreground">
+              <Languages className="w-3 h-3 text-muted-foreground" />
+              {language}
+            </span>
+          )}
+        </div>
+
         {response.total_latency_ms && (
-          <span
-            className="text-[10px] font-mono px-2 py-1 rounded-lg bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.06] text-slate-500 dark:text-slate-400"
+          <button
+            type="button"
+            onClick={() => setShowTimings((prev) => !prev)}
+            className="inline-flex items-center gap-1 text-[10px] font-mono px-2 py-1 rounded-lg bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.06] text-slate-500 dark:text-slate-400 hover:text-foreground transition-colors"
+            title="Click to view latency breakdown"
           >
-            {response.total_latency_ms}ms
-          </span>
+            <Clock className="w-3 h-3 text-amber-500" />
+            <span>{response.total_latency_ms}ms</span>
+            {latencyBreakdown && <span className="text-[9px] text-muted-foreground">▼</span>}
+          </button>
         )}
       </div>
+
+      {/* Latency timing breakdown pill */}
+      {showTimings && latencyBreakdown && (
+        <div className="grid grid-cols-3 gap-2 p-2.5 rounded-xl bg-slate-100/80 dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.06] text-center font-mono text-[11px] animate-fade-in">
+          <div>
+            <span className="text-muted-foreground block text-[10px]">Retrieval</span>
+            <span className="font-semibold text-foreground">{latencyBreakdown.retrieval_ms || 0}ms</span>
+          </div>
+          <div>
+            <span className="text-muted-foreground block text-[10px]">Rerank</span>
+            <span className="font-semibold text-foreground">{latencyBreakdown.rerank_ms || 0}ms</span>
+          </div>
+          <div>
+            <span className="text-muted-foreground block text-[10px]">LLM Stream</span>
+            <span className="font-semibold text-foreground">{latencyBreakdown.llm_ms || 0}ms</span>
+          </div>
+        </div>
+      )}
 
       {/* Summary */}
       <p className="font-medium leading-relaxed text-slate-900 dark:text-[#e2e8f0]">
@@ -136,7 +189,7 @@ export default function StructuredAnswer({ response, onSuggestionClick }: Props)
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
-              Sources ({response.citations.length})
+              Sources & Verified Citations ({response.citations.length})
             </span>
             <span
               className="text-xs transition-transform"
@@ -151,23 +204,49 @@ export default function StructuredAnswer({ response, onSuggestionClick }: Props)
               {response.citations.map((c) => (
                 <div
                   key={c.citation_id}
-                  className="px-4 py-3 space-y-1 border-t border-slate-100 dark:border-white/[0.04]"
+                  className="px-4 py-3 space-y-1.5 border-t border-slate-100 dark:border-white/[0.04]"
                 >
-                  <div className="flex items-center gap-2">
-                    <span
-                      className="text-[10px] font-bold px-2 py-0.5 rounded font-mono bg-indigo-50 dark:bg-indigo-500/15 border border-indigo-200 dark:border-indigo-500/20 text-indigo-700 dark:text-[#818cf8]"
-                    >
-                      pp.{c.page_start}–{c.page_end}
-                    </span>
-                    <p className="text-xs font-semibold text-slate-800 dark:text-[#94a3b8]">
-                      {c.manual_name}
-                    </p>
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="text-[10px] font-bold px-2 py-0.5 rounded font-mono bg-indigo-50 dark:bg-indigo-500/15 border border-indigo-200 dark:border-indigo-500/20 text-indigo-700 dark:text-[#818cf8]"
+                      >
+                        pp.{c.page_start}–{c.page_end}
+                      </span>
+                      <p className="text-xs font-semibold text-slate-800 dark:text-[#94a3b8]">
+                        {c.manual_name}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      {c.manual_id && (
+                        <Link
+                          href={`/documents/${c.manual_id}`}
+                          className="text-[11px] text-muted-foreground hover:text-amber-500 inline-flex items-center gap-1 transition-colors"
+                        >
+                          <span>Inspect Manual</span>
+                          <ExternalLink className="w-3 h-3" />
+                        </Link>
+                      )}
+                      <button
+                        onClick={() => copyCitation(c.excerpt, c.citation_id)}
+                        className="p-1 text-muted-foreground hover:text-foreground rounded"
+                        title="Copy citation text"
+                      >
+                        {copiedCitationId === c.citation_id ? (
+                          <Check className="w-3.5 h-3.5 text-emerald-500" />
+                        ) : (
+                          <Copy className="w-3.5 h-3.5" />
+                        )}
+                      </button>
+                    </div>
                   </div>
+
                   {c.section_path && (
                     <p className="text-[11px] text-slate-500 dark:text-[#475569]">{c.section_path}</p>
                   )}
-                  <p className="text-xs italic line-clamp-2 text-slate-600 dark:text-[#334155]">
-                    "{c.excerpt}"
+                  <p className="text-xs italic leading-relaxed text-slate-600 dark:text-[#94a3b8] bg-background/50 p-2 rounded border border-border/50">
+                    &quot;{c.excerpt}&quot;
                   </p>
                 </div>
               ))}

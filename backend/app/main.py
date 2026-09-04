@@ -15,7 +15,7 @@ logger = get_logger("mend_x.main")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    logger.info("MEND - X starting", environment=settings.ENVIRONMENT)
+    logger.info("MEND - X starting (local embeddings)", environment=settings.ENVIRONMENT)
 
     if settings.ENVIRONMENT == "development":
         from app.db.base import Base
@@ -82,6 +82,8 @@ def _register_routers(app: FastAPI) -> None:
     from app.api.routes.manuals import router as manuals_router
     from app.api.routes.query import router as query_router
     from app.api.routes.conversation import router as conversation_router
+    from app.api.routes.models import router as models_router
+    from app.api.routes.system import router as system_router
 
     app.include_router(health_router, prefix="/api/v1")
     app.include_router(auth_router, prefix="/api/v1")
@@ -89,6 +91,8 @@ def _register_routers(app: FastAPI) -> None:
     app.include_router(manuals_router, prefix="/api/v1")
     app.include_router(query_router, prefix="/api/v1")
     app.include_router(conversation_router, prefix="/api/v1")
+    app.include_router(models_router, prefix="/api/v1")
+    app.include_router(system_router, prefix="/api/v1")
 
 
 app = create_app()

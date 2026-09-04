@@ -11,6 +11,7 @@ from app.core.logging import get_logger
 from app.models.chunk import Chunk as ChunkModel
 from app.models.ingestion_job import IngestionJob
 from app.models.manual import Manual
+from app.db.chroma import ChromaRepository
 from app.services.ingestion.chunker import ManualChunker
 from app.services.ingestion.embedder import EmbeddingService
 from app.services.ingestion.pdf_parser import PDFParser
@@ -34,13 +35,17 @@ class IngestionPipeline:
             manual = await self._get_manual(manual_id)
             await self._update_manual_status(manual_id, "processing")
 
-            # --- Parse ---
-            pages = self.parser.parse(manual.file_path)
-            await self._update_job(job_id, pages_processed=len(pages), progress_pct=20)
+            # --- Parse (Async, Non-blocking with live page-level progress) ---
+            async def _report_parse_progress(curr: int, tot: int):
+                pct = int(5 + (curr / max(1, tot)) * 20)
+                await self._update_job(job_id, pages_processed=curr, progress_pct=pct)
+
+            pages = await self.parser.parse_async(manual.file_path, on_progress=_report_parse_progress)
+            await self._update_job(job_id, pages_processed=len(pages), progress_pct=25)
 
             # --- Chunk ---
             chunks = self.chunker.chunk_pages(pages)
-            await self._update_job(job_id, progress_pct=40)
+            await self._update_job(job_id, progress_pct=35)
 
             # --- Embed & persist in batches ---
             res = await self.db.execute(
@@ -50,12 +55,19 @@ class IngestionPipeline:
             start_index = (max_existing + 1) if max_existing is not None else 0
 
             total = len(chunks)
-            batch_size = 25
+            batch_size = 30
             for i in range(start_index, total, batch_size):
                 batch = chunks[i : i + batch_size]
                 contents = [c.content for c in batch]
                 embeddings = await self.embedder.embed_batch(contents)
+
+                db_chunks_to_add = []
+                chroma_ids = []
+                chroma_metadatas = []
+                chroma_documents = []
+
                 for chunk, embedding in zip(batch, embeddings):
+                    # Postgres record
                     db_chunk = ChunkModel(
                         manual_id=manual_id,
                         machine_id=manual.machine_id,
@@ -71,12 +83,36 @@ class IngestionPipeline:
                         embedding_model=self.embedder.model,
                     )
                     self.db.add(db_chunk)
+                    db_chunks_to_add.append(db_chunk)
+
+                await self.db.flush() # flush to generate chunk UUIDs
+
+                for db_chunk in db_chunks_to_add:
+                    chroma_ids.append(str(db_chunk.id))
+                    chroma_documents.append(db_chunk.content)
+                    chroma_metadatas.append({
+                        "manual_id": str(db_chunk.manual_id),
+                        "machine_id": str(db_chunk.machine_id),
+                        "page_start": db_chunk.page_start,
+                        "page_end": db_chunk.page_end,
+                        "chunk_type": db_chunk.chunk_type,
+                        "section_path": db_chunk.section_path or ""
+                    })
+
+                # Insert into ChromaDB
+                ChromaRepository.insert_batch(
+                    ids=chroma_ids,
+                    embeddings=embeddings,
+                    metadatas=chroma_metadatas,
+                    documents=chroma_documents
+                )
 
                 await self.db.commit()
                 processed_count = min(i + batch_size, total)
-                pct = 40 + int((processed_count / total) * 50)
+                pct = 35 + int((processed_count / max(1, total)) * 60)
                 await self._update_job(job_id, progress_pct=pct, chunks_created=processed_count)
-                await asyncio.sleep(0.5)
+                # Yield to ensure HTTP status queries can be processed smoothly
+                await asyncio.sleep(0.01)
 
             await self.db.commit()
             await self._update_manual_status(manual_id, "completed", page_count=len(pages))
