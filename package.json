@@ -1,6 +1,6 @@
 {
   "name": "vh26-37-dimensitylabs",
-  "version": "1.1.1",
+  "version": "1.2.1",
   "private": true,
   "description": "MEND - X — Industrial RAG & Intelligent Machine Troubleshooting System for Factory Floor Diagnostics",
   "scripts": {

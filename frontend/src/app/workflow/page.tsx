@@ -6,7 +6,7 @@ import LandingLayout from "@/components/landing/LandingLayout";
 
 /* ── Live Animated Terminal ── */
 const TERMINAL_SEQUENCE: { role: "user" | "system" | "ai"; text: string; delay: number }[] = [
-  { role: "system", text: "MEND-X DIAGNOSTIC ENGINE ONLINE — v1.1.1", delay: 0 },
+  { role: "system", text: "MEND-X DIAGNOSTIC ENGINE ONLINE — v1.2.1", delay: 0 },
   { role: "system", text: "Vector store connected. 3 machines indexed.", delay: 600 },
   { role: "user", text: "Machine: Haas VF-4 CNC | Query: Alarm 102, spindle overheat", delay: 1400 },
   { role: "system", text: "Embedding query... [▓▓▓▓▓▓▓▓░░] 82%", delay: 2200 },

@@ -145,7 +145,7 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-mono text-slate-500">
           <div className="flex items-center gap-3">
             <Image src="/logo-dark.png" alt="MEND-X" width={20} height={20} className="object-contain opacity-60" />
-            <span className="font-semibold text-slate-400">MEND-X v1.1.1</span>
+            <span className="font-semibold text-slate-400">MEND-X v1.2.1</span>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-3 text-center">
             <span>DIMENSITY LABS [VH26-37]</span>
