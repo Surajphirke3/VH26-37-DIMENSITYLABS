@@ -1,10 +1,14 @@
 <div align="center">
 
-<img src="Hackathon/MEND%20-%20X.png" alt="MEND - X Logo" width="320" style="border-radius: 18px; margin-bottom: 12px;"/>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="Hackathon/MEND_X_DARK.png">
+  <source media="(prefers-color-scheme: light)" srcset="Hackathon/MEND%20-%20X.png">
+  <img alt="MEND - X — From Failure to Function" src="Hackathon/MEND%20-%20X.png" width="340" />
+</picture>
 
-# MEND - X
-### *From Failure to Function.*
-**Industrial RAG & Intelligent Machine Troubleshooting System for Factory Floor Diagnostics**
+<br/>
+
+### *Industrial RAG & Intelligent Machine Troubleshooting System for Factory Floor Diagnostics*
 
 [![VCET HackC++thon 2026](https://img.shields.io/badge/VCET%20HackC%2B%2Bthon-2026-7C3AED?style=for-the-badge&logo=codeforces&logoColor=white)](https://vcet.edu.in)
 [![Domain](https://img.shields.io/badge/Domain-Application%20Data%20Management%20(RAG)-0284C7?style=for-the-badge)](https://github.com/Surajphirke3/VH26-37-DIMENSITYLABS)
