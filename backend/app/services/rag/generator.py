@@ -93,22 +93,23 @@ class LLMGenerator:
                 if attempt == 1:
                     return self._fallback_response()
             except Exception as exc:
-                logger.error("generator.llm_error", error=str(exc))
-                raise
+                logger.error("generator.llm_error", attempt=attempt, error=str(exc))
+                if attempt == 1:
+                    return self._fallback_response(f"AI provider error: {str(exc)[:100]}")
 
         return self._fallback_response()
 
     @staticmethod
-    def _fallback_response() -> dict:
+    def _fallback_response(reason: str | None = None) -> dict:
         return {
             "answer_type": "insufficient_information",
-            "summary": "Unable to parse a structured answer. Please try rephrasing your query.",
+            "summary": reason or "Unable to parse a structured answer. Please try rephrasing your query.",
             "error_meaning": None,
             "probable_causes": [],
             "corrective_steps": [],
             "citations": [],
             "confidence_level": "LOW",
-            "notes": "System encountered an error parsing the AI response.",
+            "notes": reason or "System encountered an error generating the AI response.",
             "follow_up_suggestions": [
                 "Try rephrasing your query",
                 "Specify the machine model explicitly",
