@@ -11,8 +11,6 @@ import Spinner from "@/components/ui/Spinner";
 
 interface ConvEntry { id: string; label: string; }
 
-const GEAR_PATH = "M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z";
-
 export default function DashboardPage() {
   const { user, isLoading: authLoading, logout } = useAuth();
   const router = useRouter();
@@ -20,6 +18,7 @@ export default function DashboardPage() {
   const [selectedMachine, setSelectedMachine] = useState<Machine | null>(null);
   const [conversations, setConversations] = useState<ConvEntry[]>([]);
   const [activeConvId, setActiveConvId] = useState<string | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   useEffect(() => { if (!authLoading && !user) router.replace("/login"); }, [user, authLoading, router]);
   useEffect(() => { if (user) getMachines().then(setMachines).catch(console.error); }, [user]);
@@ -40,82 +39,358 @@ export default function DashboardPage() {
     setConversations((prev) => prev.map((c) => (c.id === activeConvId ? { ...c, label: short } : c)));
   };
 
-  if (authLoading) return <div className="min-h-screen flex items-center justify-center"><Spinner size="lg" label="Loading..." /></div>;
+  if (authLoading) return (
+    <div className="min-h-screen flex items-center justify-center" style={{ background: "#08090c" }}>
+      <div className="flex flex-col items-center gap-4">
+        <Spinner size="lg" />
+        <p className="text-sm" style={{ color: "#475569" }}>Authenticating…</p>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="flex h-screen bg-slate-50 overflow-hidden">
-      <aside className="w-64 shrink-0 bg-white border-r border-slate-200 flex flex-col">
-        <div className="px-4 py-4 border-b border-slate-100 flex items-center gap-2.5">
-          <img src="/logo.png" alt="MEND - X" className="w-7 h-7 rounded-md object-contain" />
-          <span className="font-extrabold text-slate-900 text-sm tracking-tight">MEND - X</span>
-        </div>
-
-        <div className="px-3 py-3 border-b border-slate-100">
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">Machine</p>
-          <MachineSelector machines={machines} selected={selectedMachine} onChange={setSelectedMachine} />
-        </div>
-
-        <div className="flex-1 overflow-y-auto px-3 py-3">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Sessions</p>
-            <button onClick={startNewConversation} className="text-xs px-2 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors">+ New</button>
-          </div>
-          <div className="space-y-1">
-            {conversations.map((c) => (
-              <button key={c.id} onClick={() => setActiveConvId(c.id)}
-                className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors truncate ${activeConvId === c.id ? "bg-indigo-50 text-indigo-700 font-medium" : "text-slate-600 hover:bg-slate-50"}`}>
-                {c.label}
-              </button>
-            ))}
-            {conversations.length === 0 && <p className="text-xs text-slate-400 px-1">No sessions yet. Start a new one.</p>}
-          </div>
-        </div>
-
-        <div className="border-t border-slate-100 px-3 py-3">
-          <div className="flex items-center justify-between">
-            <div className="min-w-0">
-              <p className="text-xs font-medium text-slate-700 truncate">{user?.full_name ?? user?.email}</p>
-              <p className="text-xs text-slate-400 capitalize">{user?.role}</p>
+    <div className="flex h-screen overflow-hidden" style={{ background: "#08090c" }}>
+      {/* ── Sidebar ── */}
+      <aside
+        className="shrink-0 flex flex-col transition-all duration-300"
+        style={{
+          width: sidebarOpen ? "256px" : "0px",
+          background: "rgba(15,17,23,0.95)",
+          borderRight: "1px solid rgba(255,255,255,0.06)",
+          backdropFilter: "blur(20px)",
+          overflow: "hidden",
+        }}
+      >
+        <div style={{ minWidth: "256px" }}>
+          {/* Logo */}
+          <div
+            className="px-4 py-4 flex items-center gap-3"
+            style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}
+          >
+            <div className="relative shrink-0">
+              <div
+                className="absolute inset-0 rounded-lg opacity-60"
+                style={{
+                  background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+                  filter: "blur(8px)",
+                }}
+              />
+              <img
+                src="/mend-x.png"
+                alt="MEND - X"
+                className="relative w-8 h-8 rounded-lg object-contain"
+              />
             </div>
-            <div className="flex gap-1">
-              {user?.role === "admin" && (
-                <button onClick={() => router.push("/admin")} className="text-xs px-2 py-1 text-slate-500 hover:text-indigo-600 rounded transition-colors">Admin</button>
+            <div className="min-w-0">
+              <span
+                className="font-black text-sm tracking-tight block"
+                style={{
+                  background: "linear-gradient(135deg, #a5b4fc, #c4b5fd)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}
+              >
+                MEND - X
+              </span>
+              <span className="text-[10px] font-medium" style={{ color: "#10b981" }}>
+                From Failure to Function
+              </span>
+            </div>
+          </div>
+
+          {/* Machine Selector */}
+          <div className="px-3 py-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+            <p className="text-[10px] font-bold uppercase tracking-widest mb-2 px-1" style={{ color: "#334155" }}>
+              Machine Filter
+            </p>
+            <MachineSelector machines={machines} selected={selectedMachine} onChange={setSelectedMachine} />
+          </div>
+
+          {/* Sessions */}
+          <div className="flex-1 px-3 py-3 overflow-y-auto" style={{ maxHeight: "calc(100vh - 280px)" }}>
+            <div className="flex items-center justify-between mb-2 px-1">
+              <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "#334155" }}>
+                Sessions
+              </p>
+              <button
+                id="new-session-btn"
+                onClick={startNewConversation}
+                className="flex items-center gap-1 text-xs px-2 py-1 rounded-lg font-semibold transition-all hover:scale-105"
+                style={{
+                  background: "linear-gradient(135deg, rgba(99,102,241,0.2), rgba(139,92,246,0.2))",
+                  border: "1px solid rgba(99,102,241,0.3)",
+                  color: "#a5b4fc",
+                }}
+              >
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+                </svg>
+                New
+              </button>
+            </div>
+
+            <div className="space-y-1">
+              {conversations.map((c, i) => (
+                <button
+                  key={c.id}
+                  onClick={() => setActiveConvId(c.id)}
+                  className="w-full text-left px-3 py-2.5 rounded-xl text-xs transition-all duration-200 truncate flex items-center gap-2 group"
+                  style={
+                    activeConvId === c.id
+                      ? {
+                          background: "rgba(99,102,241,0.12)",
+                          border: "1px solid rgba(99,102,241,0.25)",
+                          color: "#a5b4fc",
+                        }
+                      : {
+                          background: "transparent",
+                          border: "1px solid transparent",
+                          color: "#64748b",
+                        }
+                  }
+                  onMouseEnter={(e) => {
+                    if (activeConvId !== c.id) {
+                      (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.04)";
+                      (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.07)";
+                      (e.currentTarget as HTMLElement).style.color = "#94a3b8";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (activeConvId !== c.id) {
+                      (e.currentTarget as HTMLElement).style.background = "transparent";
+                      (e.currentTarget as HTMLElement).style.borderColor = "transparent";
+                      (e.currentTarget as HTMLElement).style.color = "#64748b";
+                    }
+                  }}
+                >
+                  <svg className="w-3.5 h-3.5 shrink-0 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  </svg>
+                  <span className="truncate font-medium">{c.label}</span>
+                </button>
+              ))}
+
+              {conversations.length === 0 && (
+                <div className="px-1 py-4 text-center">
+                  <p className="text-xs" style={{ color: "#334155" }}>No sessions yet.</p>
+                  <p className="text-[11px] mt-1" style={{ color: "#1e293b" }}>Start a new troubleshooting session.</p>
+                </div>
               )}
-              <button onClick={logout} className="text-xs px-2 py-1 text-slate-400 hover:text-red-500 rounded transition-colors">Out</button>
+            </div>
+          </div>
+
+          {/* User Footer */}
+          <div
+            className="px-3 py-3"
+            style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}
+          >
+            <div
+              className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl"
+              style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
+            >
+              <div
+                className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-xs font-bold"
+                style={{
+                  background: "linear-gradient(135deg, rgba(99,102,241,0.3), rgba(139,92,246,0.3))",
+                  border: "1px solid rgba(99,102,241,0.4)",
+                  color: "#a5b4fc",
+                }}
+              >
+                {(user?.full_name ?? user?.email ?? "U")[0].toUpperCase()}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-semibold truncate" style={{ color: "#e2e8f0" }}>
+                  {user?.full_name ?? user?.email}
+                </p>
+                <p className="text-[10px] capitalize" style={{ color: "#475569" }}>
+                  {user?.role}
+                </p>
+              </div>
+              <div className="flex gap-1">
+                {user?.role === "admin" && (
+                  <button
+                    onClick={() => router.push("/admin")}
+                    className="p-1.5 rounded-lg transition-all hover:scale-110"
+                    style={{ color: "#6366f1" }}
+                    title="Admin Panel"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </button>
+                )}
+                <button
+                  onClick={logout}
+                  className="p-1.5 rounded-lg transition-all hover:scale-110"
+                  style={{ color: "#475569" }}
+                  title="Sign Out"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </aside>
 
+      {/* ── Main Content ── */}
       <main className="flex-1 flex flex-col overflow-hidden">
-        <header className="bg-white border-b border-slate-200 px-6 py-3 flex items-center">
-          <div>
-            <h1 className="text-sm font-semibold text-slate-800">Troubleshooting Assistant</h1>
-            <p className="text-xs text-slate-400">{selectedMachine ? `Machine: ${selectedMachine.name}` : "No machine filter active"}</p>
+        {/* Top Bar */}
+        <header
+          className="flex items-center gap-3 px-4 py-3 shrink-0"
+          style={{
+            background: "rgba(15,17,23,0.8)",
+            borderBottom: "1px solid rgba(255,255,255,0.05)",
+            backdropFilter: "blur(20px)",
+          }}
+        >
+          <button
+            onClick={() => setSidebarOpen((v) => !v)}
+            className="p-2 rounded-lg transition-all hover:scale-110"
+            style={{ color: "#475569", background: "rgba(255,255,255,0.04)" }}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+
+          <div className="flex-1 min-w-0">
+            <h1 className="text-sm font-semibold" style={{ color: "#e2e8f0" }}>
+              Troubleshooting Assistant
+            </h1>
+            {selectedMachine ? (
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <div className="status-dot-online" style={{ width: "5px", height: "5px" }} />
+                <p className="text-xs" style={{ color: "#10b981" }}>
+                  {selectedMachine.name}
+                  {selectedMachine.model ? ` · ${selectedMachine.model}` : ""}
+                </p>
+              </div>
+            ) : (
+              <p className="text-xs mt-0.5" style={{ color: "#334155" }}>
+                No machine filter — searching all indexed manuals
+              </p>
+            )}
+          </div>
+
+          <div
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg"
+            style={{
+              background: "rgba(16,185,129,0.08)",
+              border: "1px solid rgba(16,185,129,0.2)",
+            }}
+          >
+            <div className="status-dot-online" style={{ width: "6px", height: "6px" }} />
+            <span className="text-xs font-medium" style={{ color: "#6ee7b7" }}>
+              AI Online
+            </span>
           </div>
         </header>
+
+        {/* Chat / Welcome */}
         {activeConvId === null ? (
-          <div className="flex flex-col items-center justify-center flex-1 px-6 bg-slate-50">
-            <div className="max-w-md text-center">
-              <div className="flex justify-center mb-4">
-                <img 
-                  src="/logo.png" 
-                  alt="MEND - X" 
-                  className="h-20 w-auto object-contain drop-shadow-sm rounded-xl"
-                />
+          <div
+            className="flex-1 flex flex-col items-center justify-center px-6 relative overflow-hidden"
+            style={{ background: "#08090c" }}
+          >
+            {/* BG Glow */}
+            <div
+              className="absolute w-[500px] h-[500px] rounded-full pointer-events-none"
+              style={{
+                background: "radial-gradient(circle, rgba(99,102,241,0.06) 0%, transparent 70%)",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+              }}
+            />
+
+            <div className="relative max-w-lg text-center animate-slide-up">
+              <div className="flex justify-center mb-6">
+                <div className="relative">
+                  <div
+                    className="absolute inset-0 rounded-3xl opacity-50"
+                    style={{
+                      background: "radial-gradient(circle, rgba(99,102,241,0.6), transparent 70%)",
+                      filter: "blur(20px)",
+                      transform: "scale(1.3)",
+                    }}
+                  />
+                  <img
+                    src="/mend-x.png"
+                    alt="MEND - X"
+                    className="relative w-24 h-24 object-contain rounded-3xl animate-float"
+                    style={{ animationDuration: "4s" }}
+                  />
+                </div>
               </div>
-              <h2 className="text-2xl font-extrabold text-slate-900 mb-1">MEND - X</h2>
-              <p className="text-sm font-semibold text-emerald-600 mb-3">From Failure to Function.</p>
-              <p className="text-sm text-slate-500 mb-6">
-                Industrial RAG Troubleshooting System. Select a machine or ask about any alarm code, symptom, or repair procedure.
+
+              <h2
+                className="text-4xl font-black tracking-tight mb-1"
+                style={{
+                  background: "linear-gradient(135deg, #a5b4fc, #c4b5fd, #f0abfc)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}
+              >
+                MEND - X
+              </h2>
+              <p className="text-sm font-semibold mb-4" style={{ color: "#10b981" }}>
+                From Failure to Function
               </p>
-              <button onClick={startNewConversation} className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded-lg transition-colors">New Troubleshooting Session</button>
+              <p className="text-sm leading-relaxed mb-8" style={{ color: "#475569" }}>
+                Industrial RAG Troubleshooting System. Select a machine or ask about any alarm code, symptom, or repair procedure — backed by indexed technical manuals.
+              </p>
+
+              {/* Feature pills */}
+              <div className="flex flex-wrap gap-2 justify-center mb-8">
+                {["Error Code Lookup", "Step-by-step Repair", "Manual Citations", "Multi-machine RAG"].map((f) => (
+                  <span
+                    key={f}
+                    className="text-xs px-3 py-1.5 rounded-full font-medium"
+                    style={{
+                      background: "rgba(99,102,241,0.1)",
+                      border: "1px solid rgba(99,102,241,0.2)",
+                      color: "#a5b4fc",
+                    }}
+                  >
+                    {f}
+                  </span>
+                ))}
+              </div>
+
+              <button
+                id="start-session-btn"
+                onClick={startNewConversation}
+                className="px-8 py-3.5 rounded-xl font-semibold text-sm text-white transition-all hover:scale-105"
+                style={{
+                  background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+                  boxShadow: "0 0 32px rgba(99,102,241,0.4)",
+                }}
+              >
+                <span className="flex items-center gap-2">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Start Troubleshooting Session
+                </span>
+              </button>
             </div>
           </div>
         ) : (
-          <ChatInterface conversationId={activeConvId} machineId={selectedMachine?.id ?? null}
-            onMachineSelect={(id) => { const m = machines.find((x) => x.id === id); if (m) setSelectedMachine(m); }}
-            onFirstMessage={handleFirstMessage} />
+          <ChatInterface
+            conversationId={activeConvId}
+            machineId={selectedMachine?.id ?? null}
+            onMachineSelect={(id) => {
+              const m = machines.find((x) => x.id === id);
+              if (m) setSelectedMachine(m);
+            }}
+            onFirstMessage={handleFirstMessage}
+          />
         )}
       </main>
     </div>
