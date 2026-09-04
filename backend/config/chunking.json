@@ -1,0 +1,6 @@
+{
+  "max_tokens": 800,
+  "min_tokens": 100,
+  "overlap_pct": 0.15,
+  "strategy": "structural"
+}

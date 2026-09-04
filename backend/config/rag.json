@@ -1,0 +1,11 @@
+{
+  "evidence_threshold": 0.45,
+  "disambiguation_threshold": 0.3,
+  "refusal_message": "The indexed manuals do not contain sufficient verified information to answer this query safely.",
+  "confidence_tiers": {
+    "HIGH": 0.75,
+    "MEDIUM": 0.50,
+    "LOW": 0.00
+  },
+  "max_history_turns": 5
+}

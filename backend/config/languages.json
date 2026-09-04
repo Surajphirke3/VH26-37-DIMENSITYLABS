@@ -1,0 +1,8 @@
+{
+  "supported": [
+    "en", "hi", "mr", "gu", "ta", "te", "bn", "kn", "ml", "pa", "ur"
+  ],
+  "default_language": "en",
+  "auto_detect": true,
+  "transliterate_indic": true
+}

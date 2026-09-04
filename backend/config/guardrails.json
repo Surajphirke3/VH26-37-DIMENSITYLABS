@@ -1,0 +1,15 @@
+{
+  "input_guardrails": {
+    "max_prompt_length": 5000,
+    "block_unsafe": true,
+    "check_jailbreak": true
+  },
+  "retrieval_guardrails": {
+    "poisoning_detection": true,
+    "min_relevance_score": 0.2
+  },
+  "output_guardrails": {
+    "check_hallucination": true,
+    "block_sensitive_leakage": true
+  }
+}
