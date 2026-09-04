@@ -37,7 +37,7 @@
 
 <div align="center">
 
-| <img src="Hackathon/NORD.png" width="220" alt="NORD Logo"/><br/>**NORD** *(Low Tier)* | <img src="Hackathon/FORGE.png" width="220" alt="FORGE Logo"/><br/>**FORGE** *(Mid Tier)* | <img src="Hackathon/APEX.png" width="220" alt="APEX Logo"/><br/>**APEX** *(High Tier)* |
+| <picture><source media="(prefers-color-scheme: dark)" srcset="Hackathon/NORD_DARK.png"><source media="(prefers-color-scheme: light)" srcset="Hackathon/NORD_LIGHT.png"><img src="Hackathon/NORD.png" width="220" alt="NORD Logo"/></picture><br/>**NORD** *(Low Tier)* | <picture><source media="(prefers-color-scheme: dark)" srcset="Hackathon/FORGE_DARK.png"><source media="(prefers-color-scheme: light)" srcset="Hackathon/FORGE_LIGHT.png"><img src="Hackathon/FORGE.png" width="220" alt="FORGE Logo"/></picture><br/>**FORGE** *(Mid Tier)* | <picture><source media="(prefers-color-scheme: dark)" srcset="Hackathon/APEX_DARK.png"><source media="(prefers-color-scheme: light)" srcset="Hackathon/APEX_LIGHT.png"><img src="Hackathon/APEX.png" width="220" alt="APEX Logo"/></picture><br/>**APEX** *(High Tier)* |
 | :---: | :---: | :---: |
 | **"Fast Answers. Real Support."** | **"Deeper Insights. Stronger Solutions."** | **"Maximum Intelligence. Minimum Downtime."** |
 | **Speed & Edge First** | **Balanced Industrial Reasoning** | **Safety-Critical Deep Diagnostics** |
