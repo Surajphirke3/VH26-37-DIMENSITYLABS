@@ -317,81 +317,29 @@ export default function ArchitecturePage() {
           </h2>
         </div>
 
-        {/* Tab selectors */}
-        <div className="flex items-center gap-3 mb-8 flex-wrap">
-          {MODELS.map((m) => (
-            <button
-              key={m.name}
-              onClick={() => setSelectedModel(m.name)}
-              className={`flex items-center gap-2.5 px-5 py-2.5 rounded-xl border text-sm font-bold transition-all ${
-                selectedModel === m.name
-                  ? "text-slate-900 dark:text-white border-indigo-400/50 dark:border-white/[0.15] bg-indigo-50 dark:bg-white/[0.06] shadow-sm dark:shadow-none"
-                  : "text-slate-500 border-slate-200 dark:border-white/[0.05] hover:text-slate-900 dark:hover:text-slate-300 hover:border-slate-300 dark:hover:border-white/[0.1]"
-              }`}
-            >
-              <Image
-                src={theme === "light" ? m.logoLight : m.logoDark}
-                alt={m.name}
-                width={52}
-                height={22}
-                style={{ width: "auto", height: "auto" }}
-                className="object-contain"
-              />
-            </button>
-          ))}
-        </div>
-      </section>
-
-        {/* Active model detail */}
-        <div
-          className="rounded-2xl p-7 sm:p-10 border grid grid-cols-1 md:grid-cols-2 gap-8 transition-all bg-white dark:bg-transparent shadow-sm dark:shadow-none"
-          style={{ borderColor: `${model.color}30` }}
-        >
-          <div>
-            <div className="flex items-center gap-3 mb-4">
-              <Image
-                src={theme === "light" ? model.logoLight : model.logoDark}
-                alt={model.name}
-                width={100}
-                height={44}
-                style={{ width: "auto", height: "auto" }}
-                className="object-contain"
-              />
-            </div>
-            <div className="font-mono text-xs text-slate-500 mb-1">Underlying Model</div>
-            <div className="font-bold text-sm text-slate-900 dark:text-white mb-4">{model.model}</div>
-            <div className="font-mono text-xs text-slate-500 mb-1">Typical Latency</div>
-            <div className="font-black text-2xl font-mono mb-6" style={{ color: model.color }}>{model.latency}</div>
-
-            <div className="font-mono text-[10px] text-slate-500 uppercase tracking-widest mb-3">Best used for</div>
-            <ul className="space-y-2">
-              {model.useCases.map((u) => (
-                <li key={u} className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300">
-                  <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: model.color }} />
-                  {u}
-                </li>
+        <div className="overflow-x-auto mt-8">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-[var(--border)]">
+                <th className="text-left px-4 py-3 font-black text-[var(--text-primary)]">Scenario</th>
+                <th className="text-left px-4 py-3 font-mono text-[10px] font-bold text-amber-500 uppercase tracking-widest">Avg Latency</th>
+                <th className="text-left px-4 py-3 font-mono text-[10px] font-bold text-slate-500 uppercase tracking-widest">P99</th>
+                <th className="text-left px-4 py-3 font-mono text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Throughput</th>
+                <th className="text-left px-4 py-3 font-mono text-[10px] font-bold text-cyan-500 uppercase tracking-widest">Accuracy</th>
+              </tr>
+            </thead>
+            <tbody>
+              {BENCHMARKS.map((b, i) => (
+                <tr key={i} className="border-b border-[var(--border)] hover:bg-[var(--bg-surface)]/30 transition-colors">
+                  <td className="px-4 py-4 font-semibold text-[var(--text-primary)]">{b.scenario}</td>
+                  <td className="px-4 py-4 font-mono font-bold text-amber-500">{b.avgTime}</td>
+                  <td className="px-4 py-4 font-mono text-[var(--text-muted)]">{b.p99}</td>
+                  <td className="px-4 py-4 font-mono text-emerald-500">{b.throughput}</td>
+                  <td className="px-4 py-4 font-mono text-cyan-400 font-bold">{b.accuracy}</td>
+                </tr>
               ))}
-            </ul>
-          </div>
-
-          <div className="animate-slide-in-right relative">
-            <div className="absolute inset-0 bg-indigo-500/10 blur-[80px] rounded-full pointer-events-none" />
-            <div className="cyber-card p-8 relative z-10 bg-black/20 backdrop-blur-3xl border border-indigo-500/20">
-              <div className="font-mono text-xs space-y-3 text-indigo-300">
-                <div><span className="text-slate-500">// Query from technician on KUKA KR-210</span></div>
-                <div><span className="text-amber-400">query:</span> <span className="text-white">"servo overcurrent fault code"</span></div>
-                <div><span className="text-amber-400">machine_id:</span> <span className="text-white">"kuka_kr210_cell_4"</span></div>
-                <div className="mt-4"><span className="text-slate-500">// pgvector ANN filters:</span></div>
-                <div>WHERE machine_id = <span className="text-white">'kuka_kr210_cell_4'</span></div>
-                <div>AND cosine_similarity <span className="text-amber-400">≥</span> <span className="text-white">0.72</span></div>
-                <div className="mt-4"><span className="text-slate-500">// Result: 3 relevant manual sections</span></div>
-                <div className="text-emerald-400">✓ KUKA KR-210 Service Bulletin 2F-40-01, page 84</div>
-                <div className="text-emerald-400">✓ Servo Drive Troubleshooting Tree (matching IGBT module)</div>
-                <div className="text-emerald-400">✓ Axis 4 Fault Code Reference Table</div>
-                <div className="mt-4 text-slate-500">// Machine B queries never see these results.</div>
-              </div>
-            </div>
-          </div>
+            </tbody>
+          </table>
         </div>
       </section>
 

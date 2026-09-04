@@ -7,12 +7,18 @@ import Image from "next/image";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import { useTheme } from "@/lib/theme-context";
 
-const NAV_LINKS = [
+interface NavLinkItem {
+  href: string;
+  label: string;
+  isModels?: boolean;
+}
+
+const NAV_LINKS: NavLinkItem[] = [
   { href: "/", label: "Home" },
   { href: "/dashboard", label: "Diagnostics" },
   { href: "/documents", label: "Documents" },
   { href: "/search", label: "Search" },
-  { href: "/models", label: "Models" },
+  { href: "/models", label: "Models", isModels: true },
   { href: "/status", label: "Status" },
   { href: "/architecture", label: "Architecture" },
   { href: "/help", label: "Help" },

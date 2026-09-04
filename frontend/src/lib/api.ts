@@ -150,7 +150,7 @@ export const reprocessManual = (manualId: string): Promise<{ manual_id: string; 
   apiFetch(`/api/v1/manuals/${manualId}/reprocess`, { method: "POST" });
 
 // backend: {success, data: {manual_id, processing_status, progress_pct, ...}}
-export const getManualStatus = (manualId: string): Promise<{ processing_status: Manual["processing_status"]; progress_pct?: number; error_message?: string }> =>
+export const getManualStatus = (manualId: string): Promise<{ processing_status: Manual["processing_status"]; progress_pct?: number; error_message?: string; pages_processed?: number; chunks_created?: number }> =>
   apiFetch(`/api/v1/manuals/${manualId}/status`);
 
 export const deleteManual = (manualId: string): Promise<void> =>
