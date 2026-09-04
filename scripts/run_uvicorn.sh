@@ -35,9 +35,24 @@ fi
 # Source virtualenv
 source "$VENV_DIR/bin/activate"
 
+# 3. Ensure PostgreSQL (pgvector) and Redis are running
+if ! nc -z localhost 5432 2>/dev/null; then
+    echo "🐘 PostgreSQL is not running on localhost:5432."
+    echo "🐳 Starting PostgreSQL (pgvector) and Redis via Docker..."
+    cd "$REPO_ROOT"
+    docker compose up -d db redis
+    cd "$BACKEND_DIR"
+    echo "⏳ Waiting for PostgreSQL to be ready..."
+    until nc -z localhost 5432 2>/dev/null; do
+        sleep 1
+    done
+    echo "✅ Database is ready!"
+fi
+
 PORT="${PORT:-8000}"
 HOST="${HOST:-0.0.0.0}"
 
+echo ""
 echo "📡 Server Address : http://$HOST:$PORT"
 echo "📖 Swagger API Docs: http://localhost:$PORT/docs"
 echo "📖 ReDoc Docs      : http://localhost:$PORT/redoc"
