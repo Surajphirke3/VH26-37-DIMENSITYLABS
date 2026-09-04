@@ -52,7 +52,7 @@ export default function NotFound() {
           </span>
           <span className="text-white/20">|</span>
           <span className="font-mono text-xs text-slate-400">
-            MEND-X OS v1.1.1
+            MEND-X OS v1.2.1
           </span>
         </div>
 

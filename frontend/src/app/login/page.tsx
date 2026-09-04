@@ -262,7 +262,7 @@ export default function LoginPage() {
         )}
 
         <p className="text-center text-xs mt-5" style={{ color: "#334155" }}>
-          MEND - X v1.1.1 · Team DIMENSITY LABS [VH26-37]
+          MEND - X v1.2.1 · Team DIMENSITY LABS [VH26-37]
         </p>
       </div>
     </div>
