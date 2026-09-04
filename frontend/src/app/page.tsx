@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import LandingLayout from "@/components/landing/LandingLayout";
@@ -59,277 +59,185 @@ const MODEL_TIERS = [
     specs: ["Claude Sonnet 3.5", "3–8s latency", "Root cause analysis", "Safety-critical systems"],
     logoDark: "/apex-dark.png",
     logoLight: "/apex-light.png",
-  },
+  }
 ];
 
 export default function HomePage() {
   const { theme } = useTheme();
-  const [tick, setTick] = useState(0);
-
-  useEffect(() => {
-    const t = setInterval(() => setTick((n) => n + 1), 3000);
-    return () => clearInterval(t);
-  }, []);
 
   return (
     <LandingLayout>
-      {/* ─── BG ambient layer ─── */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute top-0 left-0 w-full h-full bg-grid opacity-20" />
-        <div className="absolute top-1/4 right-1/4 w-[600px] h-[600px] bg-indigo-700/10 rounded-full blur-[150px]" />
-        <div className="absolute bottom-1/3 left-1/5 w-[500px] h-[500px] bg-violet-700/10 rounded-full blur-[130px]" />
+      {/* ─── Ambient Glow Grid Background ─── */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden bg-grid">
+        <div className="absolute top-1/4 -right-1/4 w-[800px] h-[800px] rounded-full orb opacity-20" style={{ background: "radial-gradient(circle, #6366f1 0%, transparent 70%)" }} />
+        <div className="absolute bottom-1/4 -left-1/4 w-[600px] h-[600px] rounded-full orb opacity-15" style={{ background: "radial-gradient(circle, #8b5cf6 0%, transparent 70%)", animationDelay: "-5s" }} />
+        <div className="absolute top-1/2 left-1/3 w-[500px] h-[500px] rounded-full orb opacity-10" style={{ background: "radial-gradient(circle, #10b981 0%, transparent 70%)", animationDelay: "-2s" }} />
       </div>
 
-      {/* ─── HERO ─── */}
-      <section className="relative z-10 pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        {/* Top badge */}
-        <div className="flex items-center gap-3 mb-10">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.08] font-mono text-[11px] text-slate-600 dark:text-slate-400">
-            <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
-            <span>VCET HACKATHON 2026</span>
-            <span className="text-slate-300 dark:text-white/20">·</span>
-            <span>TEAM [VH26-37]</span>
+      {/* ─── HERO SECTION ─── */}
+      <section className="relative z-10 pt-40 pb-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col items-center text-center">
+        {/* Dynamic Status Pill */}
+        <div className="inline-flex items-center gap-3 mb-10 px-4 py-2 rounded-full glass border border-[var(--border)] animate-slide-up shadow-sm" style={{ animationDelay: "0.1s" }}>
+          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981] animate-pulse" />
+            <span className="font-mono text-[10px] font-bold text-emerald-600 dark:text-emerald-400 tracking-widest uppercase">System Operational</span>
           </div>
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 font-mono text-[11px] text-emerald-600 dark:text-emerald-400">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
-            SYSTEM OPERATIONAL
-          </div>
+          <span className="w-px h-4 bg-[var(--border)]" />
+          <span className="font-mono text-[10px] font-bold text-slate-500 tracking-widest uppercase">MEND-X Core v1.2.1</span>
         </div>
 
-        {/* Giant industrial headline — editorial style */}
-        <div className="mb-8">
-          <p className="font-mono text-xs text-slate-500 dark:text-slate-500 uppercase tracking-[0.3em] mb-4">
-            MEND - X · INDUSTRIAL AI DIAGNOSTIC ENGINE
-          </p>
-          <h1 className="font-black text-[clamp(3rem,9vw,7.5rem)] leading-[0.9] tracking-[-0.04em] uppercase text-slate-900 dark:text-white">
-            FROM
+        {/* Hero Headline with Cyber Glitch Accent - Removing standard text gradient for CSS animated ones */}
+        <div className="relative mb-8 animate-slide-up" style={{ animationDelay: "0.2s" }}>
+          <h1 className="font-black text-[clamp(3.5rem,8vw,7rem)] leading-[1] tracking-tighter uppercase text-[var(--text-primary)]">
+            From <span className="opacity-90">Failure</span>
             <br />
-            FAILURE
-            <br />
-            <span
-              style={{
-                background: "linear-gradient(90deg, #4f46e5, #7c3aed, #059669)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-            >
-              TO FUNCTION.
-            </span>
+            To <span className="gradient-text-emerald font-black" style={{ filter: 'drop-shadow(0 0 20px rgba(16,185,129,0.3))' }}>Function.</span>
           </h1>
         </div>
 
-        <div className="max-w-xl mb-12">
-          <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
-            Factory lines halt. Alarms trigger. Technicians scramble through 800-page PDFs.
-            <span className="text-slate-900 dark:text-white font-semibold"> MEND-X eliminates the gap</span> — 
-            a zero-hallucination RAG engine that converts any OEM manual into instant, 
-            page-cited repair protocols.
-          </p>
-        </div>
+        <p className="text-base sm:text-lg text-[var(--text-muted)] max-w-2xl leading-relaxed mb-12 animate-slide-up" style={{ animationDelay: "0.3s" }}>
+          Factory lines halt. Alarms trigger. Technicians scramble through 800-page PDFs.
+          <span className="text-[var(--text-primary)] font-semibold mx-1">MEND-X eliminates the blind spot.</span>
+          A zero-hallucination industrial RAG engine that transforms OEM manuals into precise, cited repair protocols.
+        </p>
 
-        {/* Dual CTAs */}
-        <div className="flex flex-wrap gap-4 items-center mb-20">
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full animate-slide-up" style={{ animationDelay: "0.4s" }}>
           <Link
             href="/dashboard"
-            className="px-7 py-3.5 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 border border-indigo-400/30 shadow-xl shadow-indigo-600/25 transition-all hover:-translate-y-0.5 flex items-center gap-2"
+            className="group relative w-full sm:w-auto px-8 py-4 rounded-xl font-bold text-sm text-white overflow-hidden transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2"
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-violet-600 to-indigo-600 bg-[length:200%_auto] group-hover:bg-[position:100%_center] transition-all duration-500" />
+            <svg className="relative w-4 h-4 z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
-            Launch Console
+            <span className="relative z-10">Launch Troubleshooting Console</span>
           </Link>
           <Link
-            href="/architecture"
-            className="px-7 py-3.5 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-white/[0.04] hover:bg-slate-200 dark:hover:bg-white/[0.08] border border-slate-200 dark:border-white/[0.08] transition-all flex items-center gap-2 shadow-sm dark:shadow-none"
+            href="/problem"
+            className="group w-full sm:w-auto px-8 py-4 rounded-xl font-semibold text-sm text-[var(--text-primary)] bg-[var(--bg-surface)] hover:bg-[var(--glass-bg-hover)] border border-[var(--border)] transition-all flex items-center justify-center gap-2 shadow-sm"
           >
-            Explore Architecture
-            <svg className="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            Explore the Crisis
+            <svg className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
             </svg>
           </Link>
-        </div>
-
-        {/* ─── Marquee strip ─── */}
-        <div className="relative overflow-hidden border-y border-slate-200 dark:border-white/[0.05] py-3 mb-20 -mx-4 sm:-mx-6 lg:-mx-8 bg-slate-50/50 dark:bg-transparent">
-          <div className="flex gap-8" style={{ animation: "marquee 18s linear infinite", whiteSpace: "nowrap" }}>
-            {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((item, i) => (
-              <span key={i} className="flex-shrink-0 font-mono text-[11px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-3">
-                <span className="w-1 h-1 rounded-full bg-indigo-500/60" />
-                {item}
-              </span>
-            ))}
-          </div>
         </div>
       </section>
 
-      {/* ─── STATS ─── */}
-      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto mb-28">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-slate-200 dark:bg-white/[0.05] rounded-2xl overflow-hidden border border-slate-200 dark:border-white/[0.06] shadow-sm dark:shadow-none">
+      {/* ─── LIVE INFINITE MARQUEE ─── */}
+      <div className="relative z-10 w-full overflow-hidden border-y border-[var(--border)] py-4 backdrop-blur-sm bg-[var(--bg-elevated)]/30">
+        <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[var(--bg-base)] to-transparent z-10" />
+        <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[var(--bg-base)] to-transparent z-10" />
+        <div className="flex gap-8 items-center" style={{ animation: "marquee 25s linear infinite", whiteSpace: "nowrap" }}>
+          {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((item, i) => (
+            <span key={i} className="flex-shrink-0 font-mono text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-widest flex items-center gap-3">
+              <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-[0_0_8px_#6366f1]" />
+              {item}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* ─── INDUSTRIAL METRICS GRID ─── */}
+      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-24">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {STATS.map((stat, i) => (
             <div
               key={i}
-              className="bg-white dark:bg-[#07080c] px-6 py-8 flex flex-col gap-2 hover:bg-slate-50 dark:hover:bg-[#0d0e14] transition-colors"
+              className="glass-card hover:border-indigo-500/30 p-8 flex flex-col gap-3 group animate-slide-up"
+              style={{ animationDelay: `${0.1 * i}s` }}
             >
-              <span className="font-black text-4xl sm:text-5xl text-slate-900 dark:text-white font-mono tracking-tighter">{stat.value}</span>
-              <span className="text-xs text-slate-500 leading-relaxed">{stat.label}</span>
+              <div className="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center font-mono text-xs font-bold text-indigo-500 border border-indigo-500/20 group-hover:scale-110 transition-transform">
+                0{i + 1}
+              </div>
+              <span className="font-black text-4xl sm:text-5xl text-[var(--text-primary)] font-mono tracking-tighter mt-4 group-hover:gradient-text transition-all">
+                {stat.value}
+              </span>
+              <span className="text-xs text-[var(--text-muted)] font-medium leading-relaxed">{stat.label}</span>
             </div>
           ))}
         </div>
       </section>
 
-      {/* ─── THREE MODEL TIERS ─── */}
-      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto mb-28">
-        <div className="mb-14">
-          <div className="flex items-center gap-3 mb-4">
-            <span className="font-mono text-[10px] text-slate-500 uppercase tracking-[0.3em]">THE THREE INTELLIGENCE TIERS</span>
-          </div>
-          <h2 className="font-black text-4xl sm:text-5xl text-slate-900 dark:text-white tracking-tight leading-tight mb-4">
-            Not one model.<br />Three, matched to severity.
+      {/* ─── TRI-TIER LLM ROUTING SYSTEM ─── */}
+      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-24">
+        <div className="text-center mb-16 animate-slide-up">
+          <span className="inline-block font-mono text-[10px] uppercase font-bold text-indigo-500 tracking-widest bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20 mb-4">
+            Adaptive Intelligence
+          </span>
+          <h2 className="font-black text-3xl sm:text-5xl text-[var(--text-primary)] tracking-tight leading-tight">
+            Not one model.<br />
+            <span className="gradient-text">Three. Matched to severity.</span>
           </h2>
-          <p className="text-slate-600 dark:text-slate-400 text-base max-w-2xl">
-            Industrial plants range from edge PLCs with no internet to cloud-connected control centers handling life-critical decisions. MEND-X routes every query to the right inference tier automatically.
-          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {MODEL_TIERS.map((model) => (
+          {MODEL_TIERS.map((model, i) => (
             <div
               key={model.name}
-              className="group relative rounded-2xl p-7 transition-all duration-300 hover:-translate-y-1 cursor-default bg-white dark:bg-transparent shadow-sm dark:shadow-none"
-              style={{
-                border: `1px solid ${model.colorBorder}`,
-              }}
+              className="cyber-card relative p-8 group animate-slide-up bg-white/50 dark:bg-transparent"
+              style={{ animationDelay: `${0.2 * i}s` }}
             >
-              {/* Tier number */}
-              <div className="font-mono text-[10px] font-bold mb-5 tracking-[0.25em] uppercase" style={{ color: model.color }}>
-                {model.tier}
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                   style={{ background: `radial-gradient(circle at top right, ${model.color}15, transparent 60%)` }} />
+
+              <div className="flex items-center justify-between mb-8 relative z-10">
+                <span className="font-mono text-[10px] font-black tracking-widest uppercase border border-current px-2 py-1 rounded" style={{ color: model.color, backgroundColor: `${model.color}10` }}>
+                  {model.tier}
+                </span>
               </div>
 
-              {/* Logo */}
-              <div className="mb-5 h-12 flex items-center">
+              <div className="h-10 mb-6 relative z-10 flex items-center">
                 <Image
                   src={theme === "light" ? model.logoLight : model.logoDark}
                   alt={model.name}
-                  width={90}
+                  width={100}
                   height={40}
-                  className="object-contain transition-opacity"
+                  className="object-contain group-hover:scale-105 transition-transform origin-left"
                 />
               </div>
 
-              {/* Description */}
-              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-6">{model.desc}</p>
+              <p className="text-sm text-[var(--text-muted)] leading-relaxed mb-8 relative z-10 min-h-[60px]">
+                {model.desc}
+              </p>
 
-              {/* Specs */}
-              <ul className="space-y-2">
+              <div className="space-y-3 relative z-10 border-t border-[var(--border)] pt-6">
                 {model.specs.map((spec) => (
-                  <li key={spec} className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
-                    <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: model.color }} />
+                  <div key={spec} className="flex items-center gap-3 text-xs font-medium text-[var(--text-secondary)]">
+                    <span className="w-1.5 h-1.5 rounded-full shadow-sm flex-shrink-0" style={{ background: model.color, boxShadow: `0 0 8px ${model.color}` }} />
                     {spec}
-                  </li>
+                  </div>
                 ))}
-              </ul>
-
-              {/* Glow edge on hover */}
-              <div
-                className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-                style={{ boxShadow: `inset 0 0 30px ${model.color}15, 0 0 20px ${model.color}15` }}
-              />
+              </div>
             </div>
           ))}
         </div>
-
-        <div className="mt-8 flex justify-center">
-          <Link
-            href="/architecture"
-            className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 flex items-center gap-2 transition-colors font-mono"
-          >
-            Deep dive into system architecture
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-            </svg>
-          </Link>
-        </div>
       </section>
 
-      {/* ─── SHORT PROBLEM HOOK ─── */}
-      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto mb-28">
-        <div
-          className="rounded-2xl p-8 sm:p-14 border border-red-500/20 relative overflow-hidden bg-rose-50/50 dark:bg-transparent shadow-sm dark:shadow-none"
-          style={{
-            backgroundImage: "var(--tw-gradient-stops, none)",
-          }}
-        >
-          <div className="absolute top-0 right-0 font-black text-[16rem] leading-none text-red-500/[0.04] dark:text-red-500/[0.04] select-none pointer-events-none font-mono tracking-tighter -mt-10 -mr-8">
-            !
-          </div>
+      {/* ─── CTA FOOTER BLOCK ─── */}
+      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto py-24">
+        <div className="glass rounded-[2rem] p-10 sm:p-16 text-center border-indigo-500/20 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/10 to-transparent pointer-events-none" />
 
-          <div className="relative z-10 max-w-2xl">
-            <span className="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-red-500/10 border border-red-500/25 text-red-600 dark:text-red-400 font-mono text-[10px] font-bold uppercase tracking-widest mb-6">
-              <span className="w-1.5 h-1.5 rounded-full bg-red-500 dark:bg-red-400 animate-pulse" />
-              The Crisis
-            </span>
-            <h2 className="font-black text-3xl sm:text-5xl text-slate-900 dark:text-white leading-tight tracking-tight mb-5">
-              Every minute a line<br />stops costs $4,333.
-            </h2>
-            <p className="text-slate-600 dark:text-slate-400 text-base leading-relaxed mb-8">
-              The average unplanned industrial outage lasts over 4 hours. That's $1M+ per incident — not from broken hardware, but from technicians unable to find the right page in the right manual fast enough.
-            </p>
+          <h2 className="font-black text-3xl sm:text-5xl text-[var(--text-primary)] mb-6 relative z-10">
+            Stop losing shifts.<br />Start MEND-X.
+          </h2>
+          <p className="text-[var(--text-muted)] text-sm sm:text-base max-w-xl mx-auto mb-10 relative z-10 leading-relaxed">
+            Every failure comes with a solution written in a manual somewhere. We just make sure you find it in 8 seconds instead of 4 hours.
+          </p>
+
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 relative z-10">
             <Link
-              href="/problem"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold text-red-700 dark:text-red-300 bg-red-500/10 hover:bg-red-500/15 border border-red-500/30 transition-all"
+              href="/dashboard"
+              className="w-full sm:w-auto px-8 py-4 rounded-xl font-black text-sm text-[var(--bg-base)] bg-[var(--text-primary)] hover:scale-105 active:scale-95 transition-transform flex items-center justify-center gap-2"
             >
-              See the full problem statement
+              Open Console
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
             </Link>
           </div>
-        </div>
-      </section>
-
-      {/* ─── Page navigation teaser ─── */}
-      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto mb-20">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {[
-            {
-              href: "/problem",
-              label: "Problem & Solution",
-              desc: "The $260K/hr crisis, hallucination dangers, and why MEND-X is the only viable answer.",
-              icon: "⚡",
-              accent: "#ef4444",
-            },
-            {
-              href: "/architecture",
-              label: "System Architecture",
-              desc: "Three-tier LLM routing, pgvector RAG pipeline, FastAPI backend internals, and data flow diagrams.",
-              icon: "⬡",
-              accent: "#6366f1",
-            },
-            {
-              href: "/workflow",
-              label: "How It Works",
-              desc: "From PDF upload to verified answer in 8 seconds. Every step of the diagnostic pipeline visualized.",
-              icon: "◎",
-              accent: "#10b981",
-            },
-          ].map((card) => (
-            <Link
-              key={card.href}
-              href={card.href}
-              className="group p-6 rounded-xl border border-slate-200 dark:border-white/[0.06] bg-white dark:bg-white/[0.02] hover:bg-slate-50 dark:hover:bg-white/[0.04] hover:border-slate-300 dark:hover:border-white/[0.12] shadow-sm dark:shadow-none transition-all flex flex-col gap-3"
-            >
-              <div className="text-2xl font-mono" style={{ color: card.accent }}>{card.icon}</div>
-              <h3 className="font-bold text-sm text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-300 transition-colors">{card.label}</h3>
-              <p className="text-xs text-slate-500 leading-relaxed">{card.desc}</p>
-              <div className="flex items-center gap-1.5 text-xs font-semibold font-mono mt-auto pt-3 border-t border-slate-100 dark:border-white/[0.06]" style={{ color: card.accent }}>
-                Explore
-                <svg className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </div>
-            </Link>
-          ))}
         </div>
       </section>
     </LandingLayout>

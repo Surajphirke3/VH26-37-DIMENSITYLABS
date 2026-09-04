@@ -1,4 +1,5 @@
 interface RefusalMessageProps {
+  type: string;
   summary: string;
   notes?: string;
   suggestions: string[];
@@ -6,11 +7,23 @@ interface RefusalMessageProps {
 }
 
 export default function RefusalMessage({
+  type,
   summary,
   notes,
   suggestions,
   onSuggestionClick,
 }: RefusalMessageProps) {
+  const getTitle = () => {
+    switch (type) {
+      case "clarification_needed":
+        return "Clarification Needed";
+      case "insufficient_information":
+        return "Insufficient Information";
+      default:
+        return "Information Needed";
+    }
+  };
+
   return (
     <div
       className="rounded-2xl p-4 space-y-3 animate-scale-in bg-amber-500/10 border border-amber-500/20 shadow-sm"
@@ -28,7 +41,7 @@ export default function RefusalMessage({
         </div>
         <div>
           <p className="text-sm font-bold text-amber-900 dark:text-amber-200">
-            Insufficient Information
+            {getTitle()}
           </p>
           <p className="text-sm mt-0.5 text-amber-800 dark:text-amber-400">
             {summary}
