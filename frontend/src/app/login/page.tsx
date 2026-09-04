@@ -2,10 +2,14 @@
 
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
+import { useTheme } from "@/lib/theme-context";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 
 export default function LoginPage() {
   const { login } = useAuth();
+  const { theme } = useTheme();
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,7 +34,24 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#08090c]">
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[var(--bg-base)] text-[var(--text-primary)] transition-colors duration-200">
+      {/* ── Top Nav Controls ── */}
+      <div className="absolute top-6 left-6 z-20">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08] transition-all"
+        >
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Home
+        </Link>
+      </div>
+
+      <div className="absolute top-6 right-6 z-20">
+        <ThemeToggle />
+      </div>
+
       {/* ── Animated Background ── */}
       <div className="absolute inset-0 bg-grid opacity-100 pointer-events-none" />
 
@@ -83,58 +104,41 @@ export default function LoginPage() {
                 }}
               />
               <img
-                src="/mend-x.png"
+                src={theme === "light" ? "/mend-x.png" : "/mend-x-dark.png"}
                 alt="MEND - X"
                 className="relative w-20 h-20 object-contain rounded-2xl animate-float"
                 style={{ animationDuration: "5s" }}
               />
             </div>
           </div>
-          <h1
-            className="text-3xl font-black tracking-tight"
-            style={{
-              background: "linear-gradient(135deg, #a5b4fc, #c4b5fd, #f0abfc)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}
-          >
-            MEND - X
+          <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white">
+            MEND<span className="text-indigo-600 dark:text-indigo-400"> - X</span>
           </h1>
-          <p className="text-sm font-semibold mt-1" style={{ color: "#10b981" }}>
+          <p className="text-sm font-bold mt-1 text-emerald-600 dark:text-emerald-400">
             From Failure to Function
           </p>
-          <p className="text-xs mt-1" style={{ color: "#475569" }}>
+          <p className="text-xs mt-1 text-slate-500 dark:text-slate-400">
             Industrial Machine Troubleshooting System
           </p>
         </div>
 
         {/* Glass Card */}
         <div
-          className="glass-card p-8"
+          className="glass-card p-8 bg-white/95 dark:bg-[rgba(15,17,23,0.85)] border border-slate-200 dark:border-white/[0.08] rounded-[20px] shadow-xl dark:shadow-[0_8px_64px_rgba(0,0,0,0.8)] transition-colors"
           style={{
-            background: "rgba(15,17,23,0.85)",
             backdropFilter: "blur(24px)",
-            border: "1px solid rgba(255,255,255,0.08)",
-            borderRadius: "20px",
-            boxShadow: "0 8px 64px rgba(0,0,0,0.8), 0 0 0 1px rgba(99,102,241,0.1)",
           }}
         >
           <div className="flex items-center gap-2 mb-6">
             <div className="status-dot-online" />
-            <h2 className="text-sm font-semibold" style={{ color: "#94a3b8" }}>
+            <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-400">
               Secure Access Portal
             </h2>
           </div>
 
           {error && (
             <div
-              className="mb-5 px-4 py-3 rounded-xl text-sm flex items-center gap-2 animate-fade-in"
-              style={{
-                background: "rgba(239,68,68,0.1)",
-                border: "1px solid rgba(239,68,68,0.25)",
-                color: "#fca5a5",
-              }}
+              className="mb-5 px-4 py-3 rounded-xl text-sm flex items-center gap-2 animate-fade-in bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/25 text-red-600 dark:text-red-300"
             >
               <svg className="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
@@ -147,8 +151,7 @@ export default function LoginPage() {
             {/* Email */}
             <div>
               <label
-                className="block text-xs font-semibold uppercase tracking-wider mb-2"
-                style={{ color: "#64748b" }}
+                className="block text-xs font-semibold uppercase tracking-wider mb-2 text-slate-600 dark:text-slate-400"
               >
                 Email Address
               </label>
@@ -159,20 +162,14 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="technician@plant.com"
-                className="input-glow w-full px-4 py-3 text-sm rounded-xl transition-all"
-                style={{
-                  background: "rgba(255,255,255,0.04)",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                  color: "#f1f5f9",
-                }}
+                className="input-glow w-full px-4 py-3 text-sm rounded-xl transition-all bg-slate-50 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-[#f1f5f9] placeholder:text-slate-400 dark:placeholder:text-slate-500"
               />
             </div>
 
             {/* Password */}
             <div>
               <label
-                className="block text-xs font-semibold uppercase tracking-wider mb-2"
-                style={{ color: "#64748b" }}
+                className="block text-xs font-semibold uppercase tracking-wider mb-2 text-slate-600 dark:text-slate-400"
               >
                 Password
               </label>
@@ -184,17 +181,12 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="input-glow w-full px-4 py-3 pr-12 text-sm rounded-xl transition-all"
-                  style={{
-                    background: "rgba(255,255,255,0.04)",
-                    border: "1px solid rgba(255,255,255,0.08)",
-                    color: "#f1f5f9",
-                  }}
+                  className="input-glow w-full px-4 py-3 pr-12 text-sm rounded-xl transition-all bg-slate-50 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-[#f1f5f9] placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPass((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-colors"
                   tabIndex={-1}
                 >
                   {showPass ? (
@@ -216,7 +208,7 @@ export default function LoginPage() {
               id="login-submit"
               type="submit"
               disabled={isLoading}
-              className="relative w-full py-3 px-4 mt-2 rounded-xl font-semibold text-sm text-white overflow-hidden"
+              className="relative w-full py-3 px-4 mt-2 rounded-xl font-semibold text-sm text-white overflow-hidden shadow-lg transition-all"
               style={{
                 background: isLoading
                   ? "rgba(99,102,241,0.4)"
@@ -245,23 +237,21 @@ export default function LoginPage() {
         {/* Demo Credentials */}
         {process.env.NODE_ENV !== "production" && (
           <div
-            className="mt-4 px-4 py-3 rounded-xl text-center animate-fade-in"
+            className="mt-4 px-4 py-3 rounded-xl text-center animate-fade-in bg-slate-100 dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.06]"
             style={{
-              background: "rgba(255,255,255,0.03)",
-              border: "1px solid rgba(255,255,255,0.06)",
               animationDelay: "0.5s",
             }}
           >
-            <p className="text-xs font-medium mb-1" style={{ color: "#475569" }}>
+            <p className="text-xs font-medium mb-1 text-slate-500 dark:text-slate-400">
               Demo credentials
             </p>
-            <p className="font-mono text-xs" style={{ color: "#6366f1" }}>
+            <p className="font-mono text-xs text-indigo-600 dark:text-indigo-400 font-semibold">
               admin@mechmind.io / Admin123!
             </p>
           </div>
         )}
 
-        <p className="text-center text-xs mt-5" style={{ color: "#334155" }}>
+        <p className="text-center text-xs mt-5 text-slate-500 dark:text-slate-500">
           MEND - X v1.2.1 · Team DIMENSITY LABS [VH26-37]
         </p>
       </div>

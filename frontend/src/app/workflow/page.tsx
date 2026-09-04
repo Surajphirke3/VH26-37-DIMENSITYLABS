@@ -178,36 +178,36 @@ export default function WorkflowPage() {
       <div className="fixed bottom-1/4 right-1/4 w-[500px] h-[500px] bg-emerald-800/8 rounded-full blur-[140px] pointer-events-none z-0" />
 
       {/* Header */}
-      <div className="relative z-10 pt-28 pb-14 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-b border-white/[0.06]">
+      <div className="relative z-10 pt-28 pb-14 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-b border-slate-200 dark:border-white/[0.06]">
         <span className="font-mono text-[10px] text-slate-500 uppercase tracking-[0.3em]">How It Works</span>
-        <h1 className="font-black text-4xl sm:text-6xl text-white tracking-tight leading-tight mt-3 mb-4">
+        <h1 className="font-black text-4xl sm:text-6xl text-slate-900 dark:text-white tracking-tight leading-tight mt-3 mb-4">
           From PDF upload<br />
-          <span className="text-emerald-400">to verified answer</span><br />
+          <span className="text-emerald-600 dark:text-emerald-400">to verified answer</span><br />
           in 8 seconds.
         </h1>
-        <p className="text-slate-400 text-base max-w-xl">
+        <p className="text-slate-600 dark:text-slate-400 text-base max-w-xl">
           Every step of the MEND-X diagnostic pipeline is auditable, deterministic, and grounded. No magic. No guessing. Here is exactly what happens.
         </p>
       </div>
 
       {/* ─── Live Terminal Demo ─── */}
-      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-16 border-b border-white/[0.05]">
+      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-16 border-b border-slate-200 dark:border-white/[0.05]">
         <div className="mb-8">
           <span className="font-mono text-[10px] text-slate-500 uppercase tracking-[0.3em]">Live Simulation</span>
-          <h2 className="font-black text-2xl sm:text-3xl text-white mt-2">Watch the engine run</h2>
-          <p className="text-slate-400 text-sm mt-2">Scroll here to trigger. The complete query cycle plays in real time below.</p>
+          <h2 className="font-black text-2xl sm:text-3xl text-slate-900 dark:text-white mt-2">Watch the engine run</h2>
+          <p className="text-slate-600 dark:text-slate-400 text-sm mt-2">Scroll here to trigger. The complete query cycle plays in real time below.</p>
         </div>
 
-        <div className="rounded-2xl border border-indigo-500/25 bg-[#0a0c14]/90 overflow-hidden max-w-3xl">
+        <div className="rounded-2xl border border-indigo-500/25 bg-slate-950/95 dark:bg-[#0a0c14]/90 shadow-xl overflow-hidden max-w-3xl">
           {/* Terminal bar */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.05] bg-[#080911]">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.08] bg-black/40">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-red-500/80" />
               <div className="w-3 h-3 rounded-full bg-amber-500/80" />
               <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
-              <span className="font-mono text-[11px] text-slate-500 ml-2">MEND-X — DIAGNOSTIC CONSOLE</span>
+              <span className="font-mono text-[11px] text-slate-400 ml-2">MEND-X — DIAGNOSTIC CONSOLE</span>
             </div>
-            <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-indigo-500/15 text-indigo-400 border border-indigo-500/25">
+            <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
               LIVE TRACE
             </span>
           </div>
@@ -218,10 +218,10 @@ export default function WorkflowPage() {
       </section>
 
       {/* ─── Interactive 3-Phase Workflow ─── */}
-      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-16 border-b border-white/[0.05]">
+      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-16 border-b border-slate-200 dark:border-white/[0.05]">
         <div className="mb-10">
           <span className="font-mono text-[10px] text-slate-500 uppercase tracking-[0.3em]">Phase-by-Phase</span>
-          <h2 className="font-black text-2xl sm:text-3xl text-white mt-2">The three operational phases</h2>
+          <h2 className="font-black text-2xl sm:text-3xl text-slate-900 dark:text-white mt-2">The three operational phases</h2>
         </div>
 
         {/* Phase selectors */}
@@ -232,8 +232,8 @@ export default function WorkflowPage() {
               onClick={() => { setActivePhase(p.id); setActiveStep(0); }}
               className={`flex items-center gap-2.5 px-5 py-3 rounded-xl border text-xs font-bold transition-all ${
                 activePhase === p.id
-                  ? "text-white border-white/[0.15] bg-white/[0.06]"
-                  : "text-slate-500 border-white/[0.05] hover:text-slate-300"
+                  ? "text-slate-900 dark:text-white border-indigo-400/50 dark:border-white/[0.15] bg-indigo-50 dark:bg-white/[0.06] shadow-sm dark:shadow-none"
+                  : "text-slate-500 border-slate-200 dark:border-white/[0.05] hover:text-slate-900 dark:hover:text-slate-300 hover:border-slate-300 dark:hover:border-white/[0.1]"
               }`}
             >
               <span className="text-base">{p.icon}</span>
@@ -247,14 +247,14 @@ export default function WorkflowPage() {
 
         {/* Phase content */}
         <div
-          className="rounded-2xl border p-7 sm:p-10"
-          style={{ background: `${phase.color}06`, borderColor: `${phase.color}20` }}
+          className="rounded-2xl border p-7 sm:p-10 bg-white dark:bg-transparent shadow-sm dark:shadow-none"
+          style={{ borderColor: `${phase.color}30` }}
         >
           <div className="flex items-center gap-3 mb-6">
             <span className="font-mono font-black text-5xl opacity-10">{phase.phase}</span>
             <div>
-              <h3 className="font-black text-xl text-white">{phase.label}</h3>
-              <p className="text-xs font-mono" style={{ color: phase.color }}>{phase.tagline}</p>
+              <h3 className="font-black text-xl text-slate-900 dark:text-white">{phase.label}</h3>
+              <p className="text-xs font-mono font-bold" style={{ color: phase.color }}>{phase.tagline}</p>
             </div>
           </div>
 
@@ -266,8 +266,8 @@ export default function WorkflowPage() {
                 onClick={() => setActiveStep(activeStep === i ? -1 : i)}
                 className={`text-left p-4 rounded-xl border transition-all ${
                   activeStep === i
-                    ? "border-white/[0.15] bg-white/[0.05]"
-                    : "border-white/[0.04] bg-white/[0.01] hover:bg-white/[0.03]"
+                    ? "border-indigo-300 dark:border-white/[0.15] bg-indigo-50/50 dark:bg-white/[0.05] shadow-sm dark:shadow-none"
+                    : "border-slate-200 dark:border-white/[0.04] bg-white dark:bg-white/[0.01] hover:bg-slate-50 dark:hover:bg-white/[0.03]"
                 }`}
               >
                 <div className="flex items-start justify-between gap-2">
@@ -279,17 +279,17 @@ export default function WorkflowPage() {
                       {i + 1}
                     </span>
                     <div>
-                      <h4 className="font-semibold text-sm text-white">{step.title}</h4>
-                      <p className="text-xs text-slate-400 mt-1 leading-relaxed">{step.desc}</p>
+                      <h4 className="font-semibold text-sm text-slate-900 dark:text-white">{step.title}</h4>
+                      <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">{step.desc}</p>
                       {activeStep === i && (
-                        <p className="text-xs text-slate-500 mt-2 leading-relaxed border-t border-white/[0.06] pt-2">
+                        <p className="text-xs text-slate-500 mt-2 leading-relaxed border-t border-slate-100 dark:border-white/[0.06] pt-2">
                           ↳ {step.detail}
                         </p>
                       )}
                     </div>
                   </div>
                   <svg
-                    className={`w-4 h-4 flex-shrink-0 text-slate-600 transition-transform ${activeStep === i ? "rotate-180" : ""}`}
+                    className={`w-4 h-4 flex-shrink-0 text-slate-400 dark:text-slate-600 transition-transform ${activeStep === i ? "rotate-180" : ""}`}
                     fill="none" viewBox="0 0 24 24" stroke="currentColor"
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -305,7 +305,7 @@ export default function WorkflowPage() {
       <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-16">
         <div className="mb-10">
           <span className="font-mono text-[10px] text-slate-500 uppercase tracking-[0.3em]">Performance</span>
-          <h2 className="font-black text-2xl sm:text-3xl text-white mt-2">Timing Breakdown</h2>
+          <h2 className="font-black text-2xl sm:text-3xl text-slate-900 dark:text-white mt-2">Timing Breakdown</h2>
         </div>
 
         <div className="max-w-2xl space-y-3">
@@ -319,14 +319,14 @@ export default function WorkflowPage() {
             { label: "Output parse + citation render", time: "~90ms", pct: 7, color: "#10b981" },
           ].map((row) => (
             <div key={row.label} className="flex items-center gap-4">
-              <div className="w-52 text-xs text-slate-400 flex-shrink-0">{row.label}</div>
-              <div className="flex-1 bg-white/[0.04] rounded-full h-2 overflow-hidden">
+              <div className="w-52 text-xs text-slate-600 dark:text-slate-400 flex-shrink-0">{row.label}</div>
+              <div className="flex-1 bg-slate-200 dark:bg-white/[0.04] rounded-full h-2 overflow-hidden">
                 <div
                   className="h-full rounded-full transition-all duration-700"
                   style={{ width: `${row.pct}%`, background: row.color }}
                 />
               </div>
-              <div className="font-mono text-xs text-slate-300 w-16 text-right flex-shrink-0">{row.time}</div>
+              <div className="font-mono text-xs text-slate-700 dark:text-slate-300 w-16 text-right flex-shrink-0 font-semibold">{row.time}</div>
             </div>
           ))}
         </div>
@@ -343,7 +343,7 @@ export default function WorkflowPage() {
           </Link>
           <Link
             href="/architecture"
-            className="px-7 py-3.5 rounded-xl text-sm font-semibold text-slate-300 bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] transition-all"
+            className="px-7 py-3.5 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-white/[0.04] hover:bg-slate-200 dark:hover:bg-white/[0.08] border border-slate-200 dark:border-white/[0.08] transition-all shadow-sm dark:shadow-none"
           >
             Full Architecture →
           </Link>

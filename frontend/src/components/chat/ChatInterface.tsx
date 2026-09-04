@@ -132,8 +132,7 @@ export default function ChatInterface({
   if (!conversationId) {
     return (
       <div
-        className="flex-1 flex items-center justify-center text-sm"
-        style={{ color: "#334155", background: "#08090c" }}
+        className="flex-1 flex items-center justify-center text-sm text-slate-500 dark:text-slate-400 bg-[var(--bg-base)]"
       >
         Select or start a conversation to begin troubleshooting.
       </div>
@@ -141,26 +140,22 @@ export default function ChatInterface({
   }
 
   return (
-    <div className="flex flex-col h-full" style={{ background: "#08090c" }}>
+    <div className="flex flex-col h-full bg-[var(--bg-base)] text-[var(--text-primary)] transition-colors duration-200">
       {/* Message Area */}
       <div className="flex-1 overflow-y-auto chat-scroll px-6 py-6 space-y-5">
         {messages.length === 0 && !isLoading && (
           <div className="text-center mt-12 animate-fade-in">
             <div
-              className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-4"
-              style={{
-                background: "rgba(99,102,241,0.1)",
-                border: "1px solid rgba(99,102,241,0.2)",
-              }}
+              className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-4 bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 shadow-sm"
             >
-              <svg className="w-7 h-7" fill="none" stroke="#6366f1" viewBox="0 0 24 24">
+              <svg className="w-7 h-7 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2h-2" />
               </svg>
             </div>
-            <p className="font-semibold text-sm" style={{ color: "#64748b" }}>
+            <p className="font-semibold text-sm text-slate-700 dark:text-[#64748b]">
               Ready to troubleshoot
             </p>
-            <p className="text-xs mt-1" style={{ color: "#334155" }}>
+            <p className="text-xs mt-1 text-slate-500 dark:text-[#334155]">
               Enter an error code or describe the fault symptom.
             </p>
           </div>
@@ -175,11 +170,10 @@ export default function ChatInterface({
             {msg.role === "user" ? (
               /* User bubble */
               <div
-                className="max-w-[70%] px-4 py-3 rounded-2xl rounded-tr-sm text-sm font-medium leading-relaxed"
+                className="max-w-[70%] px-4 py-3 rounded-2xl rounded-tr-sm text-sm font-medium leading-relaxed shadow-md shadow-indigo-600/25"
                 style={{
                   background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
                   color: "#fff",
-                  boxShadow: "0 4px 16px rgba(99,102,241,0.3)",
                 }}
               >
                 {msg.content}
@@ -187,30 +181,21 @@ export default function ChatInterface({
             ) : (
               /* AI response card */
               <div
-                className="max-w-[90%] w-full rounded-2xl rounded-tl-sm px-5 py-4"
-                style={{
-                  background: "rgba(15,17,23,0.9)",
-                  border: "1px solid rgba(255,255,255,0.07)",
-                  boxShadow: "0 4px 24px rgba(0,0,0,0.5)",
-                }}
+                className="max-w-[90%] w-full rounded-2xl rounded-tl-sm px-5 py-4 bg-white dark:bg-[rgba(15,17,23,0.9)] border border-slate-200 dark:border-white/[0.07] shadow-sm dark:shadow-[0_4px_24px_rgba(0,0,0,0.5)] transition-colors"
               >
                 {/* AI header */}
-                <div className="flex items-center gap-2 mb-3 pb-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                <div className="flex items-center gap-2 mb-3 pb-3 border-b border-slate-100 dark:border-white/[0.05]">
                   <div
-                    className="w-6 h-6 rounded-full flex items-center justify-center shrink-0"
-                    style={{
-                      background: "linear-gradient(135deg, rgba(16,185,129,0.2), rgba(5,150,105,0.2))",
-                      border: "1px solid rgba(16,185,129,0.3)",
-                    }}
+                    className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 bg-emerald-500/10 border border-emerald-500/20"
                   >
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="#10b981" viewBox="0 0 24 24">
+                    <svg className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2h-2" />
                     </svg>
                   </div>
-                  <span className="text-xs font-semibold" style={{ color: "#10b981" }}>
+                  <span className="text-xs font-semibold text-emerald-600 dark:text-[#10b981]">
                     MEND - X AI
                   </span>
-                  <span className="text-[10px] ml-auto" style={{ color: "#334155" }}>
+                  <span className="text-[10px] ml-auto text-slate-400 dark:text-[#334155]">
                     {new Date(msg.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                   </span>
                 </div>
@@ -221,7 +206,7 @@ export default function ChatInterface({
                       handleDisambiguate,
                       (s) => handleSend(s)
                     )
-                  : <p className="text-sm" style={{ color: "#94a3b8" }}>{msg.content}</p>}
+                  : <p className="text-sm text-slate-700 dark:text-[#94a3b8]">{msg.content}</p>}
               </div>
             )}
           </div>
@@ -231,26 +216,17 @@ export default function ChatInterface({
         {isLoading && (
           <div className="flex justify-start animate-fade-in">
             <div
-              className="px-5 py-4 rounded-2xl rounded-tl-sm"
-              style={{
-                background: "rgba(15,17,23,0.9)",
-                border: "1px solid rgba(255,255,255,0.07)",
-                boxShadow: "0 4px 24px rgba(0,0,0,0.5)",
-              }}
+              className="px-5 py-4 rounded-2xl rounded-tl-sm bg-white dark:bg-[rgba(15,17,23,0.9)] border border-slate-200 dark:border-white/[0.07] shadow-sm dark:shadow-[0_4px_24px_rgba(0,0,0,0.5)] transition-colors"
             >
               <div className="flex items-center gap-2 mb-2">
                 <div
-                  className="w-5 h-5 rounded-full flex items-center justify-center"
-                  style={{
-                    background: "rgba(16,185,129,0.15)",
-                    border: "1px solid rgba(16,185,129,0.3)",
-                  }}
+                  className="w-5 h-5 rounded-full flex items-center justify-center bg-emerald-500/10 border border-emerald-500/20"
                 >
-                  <svg className="w-3 h-3" fill="none" stroke="#10b981" viewBox="0 0 24 24">
+                  <svg className="w-3 h-3 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2h-2" />
                   </svg>
                 </div>
-                <span className="text-xs font-medium" style={{ color: "#10b981" }}>
+                <span className="text-xs font-medium text-emerald-600 dark:text-[#10b981]">
                   MEND - X AI
                 </span>
               </div>
@@ -260,7 +236,7 @@ export default function ChatInterface({
                   <div className="typing-dot" />
                   <div className="typing-dot" />
                 </div>
-                <span className="text-xs" style={{ color: "#334155" }}>
+                <span className="text-xs text-slate-500 dark:text-[#334155]">
                   Searching manuals…
                 </span>
               </div>
