@@ -68,8 +68,12 @@ async def send_message(
     await db.flush()
     machine_id = request.machine_id or conv.machine_id
     rag = await RAGPipeline(db).query(
-        query=request.query, machine_id=machine_id,
-        machine_name=request.machine_name or "", conversation_history=history,
+        query=request.query,
+        machine_id=machine_id,
+        machine_name=request.machine_name or "",
+        conversation_history=history,
+        model=request.model,
+        image_data=request.image_data,
     )
     if machine_id and not conv.machine_id:
         conv.machine_id = machine_id

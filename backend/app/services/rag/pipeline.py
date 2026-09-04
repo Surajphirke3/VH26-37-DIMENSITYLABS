@@ -7,10 +7,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.core.logging import get_logger
+from app.services.ai.groq import GroqLLM
+from app.services.ai.model_router import ModelRouter
 from app.services.ingestion.embedder import EmbeddingService
+from app.services.guardrails import GuardrailsManager
 from app.services.rag.disambiguator import MachineDisambiguator
 from app.services.rag.evidence_validator import EvidenceValidator
 from app.services.rag.generator import LLMGenerator
+from app.services.rag.language_detector import LanguageDetector
 from app.services.rag.query_classifier import QueryClassifier, QueryType
 from app.services.rag.reranker import CrossEncoderReranker
 from app.services.rag.retriever import HybridRetriever
@@ -48,6 +52,9 @@ class RAGPipeline:
         self.validator = EvidenceValidator(threshold=settings.EVIDENCE_SCORE_THRESHOLD)
         self.embedder = EmbeddingService()
         self.generator = LLMGenerator()
+        self.language_detector = LanguageDetector()
+        self.guardrails = GuardrailsManager()
+        self.model_router = ModelRouter()
 
     async def query(
         self,
@@ -55,6 +62,8 @@ class RAGPipeline:
         machine_id: UUID | None = None,
         machine_name: str = "",
         conversation_history: list | None = None,
+        model: str | None = None,
+        image_data: str | None = None,
     ) -> dict:
         t0 = time.time()
         if conversation_history is None:
@@ -63,19 +72,64 @@ class RAGPipeline:
         query_type = self.classifier.classify(query)
         has_error_code = query_type == QueryType.ERROR_CODE
 
+        # Language detection
+        detector = getattr(self, "language_detector", None)
+        if detector:
+            lang_meta = detector.detect(query)
+            detected_lang = lang_meta.get("language", "en")
+        else:
+            detected_lang = "en"
+
+        # Resolve AI model
+        router = getattr(self, "model_router", None)
+        if router:
+            if image_data and not model:
+                resolved_model = router.resolve_model(task="visual_inspection")
+            elif has_error_code and not model:
+                resolved_model = router.resolve_model(task="error_code_triage", explicit_model=model)
+            else:
+                resolved_model = router.resolve_model(task="balanced_troubleshooting", explicit_model=model)
+        else:
+            resolved_model = model or "llama-3.3-70b-versatile"
+
+        # Guardrail: input validation
+        guardrails = getattr(self, "guardrails", None)
+        if guardrails:
+            guard_check = guardrails.check_input(query)
+            if not guard_check.is_safe:
+                return {
+                    "answer_type": "insufficient_information",
+                    "summary": "Query was blocked by safety guardrails.",
+                    "error_meaning": None,
+                    "probable_causes": [],
+                    "corrective_steps": [],
+                    "citations": [],
+                    "confidence_level": "LOW",
+                    "notes": guard_check.message or "Input failed validation.",
+                    "follow_up_suggestions": ["Rephrase your question without special commands."],
+                    "language_detected": detected_lang,
+                    "evidence_score": 0.0,
+                    "model_used": resolved_model,
+                    "total_latency_ms": int((time.time() - t0) * 1000),
+                }
+
         # 1. Embed
+        t_emb = time.time()
         query_embedding = await self.embedder.embed_query(query)
+        emb_ms = int((time.time() - t_emb) * 1000)
 
         # 2. Hybrid retrieve (BM25 + vector → RRF)
         t_retr = time.time()
         fused = await self.retriever.retrieve(
-            query_embedding, query, machine_id, top_k=settings.MAX_RETRIEVAL_CHUNKS
+            query_embedding, query, machine_id, top_k=settings.INITIAL_TOP_K
         )
         chunks = await self.retriever.fetch_chunks(fused)
         retrieval_ms = int((time.time() - t_retr) * 1000)
 
         # 3. Cross-encoder rerank
+        t_rrk = time.time()
         chunks = self.reranker.rerank(query, chunks, top_k=settings.RERANKER_TOP_K)
+        rerank_ms = int((time.time() - t_rrk) * 1000)
 
         # 4. Disambiguation (only when machine not already pinned by caller)
         if machine_id is None:
@@ -96,7 +150,10 @@ class RAGPipeline:
                     "notes": None,
                     "follow_up_suggestions": [],
                     "disambiguation_options": dis.machine_options,
+                    "language_detected": detected_lang,
+                    "model_used": resolved_model,
                     "retrieval_latency_ms": retrieval_ms,
+                    "rerank_latency_ms": rerank_ms,
                     "total_latency_ms": int((time.time() - t0) * 1000),
                 }
 
@@ -106,14 +163,22 @@ class RAGPipeline:
             logger.info("rag.refusal", evidence_score=evidence.evidence_score)
             resp = dict(_REFUSAL_RESPONSE)
             resp["evidence_score"] = evidence.evidence_score
+            resp["language_detected"] = detected_lang
+            resp["model_used"] = resolved_model
             resp["retrieval_latency_ms"] = retrieval_ms
+            resp["rerank_latency_ms"] = rerank_ms
             resp["total_latency_ms"] = int((time.time() - t0) * 1000)
             return resp
 
         # 6. LLM generation
         t_llm = time.time()
         llm_result = await self.generator.generate(
-            query, evidence.top_chunks, machine_name, conversation_history
+            query,
+            evidence.top_chunks,
+            machine_name,
+            conversation_history,
+            model=resolved_model,
+            image_data=image_data,
         )
         llm_ms = int((time.time() - t_llm) * 1000)
 
@@ -138,7 +203,10 @@ class RAGPipeline:
 
         llm_result["citations"] = citations
         llm_result["evidence_score"] = evidence.evidence_score
+        llm_result["language_detected"] = detected_lang
+        llm_result["model_used"] = resolved_model
         llm_result["retrieval_latency_ms"] = retrieval_ms
+        llm_result["rerank_latency_ms"] = rerank_ms
         llm_result["llm_latency_ms"] = llm_ms
         llm_result["total_latency_ms"] = int((time.time() - t0) * 1000)
         llm_result["disambiguation_options"] = None
@@ -146,6 +214,7 @@ class RAGPipeline:
         logger.info(
             "rag.query_completed",
             query_type=query_type,
+            model=resolved_model,
             latency_ms=llm_result["total_latency_ms"],
         )
         return llm_result

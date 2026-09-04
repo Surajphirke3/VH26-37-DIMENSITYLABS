@@ -24,7 +24,10 @@ class GeminiLLM(LLMProvider):
 class GeminiEmbedding(EmbeddingProvider):
     def __init__(self, api_key: str, model: str) -> None:
         genai.configure(api_key=api_key)
-        self.model = model
+        cleaned_model = model.strip()
+        if cleaned_model.startswith("models/"):
+            cleaned_model = cleaned_model.replace("models/", "")
+        self.model = cleaned_model
 
     async def _embed(self, text: str, task_type: str) -> list[float]:
         loop = asyncio.get_event_loop()

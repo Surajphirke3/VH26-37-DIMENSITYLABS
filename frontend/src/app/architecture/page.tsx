@@ -178,6 +178,7 @@ export default function ArchitecturePage() {
                 alt={m.name}
                 width={52}
                 height={22}
+                style={{ width: "auto", height: "auto" }}
                 className="object-contain"
               />
             </button>
@@ -196,6 +197,7 @@ export default function ArchitecturePage() {
                 alt={model.name}
                 width={100}
                 height={44}
+                style={{ width: "auto", height: "auto" }}
                 className="object-contain"
               />
             </div>

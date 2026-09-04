@@ -10,6 +10,8 @@ class QueryRequest(BaseModel):
     query: str = Field(min_length=1, max_length=2000)
     machine_id: Optional[uuid.UUID] = None
     machine_name: Optional[str] = Field(default=None, max_length=255)
+    model: Optional[str] = Field(default=None, description="Explicit Groq model ID override")
+    image_data: Optional[str] = Field(default=None, description="Base64 encoded image or image URL for multimodal queries")
 
 
 class CorrectionStep(BaseModel):

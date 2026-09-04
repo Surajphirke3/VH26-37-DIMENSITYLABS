@@ -38,7 +38,12 @@ class EvidenceValidator:
         top_3 = chunks[:3]
         # Sum of top-3 normalised RRF scores; cap at 1.0
         raw_sum = sum(c.rrf_score for c in top_3)
-        evidence_score = min(1.0, raw_sum / (_MAX_RRF_SINGLE * 3))
+        rrf_evidence = min(1.0, raw_sum / (_MAX_RRF_SINGLE * 3))
+
+        # Check semantic reranker confidence if available
+        top_rerank = max((getattr(c, "rerank_score", 0.0) for c in top_3), default=0.0)
+        # Blend RRF and semantic rerank score
+        evidence_score = max(rrf_evidence, top_rerank)
 
         # Boost when the best chunk is directly an error_code entry
         if top_3 and top_3[0].chunk_type == "error_code":
@@ -49,11 +54,11 @@ class EvidenceValidator:
         if machine_id and chunks:
             window = chunks[:10]
             matching = sum(1 for c in window if str(c.machine_id) == str(machine_id))
-            machine_consistency = matching / len(window)
+            machine_consistency = (matching / len(window)) if window else 1.0
 
         is_sufficient = (
             evidence_score >= self.threshold
-            and machine_consistency >= 0.5
+            and machine_consistency >= 0.4
         )
 
         return EvidenceResult(

@@ -57,10 +57,17 @@ export default function ChatInterface({
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
 
-  const addUserMessage = (content: string) => {
+  const addUserMessage = (content: string, model?: string, imageData?: string) => {
     setMessages((prev) => [
       ...prev,
-      { id: crypto.randomUUID(), role: "user", content, timestamp: new Date().toISOString() },
+      {
+        id: crypto.randomUUID(),
+        role: "user",
+        content,
+        model,
+        image_data: imageData,
+        timestamp: new Date().toISOString(),
+      },
     ]);
   };
 
@@ -77,13 +84,13 @@ export default function ChatInterface({
     ]);
   };
 
-  const handleSend = async (query: string) => {
+  const handleSend = async (query: string, model?: string, imageData?: string) => {
     if (!conversationId) return;
-    addUserMessage(query);
+    addUserMessage(query, model, imageData);
     if (messages.length === 0) onFirstMessage?.(query);
     setIsLoading(true);
     try {
-      const res = await sendMessage(conversationId, query, machineId ?? undefined);
+      const res = await sendMessage(conversationId, query, machineId ?? undefined, model, imageData);
       addAssistantMessage(res);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Something went wrong.";
@@ -178,7 +185,21 @@ export default function ChatInterface({
                   color: "#fff",
                 }}
               >
-                {msg.content}
+                {msg.image_data && (
+                  <div className="mb-2 rounded-lg overflow-hidden border border-white/20">
+                    <img
+                      src={msg.image_data}
+                      alt="Inspection attachment"
+                      className="max-h-48 w-full object-cover"
+                    />
+                  </div>
+                )}
+                <p>{msg.content}</p>
+                {msg.model && (
+                  <div className="mt-1.5 pt-1 border-t border-white/20 text-[10px] text-white/75 font-mono">
+                    Model: {msg.model}
+                  </div>
+                )}
               </div>
             ) : (
               /* AI response card */

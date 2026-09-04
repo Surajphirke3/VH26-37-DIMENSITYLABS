@@ -1,7 +1,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import {
+  FileText,
+  UploadCloud,
+  Search,
+  Cpu,
+  Activity,
+  Sliders,
+  BookOpen,
+  Settings,
+} from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { getMachines, createConversation } from "@/lib/api";
 import type { Machine } from "@/lib/types";
@@ -87,6 +98,57 @@ export default function DashboardPage() {
             <MachineSelector machines={machines} selected={selectedMachine} onChange={setSelectedMachine} />
           </div>
 
+          {/* Platform Navigation */}
+          <div className="px-3 py-3 border-b border-[var(--border)]">
+            <p className="text-[10px] font-bold uppercase tracking-widest mb-2 px-1 text-slate-500 dark:text-[#334155]">
+              Platform Hub
+            </p>
+            <div className="grid grid-cols-2 gap-1.5 text-xs">
+              <Link
+                href="/documents"
+                className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/[0.04] hover:text-slate-900 dark:hover:text-white transition-colors"
+              >
+                <FileText className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                <span className="truncate">Manuals</span>
+              </Link>
+              <Link
+                href="/upload"
+                className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/[0.04] hover:text-slate-900 dark:hover:text-white transition-colors"
+              >
+                <UploadCloud className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+                <span className="truncate">Upload</span>
+              </Link>
+              <Link
+                href="/search"
+                className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/[0.04] hover:text-slate-900 dark:hover:text-white transition-colors"
+              >
+                <Search className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                <span className="truncate">Search</span>
+              </Link>
+              <Link
+                href="/models"
+                className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/[0.04] hover:text-slate-900 dark:hover:text-white transition-colors"
+              >
+                <Cpu className="w-3.5 h-3.5 text-purple-500 shrink-0" />
+                <span className="truncate">Models</span>
+              </Link>
+              <Link
+                href="/status"
+                className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/[0.04] hover:text-slate-900 dark:hover:text-white transition-colors"
+              >
+                <Activity className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                <span className="truncate">Status</span>
+              </Link>
+              <Link
+                href="/help"
+                className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/[0.04] hover:text-slate-900 dark:hover:text-white transition-colors"
+              >
+                <BookOpen className="w-3.5 h-3.5 text-cyan-500 shrink-0" />
+                <span className="truncate">Handbook</span>
+              </Link>
+            </div>
+          </div>
+
           {/* Sessions */}
           <div className="flex-1 px-4 py-4 overflow-y-auto">
             <div className="flex items-center justify-between mb-3 px-2">
@@ -130,8 +192,35 @@ export default function DashboardPage() {
                 <p className="text-[10px] uppercase text-slate-500">{user?.role}</p>
               </div>
             </div>
-            <button onClick={logout} className="p-2 text-slate-400 hover:text-red-500 transition-colors">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+          </div>
+          <div className="flex items-center gap-1">
+            <Link
+              href="/settings"
+              className="p-1.5 rounded-lg text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/[0.05] transition-all"
+              title="System Settings"
+            >
+              <Settings className="w-3.5 h-3.5" />
+            </Link>
+            {user?.role === "admin" && (
+              <button
+                onClick={() => router.push("/admin")}
+                className="p-1.5 rounded-lg text-indigo-600 dark:text-indigo-400 hover:bg-slate-100 dark:hover:bg-white/[0.05] transition-all"
+                title="Admin Panel"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </button>
+            )}
+            <button
+              onClick={logout}
+              className="p-1.5 rounded-lg text-slate-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all"
+              title="Sign Out"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
             </button>
           </div>
         </div>

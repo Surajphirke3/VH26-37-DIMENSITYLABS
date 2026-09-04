@@ -7,6 +7,27 @@ from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+import json
+import os
+from functools import cached_property
+from pathlib import Path
+from typing import Any, Dict, List
+
+from pydantic import field_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+def _load_json_config(filename: str) -> Dict[str, Any]:
+    config_path = Path(__file__).resolve().parent.parent.parent / "config" / filename
+    if config_path.exists():
+        try:
+            with open(config_path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            return {}
+    return {}
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=(".env", "../.env"),
@@ -20,6 +41,10 @@ class Settings(BaseSettings):
     POSTGRES_DB: str = "mechind"
     POSTGRES_USER: str = "mechind"
     POSTGRES_PASSWORD: str = "change_me_in_production"
+
+    # ChromaDB Vector Store
+    CHROMA_PERSIST_DIR: str = "./chroma_db"
+    CHROMA_COLLECTION_NAME: str = "manual_chunks"
 
     # Redis
     REDIS_URL: str = "redis://localhost:6379/0"
@@ -35,7 +60,7 @@ class Settings(BaseSettings):
 
     # Groq
     GROQ_API_KEY: str = "placeholder"
-    GROQ_MODEL: str = "qwen/qwen3.8-27b"
+    GROQ_MODEL: str = "qwen-2.5-32b"
 
     # OpenRouter
     OPENROUTER_API_KEY: str = "placeholder"
@@ -54,20 +79,33 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
     # App
+    PROJECT_NAME: str = "MEND - X"
+    VERSION: str = "1.2.1"
     ENVIRONMENT: str = "development"
     LOG_LEVEL: str = "INFO"
     MAX_UPLOAD_SIZE_MB: int = 100
     CORS_ORIGINS: List[str] = ["http://localhost:3000"]
     UPLOAD_DIR: str = "./uploads"
 
-    # RAG tuning
+    # RAG & Retrieval Tuning
     EVIDENCE_SCORE_THRESHOLD: float = 0.45
     DISAMBIGUATION_THRESHOLD: float = 0.3
+    INITIAL_TOP_K: int = 20
+    RERANKER_TOP_K: int = 8
+    FINAL_CONTEXT_K: int = 5
     MAX_RETRIEVAL_CHUNKS: int = 20
-    RERANKER_TOP_K: int = 10
     CHUNK_MAX_TOKENS: int = 800
     CHUNK_MIN_TOKENS: int = 100
     CHUNK_OVERLAP_PCT: int = 15
+
+    # Configs from JSON files
+    MODELS_CONFIG: Dict[str, Any] = _load_json_config("models.json")
+    RAG_CONFIG: Dict[str, Any] = _load_json_config("rag.json")
+    RETRIEVAL_CONFIG: Dict[str, Any] = _load_json_config("retrieval.json")
+    CHUNKING_CONFIG: Dict[str, Any] = _load_json_config("chunking.json")
+    GUARDRAILS_CONFIG: Dict[str, Any] = _load_json_config("guardrails.json")
+    LANGUAGES_CONFIG: Dict[str, Any] = _load_json_config("languages.json")
+    SYSTEM_CONFIG: Dict[str, Any] = _load_json_config("system.json")
 
     @cached_property
     def DATABASE_URL(self) -> str:

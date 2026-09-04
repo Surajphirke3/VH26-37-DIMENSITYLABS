@@ -2,14 +2,17 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
+from typing import List, Tuple
+
+from app.core.config import settings
 
 ERROR_CODE_PATTERN = re.compile(
-    r'\b(E\d{2,4}|ERR[-\s]\d{2,4}|F\d{2,4}|Fault\s+\d{2,4}|Error\s+\d{2,4})\b',
+    r'\b(E\d{2,4}|ERR[-\s]\d{2,4}|F\d{2,4}|Fault\s+\d{2,4}|Error\s+\d{2,4}|ALM\d{2,4})\b',
     re.IGNORECASE,
 )
 
 HEADING_RE = re.compile(
-    r'^((?:\d+\.)+\d*\s+\w|[A-Z][A-Z\s]{4,}|.+:)\s*$',
+    r'^((?:\d+\.)+\d*\s+\w|[A-Z][A-Z\s]{4,}|.+:|\#+\s+.+)\s*$',
     re.MULTILINE,
 )
 
@@ -17,47 +20,46 @@ HEADING_RE = re.compile(
 @dataclass
 class Chunk:
     chunk_index: int
-    chunk_type: str          # section, error_code, table, warning, overlap
+    chunk_type: str          # section, error_code, table, warning, list, overlap
     content: str
     page_start: int
     page_end: int
     section_path: str
     error_codes_present: list[str] = field(default_factory=list)
+    language: str = "en"
 
 
 class ManualChunker:
     def __init__(
         self,
-        max_tokens: int = 800,
-        min_tokens: int = 100,
-        overlap_pct: float = 0.15,
+        max_tokens: int | None = None,
+        min_tokens: int | None = None,
+        overlap_pct: float | None = None,
     ):
-        self.max_tokens = max_tokens
-        self.min_tokens = min_tokens
-        self.overlap_pct = overlap_pct
+        self.max_tokens = max_tokens or settings.CHUNK_MAX_TOKENS
+        self.min_tokens = min_tokens or settings.CHUNK_MIN_TOKENS
+        self.overlap_pct = (overlap_pct if overlap_pct is not None else settings.CHUNK_OVERLAP_PCT) / 100.0
 
     def chunk_pages(self, pages: list) -> list[Chunk]:
-        """Chunk all pages into structured Chunk objects."""
-        page_tuples = self._join_pages(pages)
+        """Chunk all pages into structured, context-preserving Chunk objects."""
+        if not pages:
+            return []
+
+        page_tuples = [(p.page_num, p.text) for p in pages if p.text.strip()]
         sections = self._split_into_sections(page_tuples)
         chunks: list[Chunk] = []
+
         for heading, content, page_start, page_end in sections:
             sub = self._process_section(heading, content, page_start, page_end, chunks)
             chunks.extend(sub)
+
         return chunks
-
-    # ------------------------------------------------------------------
-    # Internal helpers
-    # ------------------------------------------------------------------
-
-    def _join_pages(self, pages: list) -> list[tuple[int, str]]:
-        return [(p.page_num, p.text) for p in pages]
 
     def _split_into_sections(
         self, pages: list[tuple[int, str]]
     ) -> list[tuple[str, str, int, int]]:
         sections: list[tuple[str, str, int, int]] = []
-        current_heading = "Introduction"
+        current_heading = "General Overview"
         current_lines: list[str] = []
         current_page_start = 1
         current_page = 1
@@ -67,8 +69,7 @@ class ManualChunker:
                 stripped = line.strip()
                 if (
                     HEADING_RE.match(stripped)
-                    and len(stripped) < 100
-                    and len(stripped) > 2
+                    and 2 < len(stripped) < 120
                 ):
                     if current_lines:
                         sections.append((
@@ -94,10 +95,15 @@ class ManualChunker:
         return sections
 
     def _classify_content(self, content: str, codes: list[str]) -> str:
-        if 'WARNING' in content or 'CAUTION' in content:
+        upper = content.upper()
+        if 'WARNING' in upper or 'CAUTION' in upper or 'DANGER' in upper:
             return 'warning'
+        if '|' in content and '---' in content:
+            return 'table'
         if codes:
             return 'error_code'
+        if re.search(r'^\s*[-*•\d+\.]\s+', content, re.MULTILINE):
+            return 'procedure_list'
         return 'section'
 
     def _process_section(
@@ -116,9 +122,9 @@ class ManualChunker:
         if len(words) <= self.max_tokens:
             return [Chunk(idx, chunk_type, content, page_start, page_end, heading, codes)]
 
-        # Split at paragraph boundaries for oversized sections
+        # Split at paragraph or list item boundaries for oversized sections
         result: list[Chunk] = []
-        paragraphs = content.split('\n\n')
+        paragraphs = re.split(r'\n\s*\n', content)
         current_paras: list[str] = []
 
         for para in paragraphs:
@@ -131,7 +137,7 @@ class ManualChunker:
                     self._classify_content(text, chunk_codes),
                     text, page_start, page_end, heading, chunk_codes,
                 ))
-                # Overlap: prepend last 15% of previous chunk to next
+                # Context-preserving overlap
                 prev_words = text.split()
                 overlap_count = max(1, int(len(prev_words) * self.overlap_pct))
                 overlap_text = ' '.join(prev_words[-overlap_count:])
@@ -149,6 +155,3 @@ class ManualChunker:
             ))
 
         return result
-
-    def estimate_tokens(self, text: str) -> int:
-        return len(text.split())

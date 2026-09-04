@@ -57,8 +57,8 @@ def get_embedding_provider() -> EmbeddingProvider:
         return OllamaEmbedding(base_url=settings.OLLAMA_BASE_URL, model=settings.OLLAMA_EMBEDDING_MODEL)
 
     if provider == "local":
-        from app.services.ai.groq import GroqEmbedding
-        return GroqEmbedding()
+        from app.services.ai.local import LocalEmbedding
+        return LocalEmbedding()
 
     raise ValueError(
         f"Unknown EMBEDDING_PROVIDER: {provider!r}. Choose: gemini, groq, openrouter, ollama, local"

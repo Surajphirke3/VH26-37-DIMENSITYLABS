@@ -1,4 +1,13 @@
-import type { Machine, Manual, TroubleshootingResponse, User } from "@/lib/types";
+import type {
+  Machine,
+  Manual,
+  TroubleshootingResponse,
+  User,
+  AIModel,
+  SystemStatusData,
+  ManualChunk,
+  SearchResultItem,
+} from "@/lib/types";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
@@ -123,6 +132,23 @@ export const getManuals = (machineId?: string): Promise<Manual[]> => {
   return apiFetch<{ items: Manual[] }>(`/api/v1/manuals${qs}`).then((d) => d.items);
 };
 
+export const getManualDetail = (manualId: string): Promise<Manual & { machine?: Machine }> =>
+  apiFetch<Manual & { machine?: Machine }>(`/api/v1/manuals/${manualId}`);
+
+export const getManualChunks = (
+  manualId: string,
+  page: number = 1,
+  pageSize: number = 50,
+  search?: string
+): Promise<{ manual_id: string; total_chunks: number; page: number; page_size: number; chunks: ManualChunk[] }> => {
+  const params = new URLSearchParams({ page: String(page), page_size: String(pageSize) });
+  if (search) params.append("search", search);
+  return apiFetch(`/api/v1/manuals/${manualId}/chunks?${params.toString()}`);
+};
+
+export const reprocessManual = (manualId: string): Promise<{ manual_id: string; ingestion_job_id: string; status: string }> =>
+  apiFetch(`/api/v1/manuals/${manualId}/reprocess`, { method: "POST" });
+
 // backend: {success, data: {manual_id, processing_status, progress_pct, ...}}
 export const getManualStatus = (manualId: string): Promise<{ processing_status: Manual["processing_status"]; progress_pct?: number; error_message?: string }> =>
   apiFetch(`/api/v1/manuals/${manualId}/status`);
@@ -130,15 +156,50 @@ export const getManualStatus = (manualId: string): Promise<{ processing_status: 
 export const deleteManual = (manualId: string): Promise<void> =>
   apiFetch(`/api/v1/manuals/${manualId}`, { method: "DELETE" });
 
+// backend: {success, data: {models: AIModel[], default_model: string, task_routing: Record<string, string>}}
+export const getModels = (): Promise<{ models: AIModel[]; default_model: string; task_routing: Record<string, string> }> =>
+  apiFetch("/api/v1/models");
+
+export const getActiveModel = (): Promise<{ active_model: string; provider: string }> =>
+  apiFetch("/api/v1/models/active");
+
+// backend: {success, data: SystemStatusData}
+export const getSystemStatus = (): Promise<SystemStatusData> =>
+  apiFetch<SystemStatusData>("/api/v1/system/status");
+
+// backend: {success, data: any}
+export const getSystemConfig = (): Promise<any> =>
+  apiFetch("/api/v1/system/config");
+
+// backend: {success, data: {query, total, items: SearchResultItem[]}}
+export const searchKnowledgeBase = (
+  query: string,
+  machineId?: string,
+  topK: number = 10,
+  minSimilarity: number = 0.0
+): Promise<{ query: string; total: number; items: SearchResultItem[] }> => {
+  const params = new URLSearchParams({ query, top_k: String(topK), min_similarity: String(minSimilarity) });
+  if (machineId) params.append("machine_id", machineId);
+  return apiFetch(`/api/v1/search?${params.toString()}`);
+};
+
 // backend: {success, data: TroubleshootingResponse}
 export const singleQuery = (
   query: string,
   machineId?: string,
-  machineName?: string
+  machineName?: string,
+  model?: string,
+  imageData?: string
 ): Promise<TroubleshootingResponse> =>
   apiFetch<TroubleshootingResponse>("/api/v1/query", {
     method: "POST",
-    body: JSON.stringify({ query, machine_id: machineId, machine_name: machineName }),
+    body: JSON.stringify({
+      query,
+      machine_id: machineId,
+      machine_name: machineName,
+      model,
+      image_data: imageData,
+    }),
   });
 
 // backend: {success, data: {conversation_id, session_id}}
@@ -149,11 +210,18 @@ export const createConversation = (): Promise<{ conversation_id: string; session
 export const sendMessage = (
   conversationId: string,
   query: string,
-  machineId?: string
+  machineId?: string,
+  model?: string,
+  imageData?: string
 ): Promise<TroubleshootingResponse> =>
   apiFetch<TroubleshootingResponse>(`/api/v1/conversations/${conversationId}/messages`, {
     method: "POST",
-    body: JSON.stringify({ query, machine_id: machineId }),
+    body: JSON.stringify({
+      query,
+      machine_id: machineId,
+      model,
+      image_data: imageData,
+    }),
   });
 
 // backend: {success, data: {message, machine_id}} — returns no answer, caller ignores body
