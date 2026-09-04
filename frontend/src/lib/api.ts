@@ -26,7 +26,12 @@ async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> 
     if (typeof window !== "undefined") {
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
-      window.location.href = "/login";
+      const isPublicPage = ["/", "/problem", "/models", "/architecture", "/workflow", "/help"].some(
+        (p) => window.location.pathname === p || window.location.pathname.startsWith("/models")
+      );
+      if (!isPublicPage && window.location.pathname !== "/login") {
+        window.location.href = "/login";
+      }
     }
     throw new Error("Unauthorized");
   }
