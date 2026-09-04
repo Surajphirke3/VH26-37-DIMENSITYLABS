@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+*.egg-info/
+dist/
+.pytest_cache/
+
+# Environment
+.env
+*.env.local
+
+# Uploads
+backend/uploads/
+backend/demo_manuals/
+
+# Node
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+
+# DB
+*.sqlite
+
+# OS
+.DS_Store
+*.swp
+
+.claude
