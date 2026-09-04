@@ -25,10 +25,12 @@ function renderAssistantContent(
   }
   if (
     response.answer_type === "insufficient_information" ||
-    response.answer_type === "clarification_needed"
+    response.answer_type === "clarification_needed" ||
+    response.answer_type === "out_of_scope"
   ) {
     return (
       <RefusalMessage
+        type={response.answer_type}
         summary={response.summary}
         notes={response.notes}
         suggestions={response.follow_up_suggestions}

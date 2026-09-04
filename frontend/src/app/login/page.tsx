@@ -62,7 +62,7 @@ export default function LoginPage() {
           background: "radial-gradient(circle, #6366f1 0%, transparent 70%)",
           top: "-15%",
           left: "-10%",
-          animationDuration: "14s",
+          animation: "orb-float 14s ease-in-out infinite",
         }}
       />
       <div
@@ -71,8 +71,7 @@ export default function LoginPage() {
           background: "radial-gradient(circle, #8b5cf6 0%, transparent 70%)",
           bottom: "-10%",
           right: "-5%",
-          animationDuration: "18s",
-          animationDelay: "-6s",
+          animation: "orb-float 18s ease-in-out infinite -6s",
         }}
       />
       <div
@@ -81,8 +80,7 @@ export default function LoginPage() {
           background: "radial-gradient(circle, #10b981 0%, transparent 70%)",
           top: "40%",
           right: "10%",
-          animationDuration: "10s",
-          animationDelay: "-3s",
+          animation: "orb-float 10s ease-in-out infinite -3s",
         }}
       />
 
@@ -124,13 +122,12 @@ export default function LoginPage() {
 
         {/* Glass Card */}
         <div
-          className="glass-card p-8 bg-white/95 dark:bg-[rgba(15,17,23,0.85)] border border-slate-200 dark:border-white/[0.08] rounded-[20px] shadow-xl dark:shadow-[0_8px_64px_rgba(0,0,0,0.8)] transition-colors"
-          style={{
-            backdropFilter: "blur(24px)",
-          }}
+          className="p-8 bg-white/95 dark:bg-[rgba(15,17,23,0.85)] border border-slate-200 dark:border-white/[0.08] rounded-[20px] shadow-xl dark:shadow-[0_8px_64px_rgba(0,0,0,0.8)] transition-colors relative overflow-hidden backdrop-blur-2xl"
         >
+          {/* Edge glow sweep effect could go here */}
+
           <div className="flex items-center gap-2 mb-6">
-            <div className="status-dot-online" />
+            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-400">
               Secure Access Portal
             </h2>
@@ -162,7 +159,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="technician@plant.com"
-                className="input-glow w-full px-4 py-3 text-sm rounded-xl transition-all bg-slate-50 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-[#f1f5f9] placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                className="w-full px-4 py-3 text-sm rounded-xl transition-all duration-300 bg-slate-50 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-[#f1f5f9] placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none"
               />
             </div>
 
@@ -181,7 +178,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="input-glow w-full px-4 py-3 pr-12 text-sm rounded-xl transition-all bg-slate-50 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-[#f1f5f9] placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                  className="w-full px-4 py-3 pr-12 text-sm rounded-xl transition-all duration-300 bg-slate-50 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-[#f1f5f9] placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none"
                 />
                 <button
                   type="button"
@@ -208,7 +205,7 @@ export default function LoginPage() {
               id="login-submit"
               type="submit"
               disabled={isLoading}
-              className="relative w-full py-3 px-4 mt-2 rounded-xl font-semibold text-sm text-white overflow-hidden shadow-lg transition-all"
+              className="relative w-full py-3 px-4 mt-2 rounded-xl font-semibold text-sm text-white overflow-hidden shadow-lg transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
               style={{
                 background: isLoading
                   ? "rgba(99,102,241,0.4)"
@@ -218,9 +215,9 @@ export default function LoginPage() {
             >
               {isLoading ? (
                 <span className="flex items-center justify-center gap-2">
-                  <span className="typing-dot" />
-                  <span className="typing-dot" />
-                  <span className="typing-dot" />
+                  <span className="animate-bounce">●</span>
+                  <span className="animate-bounce delay-75">●</span>
+                  <span className="animate-bounce delay-150">●</span>
                 </span>
               ) : (
                 <span className="flex items-center justify-center gap-2">
@@ -258,3 +255,4 @@ export default function LoginPage() {
     </div>
   );
 }
+
