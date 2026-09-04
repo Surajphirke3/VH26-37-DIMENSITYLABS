@@ -15,8 +15,10 @@ from app.core.config import settings
 from app.core.logging import get_logger
 from app.db.session import get_db
 from app.models.ingestion_job import IngestionJob
+from app.models.machine import Machine
 from app.models.manual import Manual
 from app.models.user import User
+from app.services.ingestion.auto_metadata import AutoMetadataExtractor
 
 router = APIRouter()
 logger = get_logger("api.manuals")
@@ -24,18 +26,54 @@ logger = get_logger("api.manuals")
 _PDF_MAGIC = b"%PDF"
 
 
+@router.post("/manuals/extract-metadata", response_model=dict)
+async def extract_manual_metadata(
+    request: Request,
+    file: UploadFile = File(...),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_manager_or_admin),
+):
+    """Automatically extract machine and manual metadata from an uploaded PDF without saving."""
+    content = await file.read()
+    if not content.startswith(_PDF_MAGIC):
+        raise HTTPException(400, "Invalid PDF file (magic bytes check failed)")
+
+    extractor = AutoMetadataExtractor()
+    meta = await extractor.aextract_from_bytes(content, filename=file.filename or "")
+    meta_dict = meta.to_dict()
+
+    # Search for existing machines in DB that match this model or name
+    suggested_machine_id = None
+    suggested_machine_name = None
+    if meta.machine_model:
+        stmt = select(Machine).where(
+            Machine.is_active == True,
+            (Machine.model.ilike(f"%{meta.machine_model}%")) | (Machine.name.ilike(f"%{meta.machine_model}%"))
+        )
+        res = await db.execute(stmt)
+        matched_machine = res.scalars().first()
+        if matched_machine:
+            suggested_machine_id = str(matched_machine.id)
+            suggested_machine_name = matched_machine.name
+
+    meta_dict["suggested_machine_id"] = suggested_machine_id
+    meta_dict["suggested_machine_name"] = suggested_machine_name
+    return meta_dict
+
+
 @router.post("/manuals/upload", response_model=dict)
 async def upload_manual(
     request: Request,
     file: UploadFile = File(...),
-    machine_id: UUID = Form(...),
-    title: str = Form(...),
+    machine_id: Optional[UUID] = Form(None),
+    title: Optional[str] = Form(None),
     manual_type: str = Form("service"),
-    version: str = Form(None),
+    version: Optional[str] = Form(None),
+    auto_detect_metadata: bool = Form(True),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_manager_or_admin),
 ):
-    """Upload a PDF manual, persist metadata, and kick off async ingestion."""
+    """Upload a PDF manual with automatic or explicit metadata, and kick off ingestion."""
     max_bytes = settings.MAX_UPLOAD_SIZE_MB * 1024 * 1024
     cl_header = request.headers.get("content-length")
     if cl_header and int(cl_header) > max_bytes:
@@ -59,6 +97,43 @@ async def upload_manual(
             await db.flush()
         else:
             raise HTTPException(409, f"This file has already been uploaded as '{existing.title}' (duplicate detected)")
+
+    # Auto-detect metadata if machine_id or title is missing
+    if machine_id is None or not title:
+        extractor = AutoMetadataExtractor()
+        meta = await extractor.aextract_from_bytes(content, filename=file.filename or "")
+
+        if not title:
+            title = meta.title
+        if not version and meta.version:
+            version = meta.version
+        if manual_type == "service" and meta.manual_type:
+            manual_type = meta.manual_type
+
+        if machine_id is None:
+            # Search for existing machine by model or name
+            stmt = select(Machine).where(
+                Machine.is_active == True,
+                (Machine.model.ilike(f"%{meta.machine_model}%")) | (Machine.name.ilike(f"%{meta.machine_model}%"))
+            )
+            res = await db.execute(stmt)
+            matched = res.scalars().first()
+            if matched:
+                machine_id = matched.id
+            else:
+                # Automatically register machine in database
+                new_machine = Machine(
+                    name=meta.machine_name or f"{meta.manufacturer} {meta.machine_model}",
+                    model=meta.machine_model or "Standard Model",
+                    manufacturer=meta.manufacturer or "OEM",
+                    category=meta.category or "Machinery",
+                    description=f"Auto-created from manual: {title}",
+                    is_active=True,
+                )
+                db.add(new_machine)
+                await db.flush()
+                machine_id = new_machine.id
+                logger.info("machine.auto_created", machine_id=str(machine_id), name=new_machine.name)
 
     # Persist to disk
     os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
