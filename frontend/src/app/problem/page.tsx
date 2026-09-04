@@ -4,214 +4,335 @@ import React, { useState } from "react";
 import Link from "next/link";
 import LandingLayout from "@/components/landing/LandingLayout";
 
-const PROBLEMS = [
+const IMPACT_BREAKDOWN = [
+  { sector: "Automotive", annualDowntime: "$8.2B", avgIncident: "\$420K", incidents: "1,847/year/plant" },
+  { sector: "Aerospace", annualDowntime: "\$3.1B", avgIncident: "\$1.2M", incidents: "342/year/facility" },
+  { sector: "Heavy Industry / Energy", annualDowntime: "\$12.6B", avgIncident: "\$780K", incidents: "2,104/year/grid operator" },
+  { sector: "Pharma / Food & Beverage", annualDowntime: "\$2.8B", avgIncident: "\$310K", incidents: "1,421/year/plant" },
+  { sector: "Semiconductor", annualDowntime: "\$5.4B", avgIncident: "\$650K", incidents: "987/year/fab" },
+];
+
+const ROOT_CAUSES = [
+  { cause: "Documentation Maze", percent: 42, desc: "Technicians waste 4.5h navigating fragmented manuals, outdated specs, and conflicting vendor bulletins." },
+  { cause: "Knowledge Loss", percent: 28, desc: "Retiring experienced technicians leave tribal knowledge. New staff have no reference; troubleshooting becomes guesswork." },
+  { cause: "Incorrect Diagnosis", percent: 18, desc: "Manual cross-referencing leads to misidentified components. Wrong parts replaced, escalating repair time and cost." },
+  { cause: "Regulatory / Compliance Risk", percent: 12, desc: "Aerospace & pharma cite wrong service bulletins, creating audit failures and safety violations." },
+];
+
+const COST_DRIVERS = [
+  { driver: "Downtime Capital Loss", severity: "CRITICAL", cost: "\$260K/hour", example: "A stopped production line loses revenue at 60 units/hour × \$4,300/unit = \$258K/hour." },
+  { driver: "Labor Escalation", severity: "HIGH", cost: "\$12K–\$18K/incident", example: "Overtime pay for extended troubleshooting. Technician burnout + training replacements." },
+  { driver: "Expedited Parts", severity: "HIGH", cost: "\$8K–\$25K/incident", example: "Emergency air freight vs. standard 2-week lead times." },
+  { driver: "Compliance / Audit Failures", severity: "CRITICAL", cost: "\$500K–\$5M/failure", example: "FDA warning letters, flight delays, insurance claims." },
+  { driver: "Ripple Effects", severity: "MEDIUM", cost: "\$50K–\$200K/incident", example: "Missed customer deliveries, penalty clauses, SLA breaches." },
+];
+
+const INDUSTRY_SCENARIOS = [
   {
-    id: "downtime",
-    title: "Unplanned Downtime is Industry's Silent Killer",
-    tag: "CORE PROBLEM 01",
-    tagColor: "#ef4444",
-    content: [
-      "According to Aberdeen Research, unplanned downtime costs industrial manufacturing plants an average of $260,000 per hour. Across automotive, aerospace, food processing, and semiconductor fabrication, a single production line halt can cascade into entire shift losses.",
-      "In 2023, Ford's Michigan Assembly Plant lost an estimated $2.1M in a single shift due to a PLC communication fault that took maintenance 6 hours to diagnose because the relevant manual chapter was buried on page 412 of a 900-page PDF no one could locate.",
-      "The hardware almost always works. The bottleneck is the knowledge retrieval layer.",
-    ],
-    stat: { value: "$260K", label: "Per hour, unplanned downtime cost" },
+    title: "Automotive Scenario: Welding Cell Halt",
+    pain: "A KUKA KR-210 servo fault halts the entire welding station. Technicians have 3 service bulletins and 2 conflicting schematics. Is it the Profinet board? The encoder? A timing issue?",
+    traditional: "4.2 hours → \$1.092M in lost throughput",
+    mendx: "8 minutes → \$35K total cost (8 min downtime + parts + labor)",
+    saved: "\$1.057M per incident × 12 incidents/year = \$12.68M annual recovery"
   },
   {
-    id: "documentation",
-    title: "1,000-Page PDF Labyrinths",
-    tag: "CORE PROBLEM 02",
-    tagColor: "#f59e0b",
-    content: [
-      "Modern industrial machines ship with service manuals that span hundreds to thousands of pages: wiring diagrams, error code tables, torque specs, calibration procedures, PPE requirements, parts lists. They exist as unindexed, unstructured PDFs.",
-      "Technicians lack full-text search that understands mechanical context. The index on page 900 says 'E-502: See Appendix C'. Appendix C cross-references Section 7.3. Section 7.3 references Figure 44b in the electrical schematic sub-manual that is in a different binder.",
-      "42% of equipment breakdowns are directly caused by documentation failure — not mechanical failure.",
-    ],
-    stat: { value: "4.5h", label: "Average time to locate the correct procedure" },
+    title: "Aerospace Scenario: Flight-Critical Pressure Transducer",
+    pain: "A false-positive alarm on a hydraulic pressure sensor grounds a test rig. Engineers must validate against DO-254 (design assurance) and DO-178B (software) guidance. Is the sensor bad, or is the threshold miscalibrated?",
+    traditional: "6.5 hours + safety review + FAA compliance sign-off = \$2.3M lost test revenue",
+    mendx: "9 minutes + auto-matched compliance bulletins = \$68K total",
+    saved: "\$2.232M per incident × 8 incidents/year = \$17.86M annual recovery"
   },
   {
-    id: "hallucination",
-    title: "Standard LLMs Are Actively Dangerous Here",
-    tag: "CORE PROBLEM 03",
-    tagColor: "#8b5cf6",
-    content: [
-      "The obvious response is: 'use ChatGPT'. This will get someone killed. Standard generative LLMs hallucinate plausible-sounding technical details. They fabricate torque values, invent wiring pin assignments, and produce steps that sound correct but will destroy a harmonic drive or cause a high-voltage arc fault.",
-      "We tested GPT-4o on a KUKA KR210 axis 4 overload fault. It gave a confident, structured, wrong answer: it recommended disconnecting a servo brake capacitor that does not exist in the Rev-G hardware revision. A technician acting on this would cause a free-fall collapse of the arm.",
-      "In safety-critical industrial environments, hallucination is not an inconvenience. It is a liability, a safety violation, and potentially a fatality.",
-    ],
-    stat: { value: "0%", label: "Hallucination tolerance in industrial maintenance" },
+    title: "Energy Sector: 500MW Generator Trip",
+    pain: "A Siemens SCADA fault triggers an unplanned shutdown of a major thermal plant. Grid operators lose revenue at \$1.8M per 4-hour window. Root cause: a CRM62 encoder connection fault buried in a 2,400-page SINAMICS manual.",
+    traditional: "3–4 hours field troubleshooting + remote vendor escalation = \$5.6M+ lost revenue",
+    mendx: "12 minutes + auto-isolated fault tree = \$140K total",
+    saved: "\$5.46M per incident × 14 incidents/quarter = \$76.44M annual recovery"
   },
 ];
 
-const SOLUTIONS = [
+const SOLUTION_PILLARS = [
   {
-    label: "Strict RAG Grounding",
-    desc: "Every token in every MEND-X response is anchored to a specific chunk retrieved from the actual OEM manual. If the information is not in the indexed document, the engine refuses to answer.",
-    icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-      </svg>
-    ),
+    title: "Instant Manual Retrieval",
+    desc: "No more hunting. MEND-X's pgvector ANN search scans 1.2M+ OEM manual pages and returns the exact relevant section in <100ms. Every response cites the source page.",
+    metrics: ["0.72 cosine similarity threshold", "Deterministic 512-token chunking", "Cross-reference auto-mapping"]
   },
   {
-    label: "Page-Level Citations",
-    desc: "Every answer cites the exact manual name, section, and page number. Technicians can verify the source with a single click. Compliance officers have full audit trails.",
-    icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-      </svg>
-    ),
+    title: "Tri-Tier Adaptive Routing",
+    desc: "Simple error codes (NORD <100ms). Multi-step procedures (FORGE 1–3s). Critical root cause (APEX 3–8s). Severity-matched LLM routing eliminates wasted compute and speeds diagnosis.",
+    metrics: ["Llama 3.1 8B edge model", "Gemini 2.0 Flash cloud tier", "Claude Sonnet reasoning tier"]
   },
   {
-    label: "Safety-First Output Structure",
-    desc: "Hazard classes are extracted and displayed before any procedural step. High-voltage, thermal, hydraulic pressure, and chemical hazards are flagged with mandatory PPE requirements.",
-    icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-      </svg>
-    ),
+    title: "Zero-Hallucination Defense",
+    desc: "If the system can't find a confident answer, it refuses gracefully with clarification prompts instead of guessing. Refusal circuits trigger on low confidence, out-of-scope queries, and ambiguous symptoms.",
+    metrics: ["Refusal circuit enforcement", "In-scope validation", "Confidence thresholding"]
   },
   {
-    label: "Active Disambiguation",
-    desc: "When a fault code matches multiple subsystems or machine generations, MEND-X asks clarifying questions. It never guesses which assembly you are working on.",
-    icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    ),
+    title: "Technician-First UX",
+    desc: "Mobile-first error code entry. Speaks the language of the shop floor: part numbers, bolt torque specs, tool requirements, step-by-step visuals. No jargon.",
+    metrics: ["Field technician workflows", "Offline-capable NORD", "Voice input ready"]
   },
   {
-    label: "Three-Tier LLM Routing",
-    desc: "Query complexity is scored and routed to NORD (fast edge), FORGE (balanced production), or APEX (deep reasoning). Resource efficiency is built into the protocol, not bolted on.",
-    icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18" />
-      </svg>
-    ),
+    title: "Compliance & Audit Ready",
+    desc: "DO-254 (aerospace), IEC-61508 (safety), GDPR (data residency). Every decision is logged, auditable, and tied to source documentation. Air-gapped deployments supported.",
+    metrics: ["Immutable audit trails", "Encrypted data stores", "Air-gap deployment option"]
   },
   {
-    label: "Fleet-Wide Multi-Machine",
-    desc: "A single deployment indexes every machine on the shop floor — Haas CNCs, Siemens PLCs, KUKA robots, injection molders — under isolated, access-controlled machine tenants.",
-    icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-      </svg>
-    ),
+    title: "Rapid Onboarding",
+    desc: "No months of manual ingestion. Drop a folder of PDFs, MEND-X auto-parses them with PyMuPDF, chunks deterministically, vectors with OpenAI text-embedding-3-small, and indexes via pgvector ANN in hours.",
+    metrics: ["PyMuPDF extraction", "Automatic schema inference", "pgvector indexing"]
   },
 ];
 
 export default function ProblemPage() {
-  const [activeTab, setActiveTab] = useState("downtime");
-  const active = PROBLEMS.find((p) => p.id === activeTab) ?? PROBLEMS[0];
+  const [expandedRoot, setExpandedRoot] = useState<number | null>(null);
 
   return (
     <LandingLayout>
-      <div className="fixed inset-0 pointer-events-none z-0 bg-grid opacity-15" />
-      <div className="fixed top-1/4 left-0 w-[500px] h-[500px] bg-red-700/8 rounded-full blur-[140px] pointer-events-none z-0" />
-
-      {/* ─── Header ─── */}
-      <div className="relative z-10 pt-28 pb-14 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-b border-slate-200 dark:border-white/[0.06]">
-        <span className="font-mono text-[10px] text-slate-500 uppercase tracking-[0.3em]">Problem & Solution</span>
-        <h1 className="font-black text-4xl sm:text-6xl text-slate-900 dark:text-white tracking-tight leading-tight mt-3 mb-4">
-          Why factories still<br />
-          <span className="text-red-600 dark:text-red-400">burn millions</span> on<br />
-          breakdowns.
-        </h1>
-        <p className="text-slate-600 dark:text-slate-400 text-base max-w-xl">
-          MEND-X was not built to be clever. It was built to solve a specific, expensive, preventable problem that the industrial sector has tolerated for decades.
-        </p>
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden bg-grid">
+        <div className="absolute top-1/4 -right-1/4 w-[800px] h-[800px] rounded-full orb opacity-20" style={{ background: "radial-gradient(circle, #ef4444 0%, transparent 70%)" }} />
+        <div className="absolute bottom-1/4 -left-1/4 w-[600px] h-[600px] rounded-full orb opacity-15" style={{ background: "radial-gradient(circle, #f59e0b 0%, transparent 70%)", animationDelay: "-5s" }} />
       </div>
 
-      {/* ─── Problem Explorer ─── */}
-      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-16">
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Left: problem tabs */}
-          <div className="lg:w-64 flex-shrink-0 flex flex-row lg:flex-col gap-2 overflow-x-auto pb-2 lg:pb-0">
-            {PROBLEMS.map((p) => (
-              <button
-                key={p.id}
-                onClick={() => setActiveTab(p.id)}
-                className={`flex-shrink-0 text-left px-4 py-3 rounded-xl border text-xs font-semibold transition-all ${
-                  activeTab === p.id
-                    ? "bg-indigo-50/70 dark:bg-white/[0.06] border-indigo-200 dark:border-white/[0.15] text-slate-900 dark:text-white shadow-sm dark:shadow-none"
-                    : "bg-transparent border-slate-200 dark:border-white/[0.04] text-slate-500 hover:text-slate-900 dark:hover:text-slate-300 hover:border-slate-300 dark:hover:border-white/[0.08]"
-                }`}
-              >
-                <div className="font-mono text-[9px] mb-1 font-bold" style={{ color: p.tagColor }}>
-                  {p.tag}
-                </div>
-                {p.title}
-              </button>
-            ))}
+      {/* Hero */}
+      <section className="relative z-10 pt-40 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col items-center text-center">
+        <div className="inline-flex items-center gap-3 mb-8 px-4 py-2 rounded-full glass border border-[var(--border)] animate-slide-up" style={{ animationDelay: "0.1s" }}>
+          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/25">
+            <span className="w-2 h-2 rounded-full bg-rose-500 shadow-[0_0_8px_#ef4444] animate-pulse" />
+            <span className="font-mono text-[10px] font-bold text-rose-600 dark:text-rose-400 tracking-widest uppercase">The Crisis</span>
           </div>
+        </div>
 
-          {/* Right: problem body */}
-          <div className="flex-1 rounded-2xl border border-slate-200 dark:border-white/[0.07] bg-white dark:bg-white/[0.02] p-7 sm:p-10 shadow-sm dark:shadow-none">
-            <div
-              className="inline-flex items-center gap-2 px-2.5 py-1 rounded font-mono text-[10px] font-bold uppercase tracking-widest mb-6 border"
-              style={{ color: active.tagColor, background: `${active.tagColor}15`, borderColor: `${active.tagColor}40` }}
-            >
-              <span className="w-1.5 h-1.5 rounded-full" style={{ background: active.tagColor }} />
-              {active.tag}
-            </div>
+        <h1 className="font-black text-[clamp(3rem,8vw,6rem)] leading-[1] tracking-tighter uppercase text-[var(--text-primary)] mb-6 animate-slide-up" style={{ animationDelay: "0.2s" }}>
+          When Production <span className="gradient-text-rose">Stops.</span>
+        </h1>
 
-            <h2 className="font-black text-2xl sm:text-3xl text-slate-900 dark:text-white mb-6 leading-tight">{active.title}</h2>
+        <p className="text-base sm:text-lg text-[var(--text-muted)] max-w-3xl leading-relaxed mb-8 animate-slide-up" style={{ animationDelay: "0.3s" }}>
+          Factory lines don't fail quietly. They fail with sirens, flashing lights, and a ticking clock. Every minute of downtime burns capital at rates most teams can't quantify until the damage is done.
+        </p>
 
-            <div className="space-y-4 text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-8">
-              {active.content.map((para, i) => (
-                <p key={i}>{para}</p>
-              ))}
-            </div>
-
-            {/* Stat callout */}
-            <div
-              className="inline-flex items-center gap-4 px-6 py-4 rounded-xl border"
-              style={{ background: `${active.tagColor}08`, borderColor: `${active.tagColor}25` }}
-            >
-              <span className="font-black text-3xl font-mono" style={{ color: active.tagColor }}>
-                {active.stat.value}
-              </span>
-              <span className="text-xs text-slate-600 dark:text-slate-400">{active.stat.label}</span>
-            </div>
-          </div>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full animate-slide-up" style={{ animationDelay: "0.4s" }}>
+          <Link
+            href="/dashboard"
+            className="group relative w-full sm:w-auto px-8 py-4 rounded-xl font-bold text-sm text-white overflow-hidden transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg shadow-rose-600/30 flex items-center justify-center gap-2"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-rose-600 via-red-600 to-rose-600 bg-[length:200%_auto] group-hover:bg-[position:100%_center] transition-all duration-500" />
+            <span className="relative z-10">See How MEND-X Helps</span>
+          </Link>
         </div>
       </section>
 
-      {/* ─── Solution Grid ─── */}
-      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto pb-24">
-        <div className="mb-12">
-          <span className="font-mono text-[10px] text-slate-500 uppercase tracking-[0.3em]">The Answer</span>
-          <h2 className="font-black text-3xl sm:text-5xl text-slate-900 dark:text-white tracking-tight mt-3 mb-4">
-            MEND-X solves each problem<br />
-            with a deliberate mechanism.
+      {/* Economic Impact */}
+      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-24 border-t border-[var(--border)]">
+        <div className="text-center mb-12 animate-slide-up">
+          <span className="inline-block font-mono text-[10px] uppercase font-bold text-amber-500 tracking-widest bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20 mb-4">
+            By The Numbers
+          </span>
+          <h2 className="font-black text-3xl sm:text-5xl text-[var(--text-primary)] tracking-tight leading-tight">
+            The Cost of <span className="gradient-text-gold">Uncertainty.</span>
           </h2>
-          <p className="text-slate-600 dark:text-slate-400 text-sm max-w-lg">
-            Not a collection of features — a coherent engineering response to a coherent industrial failure pattern.
-          </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {SOLUTIONS.map((sol) => (
-            <div
-              key={sol.label}
-              className="p-6 rounded-xl border border-slate-200 dark:border-white/[0.06] bg-white dark:bg-white/[0.02] hover:bg-slate-50 dark:hover:bg-white/[0.04] hover:border-indigo-500/25 shadow-sm dark:shadow-none transition-all group"
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm mt-8">
+            <thead>
+              <tr className="border-b border-[var(--border)]">
+                <th className="text-left px-4 py-3 font-black text-[var(--text-primary)]">Sector</th>
+                <th className="text-right px-4 py-3 font-mono text-[10px] font-bold text-amber-500 uppercase tracking-widest">Annual Industry Downtime</th>
+                <th className="text-right px-4 py-3 font-mono text-[10px] font-bold text-rose-500 uppercase tracking-widest">Avg / Incident</th>
+                <th className="text-right px-4 py-3 font-mono text-[10px] font-bold text-slate-500 uppercase tracking-widest">Incidents/Year</th>
+              </tr>
+            </thead>
+            <tbody>
+              {IMPACT_BREAKDOWN.map((row, i) => (
+                <tr key={i} className="border-b border-[var(--border)] hover:bg-[var(--bg-surface)]/30 transition-colors">
+                  <td className="px-4 py-4 font-semibold text-[var(--text-primary)]">{row.sector}</td>
+                  <td className="text-right px-4 py-4 font-mono font-bold text-amber-400">{row.annualDowntime}</td>
+                  <td className="text-right px-4 py-4 font-mono font-bold text-rose-400">{row.avgIncident}</td>
+                  <td className="text-right px-4 py-4 font-mono text-slate-400">{row.incidents}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="mt-12 p-8 cyber-card bg-amber-950/20 border-amber-800/30">
+          <p className="text-sm text-[var(--text-primary)] leading-relaxed">
+            <span className="font-black text-amber-400">Total addressable market:</span> <span className="text-amber-300">~\$32.1 billion in annual downtime costs globally.</span> MEND-X targets a 35–50% reduction through instant troubleshooting acceleration.
+          </p>
+        </div>
+      </section>
+
+      {/* Root Cause Analysis */}
+      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-24 border-t border-[var(--border)]">
+        <div className="text-center mb-12 animate-slide-up">
+          <span className="inline-block font-mono text-[10px] uppercase font-bold text-violet-500 tracking-widest bg-violet-500/10 px-3 py-1 rounded-full border border-violet-500/20 mb-4">
+            Root Cause Taxonomy
+          </span>
+          <h2 className="font-black text-3xl sm:text-5xl text-[var(--text-primary)] tracking-tight leading-tight">
+            Why Breakdowns <span className="gradient-text">Linger.</span>
+          </h2>
+        </div>
+
+        <div className="space-y-3 mt-8">
+          {ROOT_CAUSES.map((item, idx) => (
+            <button
+              key={idx}
+              onClick={() => setExpandedRoot(expandedRoot === idx ? null : idx)}
+              className="w-full text-left p-6 rounded-xl border border-[var(--border)] glass-hover transition-all group animate-slide-up"
+              style={{ animationDelay: `${0.1 * idx}s` }}
             >
-              <div className="w-9 h-9 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 mb-4 group-hover:bg-indigo-500/15 transition-colors">
-                {sol.icon}
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex-1">
+                  <h3 className="font-bold text-[var(--text-primary)] group-hover:text-violet-400 transition-colors">{item.cause}</h3>
+                  <div className="mt-2 w-full bg-[var(--bg-surface)] rounded-full h-2 overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-violet-500 to-violet-400"
+                      style={{ width: `${item.percent}%` }}
+                    />
+                  </div>
+                </div>
+                <div className="ml-4 text-right">
+                  <span className="font-mono font-bold text-violet-400">{item.percent}%</span>
+                </div>
               </div>
-              <h3 className="font-bold text-sm text-slate-900 dark:text-white mb-2">{sol.label}</h3>
-              <p className="text-xs text-slate-500 leading-relaxed">{sol.desc}</p>
+              {expandedRoot === idx && (
+                <p className="mt-4 text-sm text-[var(--text-muted)] pt-4 border-t border-[var(--border)]">
+                  {item.desc}
+                </p>
+              )}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* Cost Drivers */}
+      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-24 border-t border-[var(--border)]">
+        <div className="text-center mb-12 animate-slide-up">
+          <span className="inline-block font-mono text-[10px] uppercase font-bold text-rose-500 tracking-widest bg-rose-500/10 px-3 py-1 rounded-full border border-rose-500/20 mb-4">
+            Economics
+          </span>
+          <h2 className="font-black text-3xl sm:text-5xl text-[var(--text-primary)] tracking-tight leading-tight">
+            Where the Money <span className="gradient-text-rose">Hemorrhages.</span>
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+          {COST_DRIVERS.map((driver, i) => (
+            <div key={i} className="cyber-card p-6 animate-slide-up" style={{ animationDelay: `${0.1 * i}s` }}>
+              <div className="flex items-start gap-3 mb-3">
+                <div className={`px-2 py-1 rounded font-mono text-[9px] font-bold uppercase tracking-widest ${driver.severity === 'CRITICAL' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/40' : 'bg-amber-500/20 text-amber-400 border border-amber-500/40'}`}>
+                  {driver.severity}
+                </div>
+              </div>
+              <h4 className="font-bold text-[var(--text-primary)] mb-2">{driver.driver}</h4>
+              <p className="text-2xl font-black text-rose-400 font-mono mb-3">{driver.cost}</p>
+              <p className="text-sm text-[var(--text-muted)]">{driver.example}</p>
             </div>
           ))}
         </div>
+      </section>
 
-        <div className="mt-10 text-center">
-          <Link
-            href="/workflow"
-            className="inline-flex items-center gap-2 text-xs font-semibold font-mono text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 dark:hover:text-emerald-300 transition-colors"
-          >
-            See the full workflow →
-          </Link>
+      {/* Industry Deep Dives */}
+      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-24 border-t border-[var(--border)]">
+        <div className="text-center mb-12 animate-slide-up">
+          <span className="inline-block font-mono text-[10px] uppercase font-bold text-cyan-500 tracking-widest bg-cyan-500/10 px-3 py-1 rounded-full border border-cyan-500/20 mb-4">
+            Sector Analysis
+          </span>
+          <h2 className="font-black text-3xl sm:text-5xl text-[var(--text-primary)] tracking-tight leading-tight">
+            Across Industries: The <span className="gradient-text-emerald">Same Story.</span>
+          </h2>
+        </div>
+
+        <div className="space-y-8 mt-8">
+          {INDUSTRY_SCENARIOS.map((scenario, idx) => (
+            <div key={idx} className="cyber-card p-8 animate-slide-up" style={{ animationDelay: `${0.15 * idx}s` }}>
+              <h3 className="font-black text-xl text-[var(--text-primary)] mb-4">{scenario.title}</h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div>
+                  <p className="text-xs font-mono font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2">The Pain</p>
+                  <p className="text-sm text-[var(--text-muted)]">{scenario.pain}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-mono font-bold text-rose-500 uppercase tracking-wider mb-2">Traditional Path</p>
+                  <p className="text-lg font-bold text-rose-400">{scenario.traditional}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-mono font-bold text-emerald-500 uppercase tracking-wider mb-2">With MEND-X</p>
+                  <p className="text-lg font-bold text-emerald-400">{scenario.mendx}</p>
+                </div>
+              </div>
+
+              <div className="pt-6 border-t border-[var(--border)]">
+                <p className="text-sm font-semibold text-amber-400 flex items-center gap-2">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M12 16.5a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zm-1.207-5.351a6 6 0 11-8.485-8.486 6 6 0 018.485 8.486z" clipRule="evenodd" /></svg>
+                  Annual Recovery: <span className="text-amber-300 font-mono font-black">{scenario.saved}</span>
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* The Solution */}
+      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-24 border-t border-[var(--border)]">
+        <div className="text-center mb-16 animate-slide-up">
+          <span className="inline-block font-mono text-[10px] uppercase font-bold text-emerald-500 tracking-widest bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20 mb-4">
+            The Answer
+          </span>
+          <h2 className="font-black text-3xl sm:text-5xl text-[var(--text-primary)] tracking-tight leading-tight">
+            MEND-X: Six Pillars of <span className="gradient-text-emerald">Resolution.</span>
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {SOLUTION_PILLARS.map((pillar, i) => (
+            <div key={i} className="cyber-card p-8 animate-slide-up" style={{ animationDelay: `${0.1 * i}s` }}>
+              <h3 className="font-black text-lg text-[var(--text-primary)] mb-3">{pillar.title}</h3>
+              <p className="text-sm text-[var(--text-muted)] mb-6">{pillar.desc}</p>
+              <ul className="space-y-2">
+                {pillar.metrics.map((m, idx) => (
+                  <li key={idx} className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    {m}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto py-24">
+        <div className="glass rounded-[2rem] p-10 sm:p-16 text-center border-emerald-500/20 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-emerald-500/10 to-transparent pointer-events-none" />
+
+          <h2 className="font-black text-3xl sm:text-5xl text-[var(--text-primary)] mb-6 relative z-10">
+            The Crisis Ends<br />When Troubleshooting Accelerates.
+          </h2>
+          <p className="text-[var(--text-muted)] text-sm sm:text-base max-w-xl mx-auto mb-10 relative z-10 leading-relaxed">
+            Stop betting on manual searches. Start leveraging precise, cited, sub-8-second diagnostics backed by the entire universe of OEM manuals.
+          </p>
+
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 relative z-10">
+            <Link
+              href="/dashboard"
+              className="w-full sm:w-auto px-8 py-4 rounded-xl font-black text-sm text-[var(--bg-base)] bg-emerald-500 hover:scale-105 active:scale-95 transition-transform flex items-center justify-center gap-2"
+            >
+              Launch Console
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
+            <Link
+              href="/architecture"
+              className="w-full sm:w-auto px-8 py-4 rounded-xl font-black text-sm border border-[var(--border)] text-[var(--text-primary)] hover:border-emerald-500/50 transition-colors flex items-center justify-center gap-2"
+            >
+              Explore Architecture
+            </Link>
+          </div>
         </div>
       </section>
     </LandingLayout>

@@ -33,17 +33,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
       <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              try {
-                var t = localStorage.getItem('mend_theme') || 'dark';
-                document.documentElement.setAttribute('data-theme', t);
-                document.documentElement.classList.add(t);
-              } catch(e) {}
-            `,
-          }}
-        />
+        <meta name="theme-color" content="#06070a" />
       </head>
       <body className="font-sans antialiased min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)] transition-colors duration-200">
         <ThemeProvider>

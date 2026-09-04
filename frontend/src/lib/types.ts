@@ -54,6 +54,7 @@ export interface TroubleshootingResponse {
     | "disambiguation_required"
     | "insufficient_information"
     | "clarification_needed"
+    | "out_of_scope"
     | "error";
   summary: string;
   error_meaning?: string;
