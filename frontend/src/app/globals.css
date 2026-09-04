@@ -324,3 +324,99 @@ textarea { resize: none; }
 button, a, input, select, textarea {
   transition: all 0.15s ease;
 }
+
+/* ─── Cybernetic, Glitch & Landing Keyframes ──────────────────── */
+@keyframes glitch1 {
+  0% { transform: translate(0); }
+  20% { transform: translate(-3px, 3px); }
+  40% { transform: translate(-3px, -3px); }
+  60% { transform: translate(3px, 3px); }
+  80% { transform: translate(3px, -3px); }
+  100% { transform: translate(0); }
+}
+
+@keyframes glitch2 {
+  0% { clip-path: inset(40% 0 61% 0); transform: skew(0.3deg); }
+  20% { clip-path: inset(92% 0 1% 0); transform: skew(-0.8deg); }
+  40% { clip-path: inset(10% 0 70% 0); transform: skew(0.5deg); }
+  60% { clip-path: inset(60% 0 20% 0); transform: skew(-0.3deg); }
+  80% { clip-path: inset(30% 0 50% 0); transform: skew(0.8deg); }
+  100% { clip-path: inset(15% 0 65% 0); transform: skew(0deg); }
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(1000%); }
+}
+
+@keyframes radarSweep {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes neonPulse {
+  0%, 100% {
+    text-shadow: 0 0 10px rgba(99, 102, 241, 0.8), 0 0 20px rgba(99, 102, 241, 0.4), 0 0 40px rgba(139, 92, 246, 0.2);
+  }
+  50% {
+    text-shadow: 0 0 20px rgba(99, 102, 241, 1), 0 0 40px rgba(99, 102, 241, 0.7), 0 0 60px rgba(139, 92, 246, 0.4);
+  }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.glitch-text {
+  position: relative;
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 900;
+  text-shadow: -2px 0 rgba(239, 68, 68, 0.7), 2px 0 rgba(6, 182, 212, 0.7);
+  animation: glitch1 2.5s infinite;
+}
+
+.glitch-text::before,
+.glitch-text::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.glitch-text::before {
+  left: 2px;
+  text-shadow: -2px 0 #ef4444;
+  clip-path: inset(0 0 0 0);
+  animation: glitch2 3s infinite linear alternate-reverse;
+}
+
+.glitch-text::after {
+  left: -2px;
+  text-shadow: 2px 0 #06b6d4;
+  clip-path: inset(0 0 0 0);
+  animation: glitch2 2.2s infinite linear alternate-reverse;
+}
+
+.scanline-overlay {
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%,
+    rgba(0, 0, 0, 0.25) 50%
+  ), linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 0.03),
+    rgba(0, 255, 0, 0.01),
+    rgba(0, 0, 255, 0.03)
+  );
+  background-size: 100% 3px, 6px 100%;
+  pointer-events: none;
+}
+
+.radar-grid {
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
