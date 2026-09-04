@@ -97,7 +97,7 @@ export default function LoginPage() {
         )}
 
         <p className="text-center text-xs text-slate-400 mt-6">
-          MEND - X v1.0.1 · Team DIMENSITY LABS [VH26-37]
+          MEND - X v1.1.0 · Team DIMENSITY LABS [VH26-37]
         </p>
       </div>
     </div>
