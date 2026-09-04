@@ -8,11 +8,14 @@ import type { Machine } from "@/lib/types";
 import MachineSelector from "@/components/chat/MachineSelector";
 import ChatInterface from "@/components/chat/ChatInterface";
 import Spinner from "@/components/ui/Spinner";
+import ThemeToggle from "@/components/ui/ThemeToggle";
+import { useTheme } from "@/lib/theme-context";
 
 interface ConvEntry { id: string; label: string; }
 
 export default function DashboardPage() {
   const { user, isLoading: authLoading, logout } = useAuth();
+  const { theme } = useTheme();
   const router = useRouter();
   const [machines, setMachines] = useState<Machine[]>([]);
   const [selectedMachine, setSelectedMachine] = useState<Machine | null>(null);
@@ -40,23 +43,22 @@ export default function DashboardPage() {
   };
 
   if (authLoading) return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: "#08090c" }}>
+    <div className="min-h-screen flex items-center justify-center bg-[var(--bg-base)]">
       <div className="flex flex-col items-center gap-4">
         <Spinner size="lg" />
-        <p className="text-sm" style={{ color: "#475569" }}>Authenticating…</p>
+        <p className="text-sm text-[var(--text-muted)]">Authenticating…</p>
       </div>
     </div>
   );
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: "#08090c" }}>
+    <div className="flex h-screen overflow-hidden bg-[var(--bg-base)] text-[var(--text-primary)] transition-colors duration-200">
       {/* ── Sidebar ── */}
       <aside
-        className="shrink-0 flex flex-col transition-all duration-300"
+        className="shrink-0 flex flex-col transition-all duration-300 border-r border-[var(--border)]"
         style={{
           width: sidebarOpen ? "256px" : "0px",
-          background: "rgba(15,17,23,0.95)",
-          borderRight: "1px solid rgba(255,255,255,0.06)",
+          background: "var(--bg-surface)",
           backdropFilter: "blur(20px)",
           overflow: "hidden",
         }}
@@ -64,8 +66,7 @@ export default function DashboardPage() {
         <div style={{ minWidth: "256px" }}>
           {/* Logo */}
           <div
-            className="px-4 py-4 flex items-center gap-3"
-            style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}
+            className="px-4 py-4 flex items-center gap-3 border-b border-[var(--border)]"
           >
             <div className="relative shrink-0">
               <div
@@ -76,7 +77,7 @@ export default function DashboardPage() {
                 }}
               />
               <img
-                src="/mend-x.png"
+                src={theme === "light" ? "/mend-x.png" : "/mend-x-dark.png"}
                 alt="MEND - X"
                 className="relative w-8 h-8 rounded-lg object-contain"
               />
@@ -85,7 +86,7 @@ export default function DashboardPage() {
               <span
                 className="font-black text-sm tracking-tight block"
                 style={{
-                  background: "linear-gradient(135deg, #a5b4fc, #c4b5fd)",
+                  background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   backgroundClip: "text",
@@ -93,15 +94,15 @@ export default function DashboardPage() {
               >
                 MEND - X
               </span>
-              <span className="text-[10px] font-medium" style={{ color: "#10b981" }}>
+              <span className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
                 From Failure to Function
               </span>
             </div>
           </div>
 
           {/* Machine Selector */}
-          <div className="px-3 py-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-            <p className="text-[10px] font-bold uppercase tracking-widest mb-2 px-1" style={{ color: "#334155" }}>
+          <div className="px-3 py-3 border-b border-[var(--border)]">
+            <p className="text-[10px] font-bold uppercase tracking-widest mb-2 px-1 text-slate-500 dark:text-[#334155]">
               Machine Filter
             </p>
             <MachineSelector machines={machines} selected={selectedMachine} onChange={setSelectedMachine} />
@@ -110,18 +111,13 @@ export default function DashboardPage() {
           {/* Sessions */}
           <div className="flex-1 px-3 py-3 overflow-y-auto" style={{ maxHeight: "calc(100vh - 280px)" }}>
             <div className="flex items-center justify-between mb-2 px-1">
-              <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "#334155" }}>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-[#334155]">
                 Sessions
               </p>
               <button
                 id="new-session-btn"
                 onClick={startNewConversation}
-                className="flex items-center gap-1 text-xs px-2 py-1 rounded-lg font-semibold transition-all hover:scale-105"
-                style={{
-                  background: "linear-gradient(135deg, rgba(99,102,241,0.2), rgba(139,92,246,0.2))",
-                  border: "1px solid rgba(99,102,241,0.3)",
-                  color: "#a5b4fc",
-                }}
+                className="flex items-center gap-1 text-xs px-2 py-1 rounded-lg font-semibold transition-all hover:scale-105 bg-indigo-50 dark:bg-indigo-500/20 border border-indigo-200 dark:border-indigo-500/30 text-indigo-600 dark:text-[#a5b4fc]"
               >
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
@@ -131,127 +127,78 @@ export default function DashboardPage() {
             </div>
 
             <div className="space-y-1">
-              {conversations.map((c, i) => (
+              {conversations.map((c) => (
                 <button
                   key={c.id}
                   onClick={() => setActiveConvId(c.id)}
-                  className="w-full text-left px-3 py-2.5 rounded-xl text-xs transition-all duration-200 truncate flex items-center gap-2 group"
-                  style={
+                  className={`w-full text-left px-3 py-2.5 rounded-xl text-xs transition-all duration-200 truncate flex items-center gap-2 group ${
                     activeConvId === c.id
-                      ? {
-                          background: "rgba(99,102,241,0.12)",
-                          border: "1px solid rgba(99,102,241,0.25)",
-                          color: "#a5b4fc",
-                        }
-                      : {
-                          background: "transparent",
-                          border: "1px solid transparent",
-                          color: "#64748b",
-                        }
-                  }
-                  onMouseEnter={(e) => {
-                    if (activeConvId !== c.id) {
-                      (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.04)";
-                      (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.07)";
-                      (e.currentTarget as HTMLElement).style.color = "#94a3b8";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (activeConvId !== c.id) {
-                      (e.currentTarget as HTMLElement).style.background = "transparent";
-                      (e.currentTarget as HTMLElement).style.borderColor = "transparent";
-                      (e.currentTarget as HTMLElement).style.color = "#64748b";
-                    }
-                  }}
+                      ? "sidebar-item-active font-semibold shadow-sm"
+                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/[0.04] hover:text-slate-900 dark:hover:text-white"
+                  }`}
                 >
-                  <svg className="w-3.5 h-3.5 shrink-0 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                  </svg>
-                  <span className="truncate font-medium">{c.label}</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0" />
+                  <span className="truncate">{c.label}</span>
                 </button>
               ))}
-
-              {conversations.length === 0 && (
-                <div className="px-1 py-4 text-center">
-                  <p className="text-xs" style={{ color: "#334155" }}>No sessions yet.</p>
-                  <p className="text-[11px] mt-1" style={{ color: "#1e293b" }}>Start a new troubleshooting session.</p>
-                </div>
-              )}
             </div>
           </div>
+        </div>
 
-          {/* User Footer */}
-          <div
-            className="px-3 py-3"
-            style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}
-          >
-            <div
-              className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl"
-              style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
-            >
-              <div
-                className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-xs font-bold"
-                style={{
-                  background: "linear-gradient(135deg, rgba(99,102,241,0.3), rgba(139,92,246,0.3))",
-                  border: "1px solid rgba(99,102,241,0.4)",
-                  color: "#a5b4fc",
-                }}
-              >
-                {(user?.full_name ?? user?.email ?? "U")[0].toUpperCase()}
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-xs font-semibold truncate" style={{ color: "#e2e8f0" }}>
-                  {user?.full_name ?? user?.email}
-                </p>
-                <p className="text-[10px] capitalize" style={{ color: "#475569" }}>
-                  {user?.role}
-                </p>
-              </div>
-              <div className="flex gap-1">
-                {user?.role === "admin" && (
-                  <button
-                    onClick={() => router.push("/admin")}
-                    className="p-1.5 rounded-lg transition-all hover:scale-110"
-                    style={{ color: "#6366f1" }}
-                    title="Admin Panel"
-                  >
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                  </button>
-                )}
-                <button
-                  onClick={logout}
-                  className="p-1.5 rounded-lg transition-all hover:scale-110"
-                  style={{ color: "#475569" }}
-                  title="Sign Out"
-                >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
-                </button>
-              </div>
+        {/* User Footer */}
+        <div className="mt-auto px-4 py-3 border-t border-[var(--border)] flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white font-bold text-xs flex items-center justify-center shrink-0">
+              {(user?.full_name ?? user?.email ?? "U")[0].toUpperCase()}
             </div>
+            <div className="min-w-0">
+              <p className="text-xs font-semibold truncate text-slate-800 dark:text-[#e2e8f0]">
+                {user?.full_name ?? user?.email}
+              </p>
+              <p className="text-[10px] capitalize text-slate-500 dark:text-[#475569]">
+                {user?.role}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-1">
+            {user?.role === "admin" && (
+              <button
+                onClick={() => router.push("/admin")}
+                className="p-1.5 rounded-lg text-indigo-600 dark:text-indigo-400 hover:bg-slate-100 dark:hover:bg-white/[0.05] transition-all"
+                title="Admin Panel"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </button>
+            )}
+            <button
+              onClick={logout}
+              className="p-1.5 rounded-lg text-slate-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all"
+              title="Sign Out"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+            </button>
           </div>
         </div>
       </aside>
 
       {/* ── Main Content ── */}
-      <main className="flex-1 flex flex-col overflow-hidden">
+      <main className="flex-1 flex flex-col overflow-hidden bg-[var(--bg-base)]">
         {/* Top Bar */}
         <header
-          className="flex items-center gap-3 px-4 py-3 shrink-0"
+          className="flex items-center gap-3 px-4 py-3 shrink-0 border-b border-[var(--border)] transition-colors"
           style={{
-            background: "rgba(15,17,23,0.8)",
-            borderBottom: "1px solid rgba(255,255,255,0.05)",
+            background: "var(--bg-surface)",
             backdropFilter: "blur(20px)",
           }}
         >
           <button
             onClick={() => setSidebarOpen((v) => !v)}
-            className="p-2 rounded-lg transition-all hover:scale-110"
-            style={{ color: "#475569", background: "rgba(255,255,255,0.04)" }}
+            className="p-2 rounded-lg transition-all hover:scale-110 text-slate-600 dark:text-[#475569] bg-slate-100 dark:bg-white/[0.04]"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -259,49 +206,48 @@ export default function DashboardPage() {
           </button>
 
           <div className="flex-1 min-w-0">
-            <h1 className="text-sm font-semibold" style={{ color: "#e2e8f0" }}>
+            <h1 className="text-sm font-semibold text-slate-900 dark:text-[#e2e8f0]">
               Troubleshooting Assistant
             </h1>
             {selectedMachine ? (
               <div className="flex items-center gap-1.5 mt-0.5">
                 <div className="status-dot-online" style={{ width: "5px", height: "5px" }} />
-                <p className="text-xs" style={{ color: "#10b981" }}>
+                <p className="text-xs text-emerald-600 dark:text-[#10b981]">
                   {selectedMachine.name}
                   {selectedMachine.model ? ` · ${selectedMachine.model}` : ""}
                 </p>
               </div>
             ) : (
-              <p className="text-xs mt-0.5" style={{ color: "#334155" }}>
+              <p className="text-xs mt-0.5 text-slate-500 dark:text-[#334155]">
                 No machine filter — searching all indexed manuals
               </p>
             )}
           </div>
 
-          <div
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg"
-            style={{
-              background: "rgba(16,185,129,0.08)",
-              border: "1px solid rgba(16,185,129,0.2)",
-            }}
-          >
-            <div className="status-dot-online" style={{ width: "6px", height: "6px" }} />
-            <span className="text-xs font-medium" style={{ color: "#6ee7b7" }}>
-              AI Online
-            </span>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+
+            <div
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20"
+            >
+              <div className="status-dot-online" style={{ width: "6px", height: "6px" }} />
+              <span className="text-xs font-medium text-emerald-600 dark:text-[#6ee7b7]">
+                AI Online
+              </span>
+            </div>
           </div>
         </header>
 
         {/* Chat / Welcome */}
         {activeConvId === null ? (
           <div
-            className="flex-1 flex flex-col items-center justify-center px-6 relative overflow-hidden"
-            style={{ background: "#08090c" }}
+            className="flex-1 flex flex-col items-center justify-center px-6 relative overflow-hidden bg-[var(--bg-base)]"
           >
             {/* BG Glow */}
             <div
-              className="absolute w-[500px] h-[500px] rounded-full pointer-events-none"
+              className="absolute w-[500px] h-[500px] rounded-full pointer-events-none opacity-40 dark:opacity-100"
               style={{
-                background: "radial-gradient(circle, rgba(99,102,241,0.06) 0%, transparent 70%)",
+                background: "radial-gradient(circle, rgba(99,102,241,0.1) 0%, transparent 70%)",
                 top: "50%",
                 left: "50%",
                 transform: "translate(-50%, -50%)",
@@ -331,7 +277,7 @@ export default function DashboardPage() {
               <h2
                 className="text-4xl font-black tracking-tight mb-1"
                 style={{
-                  background: "linear-gradient(135deg, #a5b4fc, #c4b5fd, #f0abfc)",
+                  background: "linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   backgroundClip: "text",
@@ -339,10 +285,10 @@ export default function DashboardPage() {
               >
                 MEND - X
               </h2>
-              <p className="text-sm font-semibold mb-4" style={{ color: "#10b981" }}>
+              <p className="text-sm font-semibold mb-4 text-emerald-600 dark:text-[#10b981]">
                 From Failure to Function
               </p>
-              <p className="text-sm leading-relaxed mb-8" style={{ color: "#475569" }}>
+              <p className="text-sm leading-relaxed mb-8 text-slate-600 dark:text-[#94a3b8]">
                 Industrial RAG Troubleshooting System. Select a machine or ask about any alarm code, symptom, or repair procedure — backed by indexed technical manuals.
               </p>
 
@@ -351,12 +297,7 @@ export default function DashboardPage() {
                 {["Error Code Lookup", "Step-by-step Repair", "Manual Citations", "Multi-machine RAG"].map((f) => (
                   <span
                     key={f}
-                    className="text-xs px-3 py-1.5 rounded-full font-medium"
-                    style={{
-                      background: "rgba(99,102,241,0.1)",
-                      border: "1px solid rgba(99,102,241,0.2)",
-                      color: "#a5b4fc",
-                    }}
+                    className="text-xs px-3 py-1.5 rounded-full font-medium bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 text-indigo-700 dark:text-[#a5b4fc]"
                   >
                     {f}
                   </span>

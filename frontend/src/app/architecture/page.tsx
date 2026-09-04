@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import LandingLayout from "@/components/landing/LandingLayout";
+import { useTheme } from "@/lib/theme-context";
 
 const TECH_STACK = [
   { name: "Next.js 16", role: "Frontend", detail: "React 19 App Router, SSR + CSR, TailwindCSS v4", color: "#e2e8f0" },
@@ -32,7 +33,8 @@ const MODELS = [
     name: "NORD",
     model: "Groq / Llama 3.1 8B Instant",
     latency: "<100ms",
-    logo: "/nord-dark.png",
+    logoDark: "/nord-dark.png",
+    logoLight: "/nord-light.png",
     color: "#3b82f6",
     useCases: ["Error code single-lookup", "Binary yes/no fault checks", "Offline / edge PLC environments", "High-frequency query volume"],
     avoid: ["Multi-step repair procedures", "Root cause analysis", "Safety-critical decisions"],
@@ -41,7 +43,8 @@ const MODELS = [
     name: "FORGE",
     model: "Google Gemini 2.0 Flash",
     latency: "1–3s",
-    logo: "/forge-dark.png",
+    logoDark: "/forge-dark.png",
+    logoLight: "/forge-light.png",
     color: "#f59e0b",
     useCases: ["Multi-step repair procedures", "Component cross-references", "Calibration sequences", "Mid-tier maintenance tasks"],
     avoid: ["Root cause analysis on ambiguous data", "Safety-critical arc-flash environments"],
@@ -50,7 +53,8 @@ const MODELS = [
     name: "APEX",
     model: "Anthropic Claude Sonnet 3.5",
     latency: "3–8s",
-    logo: "/apex-dark.png",
+    logoDark: "/apex-dark.png",
+    logoLight: "/apex-light.png",
     color: "#8b5cf6",
     useCases: ["Root cause analysis", "Safety-critical systems (aerospace / high-voltage)", "Cross-subsystem fault trees", "Engineering-level diagnostics"],
     avoid: ["Nothing — this is the maximum tier"],
@@ -58,6 +62,7 @@ const MODELS = [
 ];
 
 export default function ArchitecturePage() {
+  const { theme } = useTheme();
   const [selectedModel, setSelectedModel] = useState("FORGE");
   const model = MODELS.find((m) => m.name === selectedModel)!;
 
@@ -67,29 +72,29 @@ export default function ArchitecturePage() {
       <div className="fixed top-1/3 right-0 w-[600px] h-[600px] bg-indigo-800/8 rounded-full blur-[150px] pointer-events-none z-0" />
 
       {/* Header */}
-      <div className="relative z-10 pt-28 pb-14 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-b border-white/[0.06]">
+      <div className="relative z-10 pt-28 pb-14 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-b border-slate-200 dark:border-white/[0.06]">
         <span className="font-mono text-[10px] text-slate-500 uppercase tracking-[0.3em]">System Architecture</span>
-        <h1 className="font-black text-4xl sm:text-6xl text-white tracking-tight leading-tight mt-3 mb-4">
+        <h1 className="font-black text-4xl sm:text-6xl text-slate-900 dark:text-white tracking-tight leading-tight mt-3 mb-4">
           How it works<br />
-          <span className="text-indigo-400">under the hood.</span>
+          <span className="text-indigo-600 dark:text-indigo-400">under the hood.</span>
         </h1>
-        <p className="text-slate-400 text-base max-w-xl">
+        <p className="text-slate-600 dark:text-slate-400 text-base max-w-xl">
           A full walkthrough of the MEND-X technical architecture: the RAG pipeline, three-tier LLM system, data flow, and each technology's role.
         </p>
       </div>
 
       {/* ─── Tech Stack Table ─── */}
-      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-16 border-b border-white/[0.05]">
+      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-16 border-b border-slate-200 dark:border-white/[0.05]">
         <div className="mb-10">
           <span className="font-mono text-[10px] text-slate-500 uppercase tracking-[0.3em]">Stack</span>
-          <h2 className="font-black text-2xl sm:text-3xl text-white mt-2">Technology Inventory</h2>
+          <h2 className="font-black text-2xl sm:text-3xl text-slate-900 dark:text-white mt-2">Technology Inventory</h2>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {TECH_STACK.map((tech) => (
             <div
               key={tech.name}
-              className="p-5 rounded-xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] transition-all flex items-start gap-4"
+              className="p-5 rounded-xl border border-slate-200 dark:border-white/[0.06] bg-white dark:bg-white/[0.02] hover:bg-slate-50 dark:hover:bg-white/[0.04] shadow-sm dark:shadow-none transition-all flex items-start gap-4"
             >
               <div
                 className="w-1.5 flex-shrink-0 rounded-full self-stretch"
@@ -97,8 +102,8 @@ export default function ArchitecturePage() {
               />
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="font-bold text-sm text-white">{tech.name}</span>
-                  <span className="px-1.5 py-0.5 rounded text-[10px] font-mono text-slate-500 bg-white/[0.04] border border-white/[0.06]">
+                  <span className="font-bold text-sm text-slate-900 dark:text-white">{tech.name}</span>
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-mono text-slate-500 bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.06]">
                     {tech.role}
                   </span>
                 </div>
@@ -110,11 +115,11 @@ export default function ArchitecturePage() {
       </section>
 
       {/* ─── Data Flow ─── */}
-      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-16 border-b border-white/[0.05]">
+      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-16 border-b border-slate-200 dark:border-white/[0.05]">
         <div className="mb-10">
           <span className="font-mono text-[10px] text-slate-500 uppercase tracking-[0.3em]">Pipeline</span>
-          <h2 className="font-black text-2xl sm:text-3xl text-white mt-2">10-Step Data Flow</h2>
-          <p className="text-slate-400 text-sm mt-2 max-w-lg">
+          <h2 className="font-black text-2xl sm:text-3xl text-slate-900 dark:text-white mt-2">10-Step Data Flow</h2>
+          <p className="text-slate-600 dark:text-slate-400 text-sm mt-2 max-w-lg">
             From PDF upload to structured, cited answer — every step is deterministic, auditable, and grounded.
           </p>
         </div>
@@ -124,10 +129,10 @@ export default function ArchitecturePage() {
           <div className="absolute left-[19px] top-6 bottom-6 w-px bg-gradient-to-b from-indigo-600/60 via-emerald-600/40 to-red-600/40 hidden sm:block" />
 
           <div className="space-y-3">
-            {DATA_FLOW.map((item, i) => (
+            {DATA_FLOW.map((item) => (
               <div
                 key={item.step}
-                className="flex items-start gap-5 p-4 rounded-xl border border-white/[0.05] bg-white/[0.01] hover:bg-white/[0.03] hover:border-white/[0.1] transition-all group"
+                className="flex items-start gap-5 p-4 rounded-xl border border-slate-200 dark:border-white/[0.05] bg-white dark:bg-white/[0.01] hover:bg-slate-50 dark:hover:bg-white/[0.03] hover:border-slate-300 dark:hover:border-white/[0.1] shadow-sm dark:shadow-none transition-all group"
               >
                 {/* Step number node */}
                 <div
@@ -137,7 +142,7 @@ export default function ArchitecturePage() {
                   {item.step}
                 </div>
                 <div>
-                  <h3 className="font-semibold text-sm text-white mb-1">{item.label}</h3>
+                  <h3 className="font-semibold text-sm text-slate-900 dark:text-white mb-1">{item.label}</h3>
                   <p className="text-xs text-slate-500">{item.detail}</p>
                 </div>
               </div>
@@ -147,11 +152,11 @@ export default function ArchitecturePage() {
       </section>
 
       {/* ─── Three-Tier Model Deep Dive ─── */}
-      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-16 border-b border-white/[0.05]">
+      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-16 border-b border-slate-200 dark:border-white/[0.05]">
         <div className="mb-10">
           <span className="font-mono text-[10px] text-slate-500 uppercase tracking-[0.3em]">Intelligence Routing</span>
-          <h2 className="font-black text-2xl sm:text-3xl text-white mt-2">Three LLM Tiers, One Query Router</h2>
-          <p className="text-slate-400 text-sm mt-2 max-w-lg">
+          <h2 className="font-black text-2xl sm:text-3xl text-slate-900 dark:text-white mt-2">Three LLM Tiers, One Query Router</h2>
+          <p className="text-slate-600 dark:text-slate-400 text-sm mt-2 max-w-lg">
             Query complexity is scored at runtime. The router selects the appropriate tier. Cost and latency are minimized without sacrificing accuracy.
           </p>
         </div>
@@ -164,33 +169,45 @@ export default function ArchitecturePage() {
               onClick={() => setSelectedModel(m.name)}
               className={`flex items-center gap-2.5 px-5 py-2.5 rounded-xl border text-sm font-bold transition-all ${
                 selectedModel === m.name
-                  ? "text-white border-white/[0.15] bg-white/[0.06]"
-                  : "text-slate-500 border-white/[0.05] hover:text-slate-300 hover:border-white/[0.1]"
+                  ? "text-slate-900 dark:text-white border-indigo-400/50 dark:border-white/[0.15] bg-indigo-50 dark:bg-white/[0.06] shadow-sm dark:shadow-none"
+                  : "text-slate-500 border-slate-200 dark:border-white/[0.05] hover:text-slate-900 dark:hover:text-slate-300 hover:border-slate-300 dark:hover:border-white/[0.1]"
               }`}
             >
-              <Image src={m.logo} alt={m.name} width={52} height={22} className="object-contain opacity-70" />
+              <Image
+                src={theme === "light" ? m.logoLight : m.logoDark}
+                alt={m.name}
+                width={52}
+                height={22}
+                className="object-contain"
+              />
             </button>
           ))}
         </div>
 
         {/* Active model detail */}
         <div
-          className="rounded-2xl p-7 sm:p-10 border grid grid-cols-1 md:grid-cols-2 gap-8 transition-all"
-          style={{ background: `${model.color}06`, borderColor: `${model.color}20` }}
+          className="rounded-2xl p-7 sm:p-10 border grid grid-cols-1 md:grid-cols-2 gap-8 transition-all bg-white dark:bg-transparent shadow-sm dark:shadow-none"
+          style={{ borderColor: `${model.color}30` }}
         >
           <div>
             <div className="flex items-center gap-3 mb-4">
-              <Image src={model.logo} alt={model.name} width={100} height={44} className="object-contain" />
+              <Image
+                src={theme === "light" ? model.logoLight : model.logoDark}
+                alt={model.name}
+                width={100}
+                height={44}
+                className="object-contain"
+              />
             </div>
             <div className="font-mono text-xs text-slate-500 mb-1">Underlying Model</div>
-            <div className="font-bold text-sm text-white mb-4">{model.model}</div>
+            <div className="font-bold text-sm text-slate-900 dark:text-white mb-4">{model.model}</div>
             <div className="font-mono text-xs text-slate-500 mb-1">Typical Latency</div>
             <div className="font-black text-2xl font-mono mb-6" style={{ color: model.color }}>{model.latency}</div>
 
             <div className="font-mono text-[10px] text-slate-500 uppercase tracking-widest mb-3">Best used for</div>
             <ul className="space-y-2">
               {model.useCases.map((u) => (
-                <li key={u} className="flex items-center gap-2 text-xs text-slate-300">
+                <li key={u} className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300">
                   <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: model.color }} />
                   {u}
                 </li>
@@ -210,11 +227,11 @@ export default function ArchitecturePage() {
             </ul>
 
             {/* Routing decision visual */}
-            <div className="p-4 rounded-xl bg-white/[0.03] border border-white/[0.05] font-mono text-xs text-slate-400 space-y-1.5">
-              <div className="text-[10px] text-slate-600 mb-2 uppercase tracking-widest">Query Router Logic</div>
-              <div className={`${model.name === "NORD" ? "text-blue-400" : "text-slate-600"}`}>if complexity_score &lt; 0.35 → NORD</div>
-              <div className={`${model.name === "FORGE" ? "text-amber-400" : "text-slate-600"}`}>elif complexity_score &lt; 0.70 → FORGE</div>
-              <div className={`${model.name === "APEX" ? "text-violet-400" : "text-slate-600"}`}>else → APEX</div>
+            <div className="p-4 rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.05] font-mono text-xs text-slate-600 dark:text-slate-400 space-y-1.5">
+              <div className="text-[10px] text-slate-500 uppercase tracking-widest">Query Router Logic</div>
+              <div className={`${model.name === "NORD" ? "text-blue-600 dark:text-blue-400 font-bold" : "text-slate-400 dark:text-slate-600"}`}>if complexity_score &lt; 0.35 → NORD</div>
+              <div className={`${model.name === "FORGE" ? "text-amber-600 dark:text-amber-400 font-bold" : "text-slate-400 dark:text-slate-600"}`}>elif complexity_score &lt; 0.70 → FORGE</div>
+              <div className={`${model.name === "APEX" ? "text-violet-600 dark:text-violet-400 font-bold" : "text-slate-400 dark:text-slate-600"}`}>else → APEX</div>
             </div>
           </div>
         </div>
@@ -224,7 +241,7 @@ export default function ArchitecturePage() {
       <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-16">
         <div className="max-w-4xl">
           <span className="font-mono text-[10px] text-slate-500 uppercase tracking-[0.3em]">Safety Mechanism</span>
-          <h2 className="font-black text-2xl sm:text-3xl text-white mt-3 mb-6">Hallucination Defense Architecture</h2>
+          <h2 className="font-black text-2xl sm:text-3xl text-slate-900 dark:text-white mt-3 mb-6">Hallucination Defense Architecture</h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[
@@ -264,10 +281,10 @@ ORDER BY embedding <=> $2
 LIMIT 8`
               },
             ].map((item) => (
-              <div key={item.title} className="p-5 rounded-xl border border-white/[0.06] bg-white/[0.02]">
-                <h3 className="font-bold text-sm text-white mb-2">{item.title}</h3>
+              <div key={item.title} className="p-5 rounded-xl border border-slate-200 dark:border-white/[0.06] bg-white dark:bg-white/[0.02] shadow-sm dark:shadow-none">
+                <h3 className="font-bold text-sm text-slate-900 dark:text-white mb-2">{item.title}</h3>
                 <p className="text-xs text-slate-500 mb-3 leading-relaxed">{item.body}</p>
-                <pre className="font-mono text-[11px] text-emerald-400/70 bg-black/40 rounded-lg p-3 overflow-x-auto leading-relaxed">
+                <pre className="font-mono text-[11px] text-emerald-600 dark:text-emerald-400 bg-slate-900 dark:bg-black/40 text-emerald-400 rounded-lg p-3 overflow-x-auto leading-relaxed">
                   {item.code}
                 </pre>
               </div>
@@ -278,7 +295,7 @@ LIMIT 8`
         <div className="mt-10">
           <Link
             href="/workflow"
-            className="inline-flex items-center gap-2 text-xs font-semibold font-mono text-indigo-400 hover:text-indigo-300 transition-colors"
+            className="inline-flex items-center gap-2 text-xs font-semibold font-mono text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 transition-colors"
           >
             See the workflow step by step →
           </Link>

@@ -110,14 +110,14 @@ export default function ProblemPage() {
       <div className="fixed top-1/4 left-0 w-[500px] h-[500px] bg-red-700/8 rounded-full blur-[140px] pointer-events-none z-0" />
 
       {/* ─── Header ─── */}
-      <div className="relative z-10 pt-28 pb-14 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-b border-white/[0.06]">
+      <div className="relative z-10 pt-28 pb-14 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-b border-slate-200 dark:border-white/[0.06]">
         <span className="font-mono text-[10px] text-slate-500 uppercase tracking-[0.3em]">Problem & Solution</span>
-        <h1 className="font-black text-4xl sm:text-6xl text-white tracking-tight leading-tight mt-3 mb-4">
+        <h1 className="font-black text-4xl sm:text-6xl text-slate-900 dark:text-white tracking-tight leading-tight mt-3 mb-4">
           Why factories still<br />
-          <span className="text-red-400">burn millions</span> on<br />
+          <span className="text-red-600 dark:text-red-400">burn millions</span> on<br />
           breakdowns.
         </h1>
-        <p className="text-slate-400 text-base max-w-xl">
+        <p className="text-slate-600 dark:text-slate-400 text-base max-w-xl">
           MEND-X was not built to be clever. It was built to solve a specific, expensive, preventable problem that the industrial sector has tolerated for decades.
         </p>
       </div>
@@ -133,11 +133,11 @@ export default function ProblemPage() {
                 onClick={() => setActiveTab(p.id)}
                 className={`flex-shrink-0 text-left px-4 py-3 rounded-xl border text-xs font-semibold transition-all ${
                   activeTab === p.id
-                    ? "bg-white/[0.06] border-white/[0.15] text-white"
-                    : "bg-transparent border-white/[0.04] text-slate-500 hover:text-slate-300 hover:border-white/[0.08]"
+                    ? "bg-indigo-50/70 dark:bg-white/[0.06] border-indigo-200 dark:border-white/[0.15] text-slate-900 dark:text-white shadow-sm dark:shadow-none"
+                    : "bg-transparent border-slate-200 dark:border-white/[0.04] text-slate-500 hover:text-slate-900 dark:hover:text-slate-300 hover:border-slate-300 dark:hover:border-white/[0.08]"
                 }`}
               >
-                <div className="font-mono text-[9px] mb-1" style={{ color: p.tagColor, opacity: 0.8 }}>
+                <div className="font-mono text-[9px] mb-1 font-bold" style={{ color: p.tagColor }}>
                   {p.tag}
                 </div>
                 {p.title}
@@ -146,18 +146,18 @@ export default function ProblemPage() {
           </div>
 
           {/* Right: problem body */}
-          <div className="flex-1 rounded-2xl border border-white/[0.07] bg-white/[0.02] p-7 sm:p-10">
+          <div className="flex-1 rounded-2xl border border-slate-200 dark:border-white/[0.07] bg-white dark:bg-white/[0.02] p-7 sm:p-10 shadow-sm dark:shadow-none">
             <div
               className="inline-flex items-center gap-2 px-2.5 py-1 rounded font-mono text-[10px] font-bold uppercase tracking-widest mb-6 border"
-              style={{ color: active.tagColor, background: `${active.tagColor}10`, borderColor: `${active.tagColor}30` }}
+              style={{ color: active.tagColor, background: `${active.tagColor}15`, borderColor: `${active.tagColor}40` }}
             >
               <span className="w-1.5 h-1.5 rounded-full" style={{ background: active.tagColor }} />
               {active.tag}
             </div>
 
-            <h2 className="font-black text-2xl sm:text-3xl text-white mb-6 leading-tight">{active.title}</h2>
+            <h2 className="font-black text-2xl sm:text-3xl text-slate-900 dark:text-white mb-6 leading-tight">{active.title}</h2>
 
-            <div className="space-y-4 text-sm text-slate-400 leading-relaxed mb-8">
+            <div className="space-y-4 text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-8">
               {active.content.map((para, i) => (
                 <p key={i}>{para}</p>
               ))}
@@ -166,12 +166,12 @@ export default function ProblemPage() {
             {/* Stat callout */}
             <div
               className="inline-flex items-center gap-4 px-6 py-4 rounded-xl border"
-              style={{ background: `${active.tagColor}08`, borderColor: `${active.tagColor}20` }}
+              style={{ background: `${active.tagColor}08`, borderColor: `${active.tagColor}25` }}
             >
               <span className="font-black text-3xl font-mono" style={{ color: active.tagColor }}>
                 {active.stat.value}
               </span>
-              <span className="text-xs text-slate-400">{active.stat.label}</span>
+              <span className="text-xs text-slate-600 dark:text-slate-400">{active.stat.label}</span>
             </div>
           </div>
         </div>
@@ -181,11 +181,11 @@ export default function ProblemPage() {
       <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto pb-24">
         <div className="mb-12">
           <span className="font-mono text-[10px] text-slate-500 uppercase tracking-[0.3em]">The Answer</span>
-          <h2 className="font-black text-3xl sm:text-5xl text-white tracking-tight mt-3 mb-4">
+          <h2 className="font-black text-3xl sm:text-5xl text-slate-900 dark:text-white tracking-tight mt-3 mb-4">
             MEND-X solves each problem<br />
             with a deliberate mechanism.
           </h2>
-          <p className="text-slate-400 text-sm max-w-lg">
+          <p className="text-slate-600 dark:text-slate-400 text-sm max-w-lg">
             Not a collection of features — a coherent engineering response to a coherent industrial failure pattern.
           </p>
         </div>
@@ -194,12 +194,12 @@ export default function ProblemPage() {
           {SOLUTIONS.map((sol) => (
             <div
               key={sol.label}
-              className="p-6 rounded-xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] hover:border-indigo-500/25 transition-all group"
+              className="p-6 rounded-xl border border-slate-200 dark:border-white/[0.06] bg-white dark:bg-white/[0.02] hover:bg-slate-50 dark:hover:bg-white/[0.04] hover:border-indigo-500/25 shadow-sm dark:shadow-none transition-all group"
             >
-              <div className="w-9 h-9 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 mb-4 group-hover:bg-indigo-500/15 transition-colors">
+              <div className="w-9 h-9 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 mb-4 group-hover:bg-indigo-500/15 transition-colors">
                 {sol.icon}
               </div>
-              <h3 className="font-bold text-sm text-white mb-2">{sol.label}</h3>
+              <h3 className="font-bold text-sm text-slate-900 dark:text-white mb-2">{sol.label}</h3>
               <p className="text-xs text-slate-500 leading-relaxed">{sol.desc}</p>
             </div>
           ))}
@@ -208,7 +208,7 @@ export default function ProblemPage() {
         <div className="mt-10 text-center">
           <Link
             href="/workflow"
-            className="inline-flex items-center gap-2 text-xs font-semibold font-mono text-emerald-400 hover:text-emerald-300 transition-colors"
+            className="inline-flex items-center gap-2 text-xs font-semibold font-mono text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 dark:hover:text-emerald-300 transition-colors"
           >
             See the full workflow →
           </Link>

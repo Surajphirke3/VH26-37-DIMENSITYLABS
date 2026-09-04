@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { SessionProvider } from "@/lib/auth-context";
+import { ThemeProvider } from "@/lib/theme-context";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -30,9 +31,24 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
-      <body className="font-sans antialiased min-h-screen bg-[#08090c] text-[#f1f5f9]">
-        <SessionProvider>{children}</SessionProvider>
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                var t = localStorage.getItem('mend_theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', t);
+                document.documentElement.classList.add(t);
+              } catch(e) {}
+            `,
+          }}
+        />
+      </head>
+      <body className="font-sans antialiased min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)] transition-colors duration-200">
+        <ThemeProvider>
+          <SessionProvider>{children}</SessionProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

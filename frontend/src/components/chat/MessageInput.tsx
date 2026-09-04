@@ -40,10 +40,9 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
 
   return (
     <div
-      className="shrink-0 px-4 py-4"
+      className="shrink-0 px-4 py-4 border-t border-[var(--border)] transition-colors"
       style={{
-        background: "rgba(15,17,23,0.95)",
-        borderTop: "1px solid rgba(255,255,255,0.06)",
+        background: "var(--bg-surface)",
         backdropFilter: "blur(20px)",
       }}
     >
@@ -51,16 +50,11 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
       {hasErrorCode && (
         <div className="mb-2.5 animate-fade-in">
           <span
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold"
-            style={{
-              background: "rgba(99,102,241,0.15)",
-              border: "1px solid rgba(99,102,241,0.35)",
-              color: "#a5b4fc",
-            }}
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-500/15 border border-indigo-200 dark:border-indigo-500/35 text-indigo-700 dark:text-[#a5b4fc]"
           >
             <span
-              className="w-2 h-2 rounded-full"
-              style={{ background: "#6366f1", boxShadow: "0 0 6px rgba(99,102,241,0.8)", animation: "statusBlink 1.5s ease infinite" }}
+              className="w-2 h-2 rounded-full bg-indigo-600 dark:bg-indigo-400"
+              style={{ boxShadow: "0 0 6px rgba(99,102,241,0.8)", animation: "statusBlink 1.5s ease infinite" }}
             />
             Error Code Detected — RAG search will activate
           </span>
@@ -78,11 +72,8 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
             disabled={isLoading}
             rows={2}
             placeholder="Enter error code (E101) or describe the fault symptom…"
-            className="input-glow w-full px-4 py-3 text-sm rounded-xl leading-relaxed"
+            className="input-glow w-full px-4 py-3 text-sm rounded-xl leading-relaxed bg-slate-50 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-[#f1f5f9] placeholder:text-slate-400 dark:placeholder:text-slate-500"
             style={{
-              background: "rgba(255,255,255,0.04)",
-              border: "1px solid rgba(255,255,255,0.08)",
-              color: "#f1f5f9",
               minHeight: "52px",
               maxHeight: "120px",
               resize: "none",
@@ -106,20 +97,17 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
           id="send-btn"
           onClick={submit}
           disabled={isLoading || !value.trim()}
-          className="shrink-0 w-12 h-12 flex items-center justify-center rounded-xl font-bold transition-all"
+          className={`shrink-0 w-12 h-12 flex items-center justify-center rounded-xl font-bold transition-all ${
+            isLoading || !value.trim()
+              ? "bg-slate-100 dark:bg-white/[0.05] border border-slate-200 dark:border-white/[0.08] text-slate-400 dark:text-[#334155] cursor-not-allowed"
+              : "text-white hover:scale-105 shadow-md shadow-indigo-500/25"
+          }`}
           style={
             isLoading || !value.trim()
-              ? {
-                  background: "rgba(255,255,255,0.05)",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                  color: "#334155",
-                  cursor: "not-allowed",
-                }
+              ? undefined
               : {
                   background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
                   boxShadow: "0 0 20px rgba(99,102,241,0.4)",
-                  color: "#fff",
-                  transform: "scale(1.02)",
                 }
           }
           aria-label="Send query"
@@ -131,7 +119,7 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
         </button>
       </div>
 
-      <p className="mt-2 text-[10px]" style={{ color: "#1e293b" }}>
+      <p className="mt-2 text-[10px] text-slate-500 dark:text-[#64748b]">
         ↵ Enter to send &nbsp;·&nbsp; Shift+↵ for new line
       </p>
 
