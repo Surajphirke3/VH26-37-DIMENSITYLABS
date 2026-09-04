@@ -45,7 +45,7 @@ class GeminiEmbedding(EmbeddingProvider):
     async def embed_query(self, text: str) -> list[float]:
         return await self._embed(text, "retrieval_query")
 
-    async def embed_batch(self, texts: list[str], max_retries: int = 3) -> list[list[float]]:
+    async def embed_batch(self, texts: list[str], max_retries: int = 6) -> list[list[float]]:
         loop = asyncio.get_event_loop()
         for attempt in range(max_retries):
             try:
@@ -60,9 +60,12 @@ class GeminiEmbedding(EmbeddingProvider):
                 )
                 return result["embedding"]
             except Exception as exc:
-                if "RESOURCE_EXHAUSTED" in str(exc) or "429" in str(exc):
+                err_str = str(exc)
+                if "RESOURCE_EXHAUSTED" in err_str or "429" in err_str:
                     if attempt < max_retries - 1:
-                        wait = 2 ** (attempt + 1) * 5
-                        await asyncio.sleep(wait)
+                        import re
+                        match = re.search(r"retry in (\d+)", err_str)
+                        wait_sec = (int(match.group(1)) + 3) if match else 60
+                        await asyncio.sleep(wait_sec)
                         continue
                 raise

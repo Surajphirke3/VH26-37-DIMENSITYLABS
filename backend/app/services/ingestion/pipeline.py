@@ -4,7 +4,7 @@ import asyncio
 import datetime
 from uuid import UUID
 
-from sqlalchemy import select, update
+from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.logging import get_logger
@@ -43,9 +43,15 @@ class IngestionPipeline:
             await self._update_job(job_id, progress_pct=40)
 
             # --- Embed & persist in batches ---
+            res = await self.db.execute(
+                select(func.max(ChunkModel.chunk_index)).where(ChunkModel.manual_id == manual_id)
+            )
+            max_existing = res.scalar()
+            start_index = (max_existing + 1) if max_existing is not None else 0
+
             total = len(chunks)
             batch_size = 25
-            for i in range(0, total, batch_size):
+            for i in range(start_index, total, batch_size):
                 batch = chunks[i : i + batch_size]
                 contents = [c.content for c in batch]
                 embeddings = await self.embedder.embed_batch(contents)
@@ -66,11 +72,11 @@ class IngestionPipeline:
                     )
                     self.db.add(db_chunk)
 
-                await self.db.flush()
+                await self.db.commit()
                 processed_count = min(i + batch_size, total)
                 pct = 40 + int((processed_count / total) * 50)
                 await self._update_job(job_id, progress_pct=pct, chunks_created=processed_count)
-                await asyncio.sleep(0.3)
+                await asyncio.sleep(0.5)
 
             await self.db.commit()
             await self._update_manual_status(manual_id, "completed", page_count=len(pages))
