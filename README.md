@@ -11,6 +11,7 @@
 ### *Industrial RAG & Intelligent Machine Troubleshooting System for Factory Floor Diagnostics*
 
 [![VCET HackC++thon 2026](https://img.shields.io/badge/VCET%20HackC%2B%2Bthon-2026-7C3AED?style=for-the-badge&logo=codeforces&logoColor=white)](https://vcet.edu.in)
+[![Version](https://img.shields.io/badge/Version-v1.1.1-6366F1?style=for-the-badge)](https://github.com/Surajphirke3/VH26-37-DIMENSITYLABS/releases)
 [![Domain](https://img.shields.io/badge/Domain-Application%20Data%20Management%20(RAG)-0284C7?style=for-the-badge)](https://github.com/Surajphirke3/VH26-37-DIMENSITYLABS)
 [![Team](https://img.shields.io/badge/Team-DIMENSITY%20LABS%20%5BVH26--37%5D-EA580C?style=for-the-badge)](#-team--contributors)
 [![License: MIT](https://img.shields.io/badge/License-MIT-16A34A?style=for-the-badge)](LICENSE)
