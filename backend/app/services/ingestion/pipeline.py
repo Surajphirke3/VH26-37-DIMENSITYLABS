@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import datetime
 from uuid import UUID
 
@@ -41,30 +42,35 @@ class IngestionPipeline:
             chunks = self.chunker.chunk_pages(pages)
             await self._update_job(job_id, progress_pct=40)
 
-            # --- Embed & persist ---
+            # --- Embed & persist in batches ---
             total = len(chunks)
-            for i, chunk in enumerate(chunks):
-                embedding = await self.embedder.embed_text(chunk.content)
-                db_chunk = ChunkModel(
-                    manual_id=manual_id,
-                    machine_id=manual.machine_id,
-                    chunk_index=chunk.chunk_index,
-                    chunk_type=chunk.chunk_type,
-                    content=chunk.content,
-                    content_tokens=len(chunk.content.split()),
-                    page_start=chunk.page_start,
-                    page_end=chunk.page_end,
-                    section_path=chunk.section_path,
-                    error_codes_present=chunk.error_codes_present,
-                    embedding=embedding,
-                    embedding_model=self.embedder.model,
-                )
-                self.db.add(db_chunk)
+            batch_size = 25
+            for i in range(0, total, batch_size):
+                batch = chunks[i : i + batch_size]
+                contents = [c.content for c in batch]
+                embeddings = await self.embedder.embed_batch(contents)
+                for chunk, embedding in zip(batch, embeddings):
+                    db_chunk = ChunkModel(
+                        manual_id=manual_id,
+                        machine_id=manual.machine_id,
+                        chunk_index=chunk.chunk_index,
+                        chunk_type=chunk.chunk_type,
+                        content=chunk.content,
+                        content_tokens=len(chunk.content.split()),
+                        page_start=chunk.page_start,
+                        page_end=chunk.page_end,
+                        section_path=chunk.section_path,
+                        error_codes_present=chunk.error_codes_present,
+                        embedding=embedding,
+                        embedding_model=self.embedder.model,
+                    )
+                    self.db.add(db_chunk)
 
-                if i % _FLUSH_EVERY == 0:
-                    await self.db.flush()
-                    pct = 40 + int((i / total) * 50)
-                    await self._update_job(job_id, progress_pct=pct, chunks_created=i)
+                await self.db.flush()
+                processed_count = min(i + batch_size, total)
+                pct = 40 + int((processed_count / total) * 50)
+                await self._update_job(job_id, progress_pct=pct, chunks_created=processed_count)
+                await asyncio.sleep(0.3)
 
             await self.db.commit()
             await self._update_manual_status(manual_id, "completed", page_count=len(pages))

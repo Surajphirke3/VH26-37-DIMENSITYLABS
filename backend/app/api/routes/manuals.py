@@ -51,8 +51,14 @@ async def upload_manual(
 
     file_hash = hashlib.sha256(content).hexdigest()
     dup = await db.execute(select(Manual).where(Manual.file_hash == file_hash))
-    if dup.scalar_one_or_none():
-        raise HTTPException(409, "This file has already been uploaded (duplicate detected)")
+    existing = dup.scalar_one_or_none()
+    if existing:
+        if existing.processing_status == "failed":
+            logger.info("manual.reupload_failed", manual_id=str(existing.id), filename=file.filename)
+            await db.delete(existing)
+            await db.flush()
+        else:
+            raise HTTPException(409, f"This file has already been uploaded as '{existing.title}' (duplicate detected)")
 
     # Persist to disk
     os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
@@ -147,3 +153,27 @@ async def manual_status(
         "chunks_created": job.chunks_created,
         "error_message": job.error_message,
     }}
+
+
+@router.delete("/manuals/{manual_id}", response_model=dict)
+async def delete_manual(
+    manual_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_manager_or_admin),
+):
+    """Delete a manual, its file, chunks, and ingestion jobs."""
+    result = await db.execute(select(Manual).where(Manual.id == manual_id))
+    manual = result.scalar_one_or_none()
+    if not manual:
+        raise HTTPException(404, "Manual not found")
+
+    if manual.file_path and os.path.exists(manual.file_path):
+        try:
+            os.remove(manual.file_path)
+        except OSError:
+            pass
+
+    await db.delete(manual)
+    await db.commit()
+    logger.info("manual.deleted", manual_id=str(manual_id))
+    return {"success": True, "data": {"message": "Manual deleted successfully"}}

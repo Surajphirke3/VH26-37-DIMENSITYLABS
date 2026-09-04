@@ -34,6 +34,7 @@ class GeminiEmbedding(EmbeddingProvider):
                 model=f"models/{self.model}",
                 content=text,
                 task_type=task_type,
+                output_dimensionality=768,
             ),
         )
         return result["embedding"]
@@ -43,3 +44,25 @@ class GeminiEmbedding(EmbeddingProvider):
 
     async def embed_query(self, text: str) -> list[float]:
         return await self._embed(text, "retrieval_query")
+
+    async def embed_batch(self, texts: list[str], max_retries: int = 3) -> list[list[float]]:
+        loop = asyncio.get_event_loop()
+        for attempt in range(max_retries):
+            try:
+                result = await loop.run_in_executor(
+                    None,
+                    lambda: genai.embed_content(
+                        model=f"models/{self.model}",
+                        content=texts,
+                        task_type="retrieval_document",
+                        output_dimensionality=768,
+                    ),
+                )
+                return result["embedding"]
+            except Exception as exc:
+                if "RESOURCE_EXHAUSTED" in str(exc) or "429" in str(exc):
+                    if attempt < max_retries - 1:
+                        wait = 2 ** (attempt + 1) * 5
+                        await asyncio.sleep(wait)
+                        continue
+                raise

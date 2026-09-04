@@ -52,10 +52,10 @@ class HybridRetriever:
         vec_str = "[" + ",".join(str(v) for v in embedding) + "]"
         machine_filter = "AND c.machine_id = :machine_id" if machine_id else ""
         sql = text(f"""
-            SELECT c.id, 1 - (c.embedding <=> :embedding::vector) AS score
+            SELECT c.id, 1 - (c.embedding <=> CAST(:embedding AS vector)) AS score
             FROM chunks c
             WHERE c.embedding IS NOT NULL {machine_filter}
-            ORDER BY c.embedding <=> :embedding::vector
+            ORDER BY c.embedding <=> CAST(:embedding AS vector)
             LIMIT :top_k
         """)
         params: dict = {"embedding": vec_str, "top_k": top_k}

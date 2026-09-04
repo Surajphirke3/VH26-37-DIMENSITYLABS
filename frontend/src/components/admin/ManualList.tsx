@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { Manual } from "@/lib/types";
-import { getManualStatus } from "@/lib/api";
+import { getManualStatus, deleteManual } from "@/lib/api";
 
 interface ManualListProps {
   manuals: Manual[];
@@ -52,6 +52,8 @@ function StatusBadge({ manual, onComplete }: { manual: Manual; onComplete: () =>
 }
 
 export default function ManualList({ manuals, onRefresh }: ManualListProps) {
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
   if (manuals.length === 0) {
     return (
       <div className="text-center py-12 text-slate-400 text-sm">
@@ -59,6 +61,21 @@ export default function ManualList({ manuals, onRefresh }: ManualListProps) {
       </div>
     );
   }
+
+  const handleDelete = async (manualId: string, title: string) => {
+    if (!confirm(`Are you sure you want to delete "${title}"? This will remove all associated indexed chunks.`)) {
+      return;
+    }
+    setDeletingId(manualId);
+    try {
+      await deleteManual(manualId);
+      onRefresh();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to delete manual");
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   return (
     <div className="overflow-x-auto">
@@ -68,7 +85,8 @@ export default function ManualList({ manuals, onRefresh }: ManualListProps) {
             <th className="pb-3 pr-4 font-semibold text-slate-500 text-xs uppercase tracking-wide">Filename</th>
             <th className="pb-3 pr-4 font-semibold text-slate-500 text-xs uppercase tracking-wide">Title</th>
             <th className="pb-3 pr-4 font-semibold text-slate-500 text-xs uppercase tracking-wide">Status</th>
-            <th className="pb-3 font-semibold text-slate-500 text-xs uppercase tracking-wide">Uploaded</th>
+            <th className="pb-3 pr-4 font-semibold text-slate-500 text-xs uppercase tracking-wide">Uploaded</th>
+            <th className="pb-3 font-semibold text-slate-500 text-xs uppercase tracking-wide text-right">Actions</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-100">
@@ -79,8 +97,17 @@ export default function ManualList({ manuals, onRefresh }: ManualListProps) {
               <td className="py-3 pr-4">
                 <StatusBadge manual={m} onComplete={onRefresh} />
               </td>
-              <td className="py-3 text-slate-400 text-xs">
+              <td className="py-3 pr-4 text-slate-400 text-xs">
                 {new Date(m.created_at).toLocaleDateString()}
+              </td>
+              <td className="py-3 text-right">
+                <button
+                  onClick={() => handleDelete(m.id, m.title)}
+                  disabled={deletingId === m.id}
+                  className="text-xs text-red-500 hover:text-red-700 font-medium disabled:opacity-40 transition-colors"
+                >
+                  {deletingId === m.id ? "Deleting…" : "Delete"}
+                </button>
               </td>
             </tr>
           ))}

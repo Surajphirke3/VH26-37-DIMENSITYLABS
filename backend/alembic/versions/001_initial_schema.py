@@ -29,30 +29,35 @@ def upgrade() -> None:
     user_role = postgresql.ENUM(
         "admin", "manager", "technician",
         name="user_role_enum",
+        create_type=False,
     )
     user_role.create(op.get_bind(), checkfirst=True)
 
     manual_type = postgresql.ENUM(
         "operator", "service", "parts", "installation", "other",
         name="manual_type_enum",
+        create_type=False,
     )
     manual_type.create(op.get_bind(), checkfirst=True)
 
     processing_status = postgresql.ENUM(
         "pending", "processing", "completed", "failed", "reprocessing",
         name="processing_status_enum",
+        create_type=False,
     )
     processing_status.create(op.get_bind(), checkfirst=True)
 
     chunk_type = postgresql.ENUM(
         "section", "error_code", "table", "warning", "overlap",
         name="chunk_type_enum",
+        create_type=False,
     )
     chunk_type.create(op.get_bind(), checkfirst=True)
 
     message_role = postgresql.ENUM(
         "user", "assistant", "system",
         name="message_role_enum",
+        create_type=False,
     )
     message_role.create(op.get_bind(), checkfirst=True)
 
@@ -60,18 +65,21 @@ def upgrade() -> None:
         "solution", "disambiguation_required", "insufficient_information",
         "clarification_needed", "error",
         name="answer_type_enum",
+        create_type=False,
     )
     answer_type.create(op.get_bind(), checkfirst=True)
 
     confidence_level = postgresql.ENUM(
         "HIGH", "MEDIUM", "LOW",
         name="confidence_level_enum",
+        create_type=False,
     )
     confidence_level.create(op.get_bind(), checkfirst=True)
 
     job_status = postgresql.ENUM(
         "queued", "running", "completed", "failed", "cancelled",
         name="job_status_enum",
+        create_type=False,
     )
     job_status.create(op.get_bind(), checkfirst=True)
 
@@ -95,7 +103,7 @@ def upgrade() -> None:
         sa.Column("password_hash", sa.String(255), nullable=False),
         sa.Column(
             "role",
-            sa.Enum("admin", "manager", "technician", name="user_role_enum", create_type=False),
+            user_role,
             nullable=False,
             server_default="technician",
         ),
@@ -148,8 +156,7 @@ def upgrade() -> None:
         sa.Column("title", sa.String(500), nullable=False),
         sa.Column(
             "manual_type",
-            sa.Enum("operator", "service", "parts", "installation", "other",
-                    name="manual_type_enum", create_type=False),
+            manual_type,
             nullable=False,
             server_default="service",
         ),
@@ -161,8 +168,7 @@ def upgrade() -> None:
         sa.Column("page_count", sa.Integer, nullable=True),
         sa.Column(
             "processing_status",
-            sa.Enum("pending", "processing", "completed", "failed", "reprocessing",
-                    name="processing_status_enum", create_type=False),
+            processing_status,
             nullable=False,
             server_default="pending",
         ),
@@ -206,8 +212,7 @@ def upgrade() -> None:
         sa.Column("chunk_index", sa.Integer, nullable=False),
         sa.Column(
             "chunk_type",
-            sa.Enum("section", "error_code", "table", "warning", "overlap",
-                    name="chunk_type_enum", create_type=False),
+            chunk_type,
             nullable=False,
             server_default="section",
         ),
@@ -300,22 +305,18 @@ def upgrade() -> None:
         ),
         sa.Column(
             "role",
-            sa.Enum("user", "assistant", "system", name="message_role_enum", create_type=False),
+            message_role,
             nullable=False,
         ),
         sa.Column("content", sa.Text, nullable=False),
         sa.Column(
             "answer_type",
-            sa.Enum(
-                "solution", "disambiguation_required", "insufficient_information",
-                "clarification_needed", "error",
-                name="answer_type_enum", create_type=False,
-            ),
+            answer_type,
             nullable=True,
         ),
         sa.Column(
             "confidence_level",
-            sa.Enum("HIGH", "MEDIUM", "LOW", name="confidence_level_enum", create_type=False),
+            confidence_level,
             nullable=True,
         ),
         sa.Column("evidence_score", sa.Float, nullable=True),
@@ -377,8 +378,7 @@ def upgrade() -> None:
         ),
         sa.Column(
             "status",
-            sa.Enum("queued", "running", "completed", "failed", "cancelled",
-                    name="job_status_enum", create_type=False),
+            job_status,
             nullable=False,
             server_default="queued",
         ),

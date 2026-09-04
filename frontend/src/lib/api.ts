@@ -26,7 +26,10 @@ async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> 
     let message = `Request failed: ${res.status}`;
     try {
       const body = await res.json();
-      message = body?.detail ?? body?.message ?? message;
+      message = body?.error ?? body?.detail ?? body?.message ?? message;
+      if (typeof message !== "string") {
+        message = JSON.stringify(message);
+      }
     } catch {
       // ignore parse error
     }
@@ -40,15 +43,21 @@ async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> 
 }
 
 export async function login(email: string, password: string): Promise<void> {
-  const body = new URLSearchParams({ username: email, password });
   const res = await fetch(`${BASE_URL}/api/v1/auth/login`, {
     method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: body.toString(),
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.detail ?? "Login failed");
+    let msg = "Login failed. Please check your credentials.";
+    const rawMsg = err?.error ?? err?.detail ?? err?.message;
+    if (typeof rawMsg === "string") {
+      msg = rawMsg;
+    } else if (Array.isArray(rawMsg) && rawMsg[0]?.msg) {
+      msg = rawMsg[0].msg;
+    }
+    throw new Error(msg);
   }
   const data = await res.json();
   localStorage.setItem("access_token", data.access_token);
@@ -89,8 +98,11 @@ export const getManuals = (machineId?: string): Promise<Manual[]> => {
 };
 
 // backend: {success, data: {manual_id, processing_status, progress_pct, ...}}
-export const getManualStatus = (manualId: string): Promise<{ processing_status: Manual["processing_status"]; progress_pct?: number }> =>
+export const getManualStatus = (manualId: string): Promise<{ processing_status: Manual["processing_status"]; progress_pct?: number; error_message?: string }> =>
   apiFetch(`/api/v1/manuals/${manualId}/status`);
+
+export const deleteManual = (manualId: string): Promise<void> =>
+  apiFetch(`/api/v1/manuals/${manualId}`, { method: "DELETE" });
 
 // backend: {success, data: TroubleshootingResponse}
 export const singleQuery = (

@@ -9,7 +9,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=(".env", "../.env"),
         case_sensitive=False,
         extra="ignore",
     )
@@ -17,9 +17,9 @@ class Settings(BaseSettings):
     # Database
     POSTGRES_HOST: str = "localhost"
     POSTGRES_PORT: int = 5432
-    POSTGRES_DB: str = "mechmind"
-    POSTGRES_USER: str = "postgres"
-    POSTGRES_PASSWORD: str = ""
+    POSTGRES_DB: str = "mechind"
+    POSTGRES_USER: str = "mechind"
+    POSTGRES_PASSWORD: str = "change_me_in_production"
 
     # Redis
     REDIS_URL: str = "redis://localhost:6379/0"
@@ -30,12 +30,12 @@ class Settings(BaseSettings):
 
     # Gemini
     GEMINI_API_KEY: str = "placeholder"
-    GEMINI_EMBEDDING_MODEL: str = "text-embedding-004"
-    GEMINI_GENERATION_MODEL: str = "gemini-1.5-flash"
+    GEMINI_EMBEDDING_MODEL: str = "gemini-embedding-001"
+    GEMINI_GENERATION_MODEL: str = "gemini-2.5-flash"
 
     # Groq
     GROQ_API_KEY: str = "placeholder"
-    GROQ_MODEL: str = "llama-3.3-70b-versatile"
+    GROQ_MODEL: str = "qwen/qwen3.8-27b"
 
     # OpenRouter
     OPENROUTER_API_KEY: str = "placeholder"

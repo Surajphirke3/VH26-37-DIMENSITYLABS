@@ -10,7 +10,7 @@ import Spinner from "@/components/ui/Spinner";
 interface UploadResult { manual_id: string; ingestion_job_id: string; status: string; }
 type PollStatus = "pending" | "processing" | "completed" | "failed";
 
-const MANUAL_TYPES = ["operation", "maintenance", "troubleshooting", "installation", "parts"];
+const MANUAL_TYPES = ["operator", "service", "parts", "installation", "other"];
 
 export default function UploadManualPage() {
   const { user, isLoading } = useAuth();
@@ -18,7 +18,7 @@ export default function UploadManualPage() {
   const [machines, setMachines] = useState<Machine[]>([]);
   const [machineId, setMachineId] = useState("");
   const [title, setTitle] = useState("");
-  const [manualType, setManualType] = useState("troubleshooting");
+  const [manualType, setManualType] = useState("service");
   const [version, setVersion] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
