@@ -24,22 +24,13 @@ const PUBLIC_LINKS: NavLinkItem[] = [
   { href: "/help", label: "Help" },
 ];
 
-const AUTH_LINKS: NavLinkItem[] = [
-  { href: "/", label: "Home" },
-  { href: "/dashboard", label: "Diagnostics" },
-  { href: "/documents", label: "Documents" },
-  { href: "/search", label: "Search" },
-  { href: "/models", label: "Our Models", isModels: true },
-  { href: "/architecture", label: "Architecture" },
-  { href: "/status", label: "Status" },
-  { href: "/help", label: "Help" },
-];
+
 
 export default function LandingLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { theme } = useTheme();
   const { user, logout } = useAuth();
-  const navLinks = user ? AUTH_LINKS : PUBLIC_LINKS;
+  const navLinks = PUBLIC_LINKS;
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [modelsDropdownOpen, setModelsDropdownOpen] = useState(false);

@@ -74,20 +74,36 @@ export default function DashboardPage() {
         }}
       >
         <div style={{ width: "280px", opacity: sidebarOpen ? 1 : 0 }} className="flex flex-col h-full transition-opacity duration-300">
-          {/* Logo */}
-          <div className="px-6 py-6 flex items-center gap-3 border-b border-[var(--border)]">
-            <div className="relative shrink-0">
-              <div className="absolute -inset-1 rounded-lg bg-indigo-500 opacity-30 blur-sm" />
-              <img
-                src={theme === "light" ? "/logo-solid.png" : "/logo-dark.png"}
-                alt="MEND - X"
-                className="relative w-9 h-9 rounded-lg object-contain"
-              />
-            </div>
-            <div>
-              <span className="font-black text-sm tracking-tight block text-[var(--text-primary)]">MEND-X Core</span>
-              <span className="text-[10px] font-mono text-emerald-500 uppercase tracking-widest">System Online</span>
-            </div>
+          {/* Logo & Console Indicator */}
+          <div className="px-5 py-5 flex items-center justify-between border-b border-[var(--border)]">
+            <Link href="/dashboard" className="flex items-center gap-3 group" title="MEND-X Diagnostics Console">
+              <div className="relative shrink-0">
+                <img
+                  src={theme === "light" ? "/brand-icon-light.png" : "/brand-icon-dark.png"}
+                  alt="MEND-X"
+                  className="w-8 h-8 rounded-lg object-contain group-hover:scale-105 transition-transform"
+                />
+              </div>
+              <div className="flex flex-col">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-black text-sm tracking-tight text-[var(--text-primary)]">MEND-X</span>
+                  <span className="px-1.5 py-0.5 rounded text-[8px] font-mono font-bold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 uppercase">
+                    CONSOLE
+                  </span>
+                </div>
+                <span className="text-[10px] font-mono text-emerald-500 uppercase tracking-wider font-semibold flex items-center gap-1 mt-0.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  ONLINE
+                </span>
+              </div>
+            </Link>
+            <Link
+              href="/"
+              className="text-[10px] font-mono text-slate-400 hover:text-indigo-500 transition-colors px-1.5 py-1 rounded hover:bg-slate-100 dark:hover:bg-white/[0.05]"
+              title="Return to Public Website"
+            >
+              Portal ↗
+            </Link>
           </div>
 
           {/* Machine Selector */}

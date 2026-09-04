@@ -14,7 +14,7 @@ import {
   Sparkles,
   Info,
 } from "lucide-react";
-import LandingLayout from "@/components/landing/LandingLayout";
+import ConsoleLayout from "@/components/console/ConsoleLayout";
 import { getSystemConfig, getModels } from "@/lib/api";
 import { AIModel } from "@/lib/types";
 
@@ -103,8 +103,8 @@ export default function SettingsPage() {
   };
 
   return (
-    <LandingLayout>
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16">
+    <ConsoleLayout>
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
@@ -434,6 +434,6 @@ export default function SettingsPage() {
           </div>
         </form>
       </div>
-    </LandingLayout>
+    </ConsoleLayout>
   );
 }
