@@ -324,7 +324,7 @@ export default function SystemStatusPage() {
               <div className="flex justify-between py-1.5 border-b border-border/70">
                 <span className="text-muted-foreground">Application:</span>
                 <span className="font-mono font-bold text-foreground">
-                  {data?.runtime?.app_name || "MEND - X"} v{data?.runtime?.version || "3.0.0"}
+                  {data?.runtime?.app_name || "MEND - X"} v{data?.runtime?.version || "1.2.1"}
                 </span>
               </div>
               <div className="flex justify-between py-1.5 border-b border-border/70">

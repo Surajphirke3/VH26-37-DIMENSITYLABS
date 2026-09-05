@@ -157,7 +157,7 @@ export default function HomePage() {
             <span className="font-mono text-[10px] font-bold text-emerald-600 dark:text-emerald-400 tracking-widest uppercase">System Operational</span>
           </div>
           <span className="w-px h-4 bg-[var(--border)]" />
-          <span className="font-mono text-[10px] font-bold text-slate-500 tracking-widest uppercase">MEND-X Core v3.0.0</span>
+          <span className="font-mono text-[10px] font-bold text-slate-500 tracking-widest uppercase">MEND-X Core v1.2.1</span>
         </div>
 
         {/* Hero Headline */}

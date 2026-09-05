@@ -328,7 +328,7 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
               height={24}
               className="w-6 h-6 object-contain"
             />
-            <span className="font-bold text-[var(--text-primary)]">MEND-X v3.0.0</span>
+            <span className="font-bold text-[var(--text-primary)]">MEND-X v1.2.1</span>
             <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 border border-emerald-500/20 text-emerald-500">PROD</span>
           </div>
 

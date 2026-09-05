@@ -62,7 +62,7 @@ export default function LoginPage() {
         <div className="flex items-center gap-3">
           <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            CORE v3.0.0 · SYSTEM OPERATIONAL
+            CORE v1.2.1 · SYSTEM OPERATIONAL
           </div>
           <ThemeToggle />
         </div>

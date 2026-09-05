@@ -1,6 +1,6 @@
 {
   "name": "mend-x-frontend",
-  "version": "3.0.0",
+  "version": "1.2.1",
   "private": true,
   "scripts": {
     "dev": "next dev",

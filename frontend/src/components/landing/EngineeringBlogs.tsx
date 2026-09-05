@@ -57,7 +57,7 @@ export default function EngineeringBlogs() {
               {/* Fallback pattern if image is missing, though we use unsplash */}
               <div className="absolute inset-0 bg-slate-800" />
               {blog.img && (
-                <Image src={blog.img} alt={blog.title} fill className="object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out opacity-60 group-hover:opacity-100" />
+                <Image src={blog.img} alt={blog.title} fill unoptimized className="object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out opacity-60 group-hover:opacity-100" />
               )}
               {/* Tags absolute positioned */}
               <div className="absolute top-4 left-4 z-20 flex gap-2">
