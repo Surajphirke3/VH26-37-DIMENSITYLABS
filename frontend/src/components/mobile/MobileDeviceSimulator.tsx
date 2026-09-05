@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
+import Image from "next/image";
 import {
   Wifi,
   Battery,
@@ -560,8 +561,15 @@ export default function MobileDeviceSimulator({
                   {/* Tier 1: System Title, Status, Model Selector & Camera */}
                   <div className="px-3.5 py-2 bg-[#0c0f17] flex items-center justify-between border-b border-white/5">
                     <div className="flex items-center gap-2 min-w-0">
-                      <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-teal-500 to-indigo-600 flex items-center justify-center text-white font-black text-[11px] shadow-sm shrink-0">
-                        M
+                      <div className="w-7 h-7 rounded-xl p-1 bg-white/[0.08] border border-white/15 flex items-center justify-center shadow-md shrink-0">
+                        <Image
+                          src="/brand-icon-dark.png"
+                          alt="MEND-X App Logo"
+                          width={24}
+                          height={24}
+                          className="w-full h-full object-contain"
+                          priority
+                        />
                       </div>
                       <div className="leading-tight min-w-0">
                         <div className="flex items-center gap-1.5">
@@ -689,8 +697,17 @@ export default function MobileDeviceSimulator({
                   className={`flex flex-col ${msg.sender === "user" ? "items-end" : "items-start"} space-y-1`}
                 >
                   {/* Sender & Timestamp */}
-                  <span className="text-[9px] font-mono text-slate-500 px-1">
-                    {msg.sender === "user" ? "Technician" : "MEND-X AI Grounded"} · {msg.timestamp}
+                  <span className="text-[9px] font-mono text-slate-500 px-1 flex items-center gap-1.5">
+                    {msg.sender === "ai" && (
+                      <Image
+                        src="/brand-icon-dark.png"
+                        alt="MEND-X"
+                        width={12}
+                        height={12}
+                        className="w-3 h-3 object-contain inline-block shrink-0"
+                      />
+                    )}
+                    <span>{msg.sender === "user" ? "Technician" : "MEND-X AI Grounded"} · {msg.timestamp}</span>
                   </span>
 
                   {/* Bubble Content */}
@@ -885,8 +902,14 @@ export default function MobileDeviceSimulator({
                 {deviceSkin === "iphone" ? (
                   /* Authentic iOS Camera Permission Alert */
                   <div className="w-full max-w-[290px] rounded-[26px] bg-[#1a1e29]/95 border border-white/20 text-center shadow-[0_20px_60px_rgba(0,0,0,0.8)] p-5 space-y-4 backdrop-blur-2xl">
-                    <div className="w-13 h-13 mx-auto rounded-2xl bg-gradient-to-tr from-indigo-500 to-teal-400 flex items-center justify-center text-white shadow-lg">
-                      <Camera className="w-6 h-6 text-white" />
+                    <div className="w-12 h-12 mx-auto rounded-2xl bg-[#10131d] border border-white/15 flex items-center justify-center text-white shadow-lg p-2.5">
+                      <Image
+                        src="/brand-icon-dark.png"
+                        alt="MEND-X Field"
+                        width={36}
+                        height={36}
+                        className="w-full h-full object-contain"
+                      />
                     </div>
                     <div className="space-y-1.5">
                       <h3 className="text-sm font-bold text-white tracking-tight leading-snug">
@@ -1156,8 +1179,14 @@ export default function MobileDeviceSimulator({
                     {/* Header */}
                     <div className="p-4 border-b border-white/10 flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
-                        <div className="p-2 rounded-xl bg-teal-500/20 text-teal-400 border border-teal-500/30">
-                          <BookOpen className="w-4 h-4" />
+                        <div className="w-8 h-8 rounded-xl p-1.5 bg-teal-500/10 border border-teal-500/30 flex items-center justify-center shrink-0">
+                          <Image
+                            src="/brand-icon-dark.png"
+                            alt="MEND-X"
+                            width={22}
+                            height={22}
+                            className="w-full h-full object-contain"
+                          />
                         </div>
                         <div>
                           <h4 className="font-bold text-xs text-white">Grounded OEM Manuals</h4>
@@ -1267,11 +1296,22 @@ export default function MobileDeviceSimulator({
                 >
                   {/* Header */}
                   <div className="p-4 border-b border-white/10 flex items-center justify-between">
-                    <div>
-                      <h4 className="font-bold text-xs text-white">Select Industrial Equipment</h4>
-                      <span className="text-[10px] font-mono text-slate-400">
-                        Switch target machine for diagnostic queries & manual RAG
-                      </span>
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl p-1.5 bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center shrink-0">
+                        <Image
+                          src="/brand-icon-dark.png"
+                          alt="MEND-X"
+                          width={22}
+                          height={22}
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-xs text-white">Select Industrial Equipment</h4>
+                        <span className="text-[10px] font-mono text-slate-400">
+                          Switch target machine for diagnostic queries & manual RAG
+                        </span>
+                      </div>
                     </div>
                     <button
                       type="button"
