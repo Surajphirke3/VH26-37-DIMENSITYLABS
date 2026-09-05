@@ -7,7 +7,7 @@ import LandingLayout from "@/components/landing/LandingLayout";
 import { useTheme } from "@/lib/theme-context";
 
 interface ModelSpec {
-  name: "NORD" | "FORGE" | "APEX";
+  name: string;
   tierLabel: string;
   tagline: string;
   accentColor: string;
@@ -30,106 +30,176 @@ interface ModelSpec {
   };
 }
 
-const MODELS_DATA: Record<"NORD" | "FORGE" | "APEX", ModelSpec> = {
-  NORD: {
-    name: "NORD",
-    tierLabel: "TIER 01 · LOW LATENCY",
+type ModelTierKey = "AUTO" | "QWEN" | "MINI" | "GPT20B" | "GPT120B";
+
+const MODELS_DATA: Record<ModelTierKey, ModelSpec> = {
+  AUTO: {
+    name: "Auto Round-Robin",
+    tierLabel: "TIER 00 · RESILIENT MULTI-PROVIDER",
+    tagline: "Dynamic Failover: Ollama Cloud → Local → Groq",
+    accentColor: "#10b981",
+    accentBg: "rgba(16,185,129,0.08)",
+    accentBorder: "rgba(16,185,129,0.25)",
+    engine: "Ollama Cloud API / Local Ollama / Groq Fallback",
+    latency: "Adaptive (~400ms Cloud / ~2s Local)",
+    contextWindow: "128,000 tokens",
+    hardwareTarget: "Cloud GPU + Local Edge Hybrid",
+    logoLight: "/nord-light.png",
+    logoDark: "/nord-dark.png",
+    summary:
+      "Our most resilient inference setup. Dispatches queries to Ollama Cloud first for high throughput. If network drops or quotas exhaust, it gracefully cascades to your local Ollama daemon, followed by Groq as emergency backup.",
+    keyStrengths: [
+      "Zero downtime with automatic 3-tier round-robin fallback",
+      "Prioritizes fast cloud GPU inference when API key is present",
+      "Offline continuity with local Ollama runtime",
+      "Strips chain-of-thought tokens cleanly for valid JSON output",
+    ],
+    idealQueries: [
+      "Complex multi-machine error code diagnosis under fluctuating connectivity",
+      "Heavy maintenance procedure synthesis with zero downtime requirement",
+      "Offline-first industrial troubleshooting on factory floor gateways",
+      "Automated sensor telemetry and fault code correlation",
+    ],
+    deploymentSpecs: {
+      memory: "Hybrid / 8 GB RAM local minimum",
+      throughput: "300+ tokens/sec (Cloud) / 45 tokens/sec (Local)",
+      protocol: "OpenAI-compatible REST + Local Socket",
+      edgeReady: true,
+    },
+  },
+  QWEN: {
+    name: "Qwen 3.5 9B",
+    tierLabel: "TIER 01 · INDUSTRIAL WORKHORSE (OLLAMA)",
+    tagline: "High-Accuracy Structured Diagnostics & Multilingual Reasoning",
+    accentColor: "#06b6d4",
+    accentBg: "rgba(6,182,212,0.08)",
+    accentBorder: "rgba(6,182,212,0.25)",
+    engine: "Ollama Runtime / qwen3.5:9b",
+    latency: "800ms – 1.8s",
+    contextWindow: "32,768 tokens",
+    hardwareTarget: "Ollama Cloud API / Apple Silicon / On-Prem Workstation",
+    logoLight: "/forge-light.png",
+    logoDark: "/forge-dark.png",
+    summary:
+      "State-of-the-art open weights model running natively on Ollama Cloud and local machine. Excels at deep diagnostic logic, multilingual equipment manual synthesis, and rigorous JSON schema adherence.",
+    keyStrengths: [
+      "Native support on Ollama Cloud and local Ollama daemon",
+      "Superior technical multilingual understanding across European & Asian manuals",
+      "High reasoning fidelity with chain-of-thought stripping",
+      "Guaranteed JSON schema output for citation linking",
+    ],
+    idealQueries: [
+      "Siemens S120 infeed unit DC link pre-charging sequence and torque specs",
+      "Multilingual manual synthesis for Fanuc CNC alarm codes",
+      "Component isolation steps for hydraulic manifold pressure drops",
+      "Wiring schematic tracing with pinout confirmation",
+    ],
+    deploymentSpecs: {
+      memory: "6.6 GB VRAM / Ollama Native",
+      throughput: "120+ tokens/sec",
+      protocol: "Ollama HTTP API",
+      edgeReady: true,
+    },
+  },
+  MINI: {
+    name: "Compound Mini",
+    tierLabel: "TIER 01 · FAST EDGE / TRIAGE",
     tagline: "Instant Edge Triage & Error Code Matching",
     accentColor: "#3b82f6",
     accentBg: "rgba(59,130,246,0.08)",
     accentBorder: "rgba(59,130,246,0.25)",
-    engine: "Groq LPU / Llama 3.1 8B Instant",
+    engine: "Groq LPU / groq/compound-mini",
     latency: "< 100ms",
     contextWindow: "8,192 tokens",
     hardwareTarget: "Edge IPC, Siemens SIMATIC IPC, Raspberry Pi 5 CM4",
     logoLight: "/nord-light.png",
     logoDark: "/nord-dark.png",
     summary:
-      "Engineered for sub-second frontline operations where speed is paramount. NORD immediately resolves single-point error codes, binary status checks, and straightforward manual lookups directly on the factory line.",
+      "Engineered for sub-second frontline operations where speed is paramount. Resolves single-point error codes, binary status checks, and straightforward manual lookups directly on the factory line.",
     keyStrengths: [
       "Sub-100 millisecond response time",
-      "Runs on local edge hardware without cloud dependency",
+      "Ultra-low token latency on Groq LPU",
       "High-throughput concurrent polling for line controllers",
       "Deterministic error-code to manual page mapping",
     ],
     idealQueries: [
+      "Siemens SINAMICS G120 fault F001 meaning",
+      "PowerFlex 755 Fault 8 overspeed reset",
+      "Siemens S120 F030 overvoltage check",
       "Fanuc error SRVO-006 Hand broken",
-      "Haas VF-4 Alarm 102 meaning",
-      "KUKA KRC4 fuse rating for drive controller",
-      "Siemens S7-1500 LED red blink code 0x8090",
     ],
     deploymentSpecs: {
       memory: "8 GB RAM / 4-core Edge CPU",
-      throughput: "140+ tokens/sec",
-      protocol: "Local gRPC / Edge WebSocket",
+      throughput: "300+ tokens/sec",
+      protocol: "Groq LPU API / Edge WebSocket",
       edgeReady: true,
     },
   },
-  FORGE: {
-    name: "FORGE",
+  GPT20B: {
+    name: "GPT-OSS 20B",
     tierLabel: "TIER 02 · PRODUCTION WORKHORSE",
-    tagline: "Multi-Step Repair & Component Cross-Reference",
+    tagline: "Fast Multi-Step Procedures & Component Cross-Reference",
     accentColor: "#f59e0b",
     accentBg: "rgba(245,158,11,0.08)",
     accentBorder: "rgba(245,158,11,0.25)",
-    engine: "Google Gemini 2.0 Flash",
-    latency: "1.2s – 2.4s",
-    contextWindow: "1,000,000 tokens",
-    hardwareTarget: "Plant Floor Server, On-Prem Linux Workstation, Hybrid Cloud",
+    engine: "Groq LPU / openai/gpt-oss-20b",
+    latency: "1.0s – 1.8s",
+    contextWindow: "128,000 tokens",
+    hardwareTarget: "Plant Floor Gateway, On-Prem Linux Workstation",
     logoLight: "/forge-light.png",
     logoDark: "/forge-dark.png",
     summary:
-      "The heavy-duty core of MEND-X. FORGE interprets multi-page troubleshooting workflows, cross-references wiring schematics with physical part numbers, and formats step-by-step repair instructions for technicians.",
+      "The high-throughput diagnostic workhorse. Interprets multi-page troubleshooting workflows, cross-references wiring schematics with physical part numbers, and formats step-by-step repair instructions for technicians.",
     keyStrengths: [
-      "Massive multi-page context ingestion (entire chapter cross-referencing)",
+      "Massive multi-page context ingestion (128k context)",
       "Strict sequence ordering for maintenance procedures",
       "Extracts torque ratings, calibration tables, and tool requirements",
       "Pin-accurate wiring harness and connector trace analysis",
     ],
     idealQueries: [
-      "How to disassemble and repack Haas VF-4 spindle bearings",
-      "Step-by-step calibration procedure for KUKA axis 4 resolver",
-      "Siemens Profinet cyclic communication timeout troubleshooting",
+      "Step-by-step troubleshooting for Siemens G120 F001 overcurrent trip",
+      "PowerFlex 755 bus regulator calibration procedure",
+      "Siemens S120 infeed unit DC link pre-charging sequence",
       "Torque specs and gasket replacement order for hydraulic manifold",
     ],
     deploymentSpecs: {
       memory: "16 GB RAM / Hybrid Gateway",
-      throughput: "95 tokens/sec",
-      protocol: "Secure REST / SSE Stream",
+      throughput: "240+ tokens/sec",
+      protocol: "Groq LPU API / SSE Stream",
       edgeReady: true,
     },
   },
-  APEX: {
-    name: "APEX",
+  GPT120B: {
+    name: "GPT-OSS 120B",
     tierLabel: "TIER 03 · DEEP REASONING",
     tagline: "Root-Cause Analysis & Safety-Critical Diagnostics",
     accentColor: "#8b5cf6",
     accentBg: "rgba(139,92,246,0.08)",
     accentBorder: "rgba(139,92,246,0.25)",
-    engine: "Anthropic Claude Sonnet 3.5",
-    latency: "3.2s – 6.5s",
-    contextWindow: "200,000 tokens",
-    hardwareTarget: "High-Security Plant VPC / Isolated On-Prem Cluster",
+    engine: "Groq LPU / openai/gpt-oss-120b",
+    latency: "2.0s – 3.8s",
+    contextWindow: "128,000 tokens",
+    hardwareTarget: "High-Throughput Groq LPU Cluster",
     logoLight: "/apex-light.png",
     logoDark: "/apex-dark.png",
     summary:
-      "The pinnacle of industrial diagnostic intelligence. APEX activates for complex cascading faults, unknown multi-subsystem breakdowns, and safety-critical operations where any mistake risks catastrophic equipment failure or human injury.",
+      "The pinnacle of industrial diagnostic intelligence. Activates for complex cascading faults, cross-manual ambiguity, and safety-critical operations where any mistake risks catastrophic equipment failure or human injury.",
     keyStrengths: [
       "Rigorous deductive reasoning across multiple interconnected systems",
+      "Cross-manual disambiguation (e.g. G120 vs S120 identical fault codes)",
       "Mandatory hazard identification (arc-flash, thermal, pressure, chemical)",
-      "Synthesizes conflicting symptoms into verified root-cause hypotheses",
-      "Generates OSHA and ISO-compliant maintenance audit protocols",
+      "OSHA and ISO-compliant maintenance audit protocols",
     ],
     idealQueries: [
-      "Spindle seized with simultaneous encoder failure and bus under-voltage",
-      "Emergency shutdown sequence after coolant reservoir leak onto high-voltage bus",
+      "F001 on G120 vs S120: disambiguate power unit vs vector module behavior",
+      "Cascading DC bus fault with simultaneous motor encoder feedback loss",
       "Harmonic drive backlash with abnormal thermal expansion at full load",
-      "Comprehensive failure mode & effects analysis (FMEA) for robot arm collapse",
+      "Comprehensive failure mode & effects analysis (FMEA) for drive rack collapse",
     ],
     deploymentSpecs: {
-      memory: "Enterprise Cloud / Dedicated Secure GPU",
-      throughput: "65 tokens/sec",
-      protocol: "Mutual TLS 1.3 / Air-Gapped Option",
+      memory: "Enterprise Cloud / Dedicated Secure LPU",
+      throughput: "180+ tokens/sec",
+      protocol: "Groq LPU API / Zero Retention",
       edgeReady: false,
     },
   },
@@ -137,31 +207,31 @@ const MODELS_DATA: Record<"NORD" | "FORGE" | "APEX", ModelSpec> = {
 
 const SIMULATOR_PRESETS = [
   {
-    query: "Fanuc SRVO-006 alarm lookup",
-    machine: "Fanuc M20iA",
-    routedTo: "NORD" as const,
+    query: "Siemens G120 F001 overcurrent fault code lookup",
+    machine: "Siemens SINAMICS G120",
+    routedTo: "MINI" as const,
     complexityScore: 0.18,
     reasoning: "Keyword-exact fault code inquiry. Requires direct catalog retrieval without multi-step procedural synthesis. Instant edge response.",
   },
   {
-    query: "Haas VF-4 Spindle Overheat: Step-by-step chiller filter flush and thermistor pin test",
-    machine: "Haas VF-4 CNC",
-    routedTo: "FORGE" as const,
+    query: "PowerFlex 755 Fault 8: Step-by-step deceleration profile tuning and motor test",
+    machine: "Allen-Bradley PowerFlex 755",
+    routedTo: "GPT20B" as const,
     complexityScore: 0.58,
-    reasoning: "Multi-step mechanical maintenance procedure requiring sequential action items, tool specs, and component cross-referencing.",
+    reasoning: "Multi-step mechanical maintenance procedure requiring sequential action items, tool specs, and parameter verification.",
   },
   {
-    query: "Cascading bus fault and hydraulic pressure collapse with burning odor after power surge",
-    machine: "KUKA KR210 & Siemens S7",
-    routedTo: "APEX" as const,
+    query: "Disambiguate F030 overvoltage between SINAMICS G120 and S120 with cascading DC bus failure",
+    machine: "SINAMICS G120 & S120 Cross-Manual",
+    routedTo: "GPT120B" as const,
     complexityScore: 0.89,
-    reasoning: "Complex cross-subsystem incident involving electrical surge and physical hydraulic hazard. Requires root-cause deduction and safety PPE protocol.",
+    reasoning: "Complex cross-subsystem incident involving electrical surge and cross-manual code overlap. Requires root-cause deduction and safety PPE protocol.",
   },
 ];
 
 export default function ModelsPage() {
   const { theme } = useTheme();
-  const [selectedModel, setSelectedModel] = useState<"NORD" | "FORGE" | "APEX">("FORGE");
+  const [selectedModel, setSelectedModel] = useState<ModelTierKey>("AUTO");
   const [activePreset, setActivePreset] = useState(1);
   const activeSpec = MODELS_DATA[selectedModel];
   const sim = SIMULATOR_PRESETS[activePreset];
@@ -223,8 +293,8 @@ export default function ModelsPage() {
 
         {/* ─── Model Tier Switcher Tabs ─── */}
         <div className="flex justify-center mb-10">
-          <div className="p-1.5 rounded-2xl bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08] flex items-center gap-2">
-            {(["NORD", "FORGE", "APEX"] as const).map((mName) => {
+          <div className="p-1.5 rounded-2xl bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08] flex items-center gap-2 flex-wrap justify-center">
+            {(["AUTO", "QWEN", "MINI", "GPT20B", "GPT120B"] as const).map((mName) => {
               const item = MODELS_DATA[mName];
               const isSelected = selectedModel === mName;
               return (
@@ -521,9 +591,9 @@ export default function ModelsPage() {
               <thead>
                 <tr className="border-b border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-white/[0.02]">
                   <th className="p-4 font-mono font-bold text-slate-500">Metric / Capability</th>
-                  <th className="p-4 font-bold text-blue-600 dark:text-blue-400">NORD (Tier 01)</th>
-                  <th className="p-4 font-bold text-amber-600 dark:text-amber-400">FORGE (Tier 02)</th>
-                  <th className="p-4 font-bold text-violet-600 dark:text-violet-400">APEX (Tier 03)</th>
+                  <th className="p-4 font-bold text-blue-600 dark:text-blue-400">Compound Mini (Tier 01)</th>
+                  <th className="p-4 font-bold text-amber-600 dark:text-amber-400">GPT-OSS 20B (Tier 02)</th>
+                  <th className="p-4 font-bold text-violet-600 dark:text-violet-400">GPT-OSS 120B (Tier 03)</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-white/[0.05]">
@@ -535,21 +605,21 @@ export default function ModelsPage() {
                 </tr>
                 <tr>
                   <td className="p-4 font-medium text-slate-600 dark:text-slate-400">Base LLM Engine</td>
-                  <td className="p-4 font-mono text-slate-700 dark:text-slate-300">Llama 3.1 8B Instant (Groq)</td>
-                  <td className="p-4 font-mono text-slate-700 dark:text-slate-300">Google Gemini 2.0 Flash</td>
-                  <td className="p-4 font-mono text-slate-700 dark:text-slate-300">Claude Sonnet 3.5 (Anthropic)</td>
+                  <td className="p-4 font-mono text-slate-700 dark:text-slate-300">groq/compound-mini (Groq LPU)</td>
+                  <td className="p-4 font-mono text-slate-700 dark:text-slate-300">openai/gpt-oss-20b (Groq LPU)</td>
+                  <td className="p-4 font-mono text-slate-700 dark:text-slate-300">openai/gpt-oss-120b (Groq LPU)</td>
                 </tr>
                 <tr>
                   <td className="p-4 font-medium text-slate-600 dark:text-slate-400">Response Latency</td>
                   <td className="p-4 font-mono font-bold text-blue-600 dark:text-blue-400">&lt; 100ms</td>
-                  <td className="p-4 font-mono font-bold text-amber-600 dark:text-amber-400">1.2s – 2.4s</td>
-                  <td className="p-4 font-mono font-bold text-violet-600 dark:text-violet-400">3.2s – 6.5s</td>
+                  <td className="p-4 font-mono font-bold text-amber-600 dark:text-amber-400">1.0s – 1.8s</td>
+                  <td className="p-4 font-mono font-bold text-violet-600 dark:text-violet-400">2.0s – 3.8s</td>
                 </tr>
                 <tr>
                   <td className="p-4 font-medium text-slate-600 dark:text-slate-400">Context Window</td>
                   <td className="p-4 font-mono text-slate-700 dark:text-slate-300">8,192 tokens</td>
-                  <td className="p-4 font-mono text-slate-700 dark:text-slate-300">1,000,000 tokens</td>
-                  <td className="p-4 font-mono text-slate-700 dark:text-slate-300">200,000 tokens</td>
+                  <td className="p-4 font-mono text-slate-700 dark:text-slate-300">128,000 tokens</td>
+                  <td className="p-4 font-mono text-slate-700 dark:text-slate-300">128,000 tokens</td>
                 </tr>
                 <tr>
                   <td className="p-4 font-medium text-slate-600 dark:text-slate-400">Edge / Offline Capable</td>

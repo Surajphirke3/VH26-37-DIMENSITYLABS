@@ -20,31 +20,29 @@ class MachineDisambiguator:
     specify which machine they mean.
     """
 
-    def __init__(self, threshold: float = 0.3) -> None:
+    def __init__(self, threshold: float = 0.05) -> None:
         self.threshold = threshold
 
     def analyze(self, chunks: list, query_has_error_code: bool) -> DisambiguationResult:
         """
-        Inspect the top-10 chunks for multi-machine spread.
-        Ambiguity is only flagged when:
-          - the ambiguity score exceeds the threshold, AND
-          - more than one distinct machine is present, AND
-          - the query contains an error code (error codes are the most likely
-            source of cross-machine confusion).
+        Inspect retrieved chunks for multi-machine spread.
+        Ambiguity is flagged when:
+          - more than one distinct machine is present in the top chunks, AND
+          - the query contains an error code (or ambiguity threshold exceeded).
         """
         if not chunks:
             return DisambiguationResult(False, 0.0, None, [])
 
-        window = chunks[:10]
+        window = chunks[:20]
         machine_counts: Counter = Counter(str(c.machine_id) for c in window)
         total = sum(machine_counts.values())
         dominant_str, dominant_count = machine_counts.most_common(1)[0]
-        ambiguity_score = 1.0 - (dominant_count / total)
+        ambiguity_score = 1.0 - (dominant_count / total) if total > 0 else 0.0
 
+        # Trigger disambiguation if 2 or more machines have matched chunks for an error code query
         is_ambiguous = (
-            ambiguity_score > self.threshold
-            and len(machine_counts) > 1
-            and query_has_error_code
+            len(machine_counts) > 1
+            and (query_has_error_code or ambiguity_score >= self.threshold)
         )
 
         # Build at most 5 unique machine options from the window
@@ -57,7 +55,7 @@ class MachineDisambiguator:
                 options.append({
                     "machine_id": mid,
                     "machine_name": chunk.machine_name,
-                    "snippet": chunk.content[:200].strip(),
+                    "snippet": chunk.content[:250].strip(),
                 })
 
         dominant_id = UUID(dominant_str) if not is_ambiguous else None

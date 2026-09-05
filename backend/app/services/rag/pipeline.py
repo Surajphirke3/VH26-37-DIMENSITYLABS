@@ -90,7 +90,7 @@ class RAGPipeline:
             else:
                 resolved_model = router.resolve_model(task="balanced_troubleshooting", explicit_model=model)
         else:
-            resolved_model = model or "llama-3.3-70b-versatile"
+            resolved_model = model or settings.GROQ_MODEL
 
         # Guardrail: input validation
         guardrails = getattr(self, "guardrails", None)

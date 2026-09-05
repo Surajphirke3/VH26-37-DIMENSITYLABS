@@ -252,7 +252,7 @@ export default function SystemStatusPage() {
               <div className="flex justify-between py-1.5 border-b border-border/70">
                 <span className="text-muted-foreground">Default Model:</span>
                 <span className="font-mono font-bold text-amber-500">
-                  {data?.groq?.default_model || "llama-3.3-70b-versatile"}
+                  {data?.groq?.default_model || "openai/gpt-oss-120b"}
                 </span>
               </div>
               <div className="flex justify-between py-1.5 border-b border-border/70">
@@ -267,7 +267,7 @@ export default function SystemStatusPage() {
               </div>
               <div className="flex justify-between py-1.5">
                 <span className="text-muted-foreground">Vision Preview:</span>
-                <span className="font-mono text-foreground">Enabled (llama-3.2-11b)</span>
+                <span className="font-mono text-foreground">Multimodal (Text-Grounded)</span>
               </div>
             </div>
           </div>

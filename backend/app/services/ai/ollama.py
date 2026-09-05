@@ -1,8 +1,18 @@
 from __future__ import annotations
 
+import re
 import httpx
 
 from app.services.ai.base import EmbeddingProvider, LLMProvider
+
+# Qwen3 and similar reasoning models wrap chain-of-thought in <think>…</think>.
+# Strip those tags so we only parse the actual JSON output.
+_THINK_RE = re.compile(r"<think>.*?</think>", re.DOTALL | re.IGNORECASE)
+
+
+def _strip_think(text: str) -> str:
+    """Remove Qwen3 / reasoning-model <think> blocks from output."""
+    return _THINK_RE.sub("", text).strip()
 
 
 class OllamaLLM(LLMProvider):
@@ -11,16 +21,16 @@ class OllamaLLM(LLMProvider):
         self._model = model
 
     async def generate(self, prompt: str) -> str:
-        async with httpx.AsyncClient(timeout=120) as client:
+        async with httpx.AsyncClient(timeout=180) as client:
             resp = await client.post(
                 f"{self._base_url}/api/generate",
                 json={"model": self._model, "prompt": prompt, "stream": False},
             )
             resp.raise_for_status()
-            return resp.json()["response"]
+            return _strip_think(resp.json()["response"])
 
     async def generate_json(self, prompt: str) -> str:
-        async with httpx.AsyncClient(timeout=120) as client:
+        async with httpx.AsyncClient(timeout=180) as client:
             resp = await client.post(
                 f"{self._base_url}/api/generate",
                 json={
@@ -31,7 +41,7 @@ class OllamaLLM(LLMProvider):
                 },
             )
             resp.raise_for_status()
-            return resp.json()["response"]
+            return _strip_think(resp.json()["response"])
 
 
 class OllamaEmbedding(EmbeddingProvider):
@@ -50,3 +60,12 @@ class OllamaEmbedding(EmbeddingProvider):
 
     async def embed_query(self, text: str) -> list[float]:
         return await self.embed_text(text)
+
+    async def embed_batch(self, texts: list[str]) -> list[list[float]]:
+        if not texts:
+            return []
+        results = []
+        for text in texts:
+            results.append(await self.embed_text(text))
+        return results
+

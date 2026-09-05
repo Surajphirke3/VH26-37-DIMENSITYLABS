@@ -52,25 +52,47 @@ class HybridRetriever:
         machine_id: UUID | None,
         top_k: int,
     ) -> list[tuple[UUID, float]]:
-        """Query ChromaDB using Cosine Similarity."""
+        """Query pgvector in PostgreSQL using Cosine Similarity (with fallback to ChromaDB)."""
+        target_uuid = None
+        if machine_id:
+            if isinstance(machine_id, UUID):
+                target_uuid = machine_id
+            else:
+                try:
+                    target_uuid = UUID(str(machine_id))
+                except (ValueError, TypeError):
+                    target_uuid = None
+
         try:
-            # Run blocking chroma search in thread pool or keep synchronous for now since it's local
+            emb_str = "[" + ",".join(str(x) for x in embedding) + "]"
+            machine_filter = "AND machine_id = :machine_id" if target_uuid else ""
+            sql = text(f"""
+                SELECT id, 1 - (embedding <=> CAST(:emb AS vector)) as similarity
+                FROM chunks
+                WHERE embedding IS NOT NULL {machine_filter}
+                ORDER BY embedding <=> CAST(:emb AS vector)
+                LIMIT :top_k
+            """)
+            params = {"emb": emb_str, "top_k": top_k}
+            if target_uuid:
+                params["machine_id"] = target_uuid
+            res = await self.db.execute(sql, params)
+            rows = res.fetchall()
+            if rows:
+                return [(row[0], float(row[1])) for row in rows]
+        except Exception as exc:
+            logger.warning("retriever.pgvector_search.failed", error=str(exc))
+
+        # Fallback to ChromaDB if Postgres vector search fails or is empty
+        try:
             res = ChromaRepository.similarity_search(
                 query_embedding=embedding,
                 top_k=top_k,
-                machine_id=machine_id
+                machine_id=target_uuid,
             )
-
             ids = res.get("ids", [[]])[0]
             distances = res.get("distances", [[]])[0]
-
-            scored_results = []
-            for i, chunk_id in enumerate(ids):
-                # ChromaDB returns cosine distance. similarity = 1 - distance
-                similarity = 1.0 - float(distances[i])
-                scored_results.append((UUID(chunk_id), similarity))
-
-            return scored_results
+            return [(UUID(chunk_id), 1.0 - float(distances[i])) for i, chunk_id in enumerate(ids)]
         except Exception as exc:
             logger.error("retriever.vector_search.failed", error=str(exc))
             return []
@@ -81,23 +103,56 @@ class HybridRetriever:
         machine_id: UUID | None,
         top_k: int,
     ) -> list[tuple[UUID, float]]:
-        """Postgres TSVector keyword search."""
-        machine_filter = "AND c.machine_id = :machine_id" if machine_id else ""
+        """Postgres TSVector keyword search with websearch syntax."""
+        target_uuid = None
+        if machine_id:
+            if isinstance(machine_id, UUID):
+                target_uuid = machine_id
+            else:
+                try:
+                    target_uuid = UUID(str(machine_id))
+                except (ValueError, TypeError):
+                    target_uuid = None
+
+        machine_filter = "AND c.machine_id = :machine_id" if target_uuid else ""
         sql = text(f"""
             SELECT c.id,
                    ts_rank(to_tsvector('english', c.content),
-                           plainto_tsquery('english', :query)) AS score
+                           websearch_to_tsquery('english', :query)) AS score
             FROM chunks c
             WHERE to_tsvector('english', c.content)
-                  @@ plainto_tsquery('english', :query) {machine_filter}
+                  @@ websearch_to_tsquery('english', :query) {machine_filter}
             ORDER BY score DESC
             LIMIT :top_k
         """)
         params: dict = {"query": query, "top_k": top_k}
-        if machine_id:
-            params["machine_id"] = str(machine_id)
-        result = await self.db.execute(sql, params)
-        return [(row[0], row[1]) for row in result.fetchall()]
+        if target_uuid:
+            params["machine_id"] = target_uuid
+        try:
+            result = await self.db.execute(sql, params)
+            rows = result.fetchall()
+            if rows:
+                return [(row[0], float(row[1])) for row in rows]
+        except Exception as exc:
+            logger.debug("retriever.keyword_search.websearch_fallback", error=str(exc))
+
+        # Fallback to plainto_tsquery if websearch syntax fails
+        try:
+            fallback_sql = text(f"""
+                SELECT c.id,
+                       ts_rank(to_tsvector('english', c.content),
+                               plainto_tsquery('english', :query)) AS score
+                FROM chunks c
+                WHERE to_tsvector('english', c.content)
+                      @@ plainto_tsquery('english', :query) {machine_filter}
+                ORDER BY score DESC
+                LIMIT :top_k
+            """)
+            result = await self.db.execute(fallback_sql, params)
+            return [(row[0], float(row[1])) for row in result.fetchall()]
+        except Exception as exc:
+            logger.warning("retriever.keyword_search.failed", error=str(exc))
+            return []
 
     def _rrf_fuse(
         self,

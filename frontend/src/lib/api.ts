@@ -26,8 +26,17 @@ async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> 
     if (typeof window !== "undefined") {
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
-      const isPublicPage = ["/", "/problem", "/models", "/architecture", "/workflow", "/help"].some(
-        (p) => window.location.pathname === p || window.location.pathname.startsWith("/models")
+      const isPublicPage = [
+        "/",
+        "/problem",
+        "/models",
+        "/architecture",
+        "/workflow",
+        "/help",
+        "/inspector",
+        "/demo",
+      ].some(
+        (p) => window.location.pathname === p || window.location.pathname.startsWith("/models") || window.location.pathname.startsWith("/inspector") || window.location.pathname.startsWith("/demo")
       );
       if (!isPublicPage && window.location.pathname !== "/login") {
         window.location.href = "/login";
@@ -211,6 +220,23 @@ export const singleQuery = (
 export const createConversation = (): Promise<{ conversation_id: string; session_id: string }> =>
   apiFetch("/api/v1/conversations", { method: "POST", body: JSON.stringify({}) });
 
+export interface ConversationItem {
+  id: string;
+  conversation_id: string;
+  title: string;
+  machine_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export const listConversations = async (): Promise<ConversationItem[]> => {
+  const res = await apiFetch<{ success: boolean; data: ConversationItem[] }>("/api/v1/conversations");
+  return Array.isArray(res) ? res : res?.data ?? [];
+};
+
+export const deleteConversation = (conversationId: string): Promise<{ success: boolean; data: { deleted: string } }> =>
+  apiFetch(`/api/v1/conversations/${conversationId}`, { method: "DELETE" });
+
 // backend: {success, data: TroubleshootingResponse + conversation_id + message_id}
 export const sendMessage = (
   conversationId: string,
@@ -248,6 +274,7 @@ export const getConversationMessages = (conversationId: string): Promise<{
     id: string;
     role: "user" | "assistant";
     content: string;
+    response?: TroubleshootingResponse | null;
     answer_type: string | null;
     confidence_level: string | null;
     evidence_score: number | null;
@@ -255,3 +282,4 @@ export const getConversationMessages = (conversationId: string): Promise<{
     created_at: string;
   }>;
 }> => apiFetch(`/api/v1/conversations/${conversationId}/messages`);
+

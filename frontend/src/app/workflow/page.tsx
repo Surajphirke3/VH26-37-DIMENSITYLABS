@@ -35,7 +35,7 @@ const WORKFLOW_STAGES = [
     stage: "Field Technician Workflow",
     actor: "Maintenance Technician",
     time: "<8 seconds per query",
-    desc: "Technician encounters fault, enters error code or symptom description. MEND-X tri-tier routing (NORD/FORGE/APEX) returns cited repair protocol.",
+    desc: "Technician encounters fault, enters error code or symptom description. MEND-X dynamic Groq LPU routing returns cited repair protocol.",
     tasks: [
       "Observe machine fault (alarm, error code, symptom)",
       "Open MEND-X mobile app or terminal",
@@ -81,7 +81,7 @@ const INTEGRATION_POINTS = [
   {
     system: "Mobile Apps & Tablets",
     connection: "Field technician interface",
-    desc: "Native iOS/Android apps with QR code scanning, voice input, offline mode (NORD tier). Ruggedized tablet support.",
+    desc: "Native iOS/Android apps with QR code scanning, voice input, and fast edge mode. Ruggedized tablet support.",
     protocols: ["REST API", "WebSocket", "Progressive Web App", "Offline sync"]
   }
 ];
@@ -143,7 +143,7 @@ const DEPLOYMENT_SCENARIOS = [
     title: "Aerospace Manufacturing",
     scale: "12 test rigs, flight-critical systems",
     challenge: "DO-254 compliance, complex hydraulic diagnostics",
-    deployment: "Air-gapped network, APEX tier for safety-critical analysis",
+    deployment: "Air-gapped or dedicated VPC, GPT-OSS 120B tier for safety-critical analysis",
     outcome: "99.7% compliance audit pass rate, 6.5h → 9min fault isolation"
   },
   {
@@ -159,9 +159,9 @@ const TRACE_SIMULATION = [
   { timestamp: "14:23:01.045", system: "SCADA", event: "Alarm received: KUKA-KR210-CELL4 → ERR-792 (Servo overcurrent Axis 4)" },
   { timestamp: "14:23:01.112", system: "MEND-X", event: "Query ingestion: machine_id='kuka_kr210_cell_4', fault_code='ERR-792'" },
   { timestamp: "14:23:01.156", system: "pgvector", event: "ANN search: 3 matches found (cosine similarity ≥ 0.72)" },
-  { timestamp: "14:23:01.203", system: "NORD", event: "Edge inference: 67ms → 'Servo drive fault, proceed to FORGE tier'" },
-  { timestamp: "14:23:01.298", system: "FORGE", event: "Gemini 2.0 Flash: Multi-step procedure generation..." },
-  { timestamp: "14:23:02.891", system: "FORGE", event: "Response: Replace IGBT module, Axis 4. Torque: 3.2Nm. Recalibrate via KRC4." },
+  { timestamp: "14:23:01.203", system: "Mini", event: "Edge inference: 67ms → 'Servo drive fault, proceed to diagnostic tier'" },
+  { timestamp: "14:23:01.298", system: "GPT-OSS", event: "Groq LPU: Multi-step procedure generation..." },
+  { timestamp: "14:23:02.891", system: "GPT-OSS", event: "Response: Replace IGBT module, Axis 4. Torque: 3.2Nm. Recalibrate via KRC4." },
   { timestamp: "14:23:02.934", system: "Mobile App", event: "Technician receives protocol with 3 OEM manual citations" },
   { timestamp: "14:31:14.782", system: "Technician", event: "Repair completed, production line resumed" },
 ];
@@ -414,7 +414,7 @@ export default function WorkflowPage() {
                           animationFillMode: "forwards"
                         }}
                       >
-                        <span className="text-slate-500">{entry.timestamp}</span> <span className={`font-semibold ${entry.system === 'SCADA' ? 'text-rose-400' : entry.system === 'MEND-X' ? 'text-cyan-400' : entry.system === 'pgvector' ? 'text-blue-400' : entry.system === 'NORD' ? 'text-indigo-400' : entry.system === 'FORGE' ? 'text-amber-400' : entry.system === 'Mobile App' ? 'text-green-400' : 'text-emerald-400'}`}>[{entry.system}]</span> <span className="text-white/90">{entry.event}</span>
+                        <span className="text-slate-500">{entry.timestamp}</span> <span className={`font-semibold ${entry.system === 'SCADA' ? 'text-rose-400' : entry.system === 'MEND-X' ? 'text-cyan-400' : entry.system === 'pgvector' ? 'text-blue-400' : entry.system === 'Mini' ? 'text-indigo-400' : entry.system === 'GPT-OSS' ? 'text-amber-400' : entry.system === 'Mobile App' ? 'text-green-400' : 'text-emerald-400'}`}>[{entry.system}]</span> <span className="text-white/90">{entry.event}</span>
                       </div>
                     ))}
 

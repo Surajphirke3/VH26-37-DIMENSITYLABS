@@ -128,7 +128,7 @@ export default function LoginPage() {
                 </div>
                 <div>
                   <div className="text-slate-400 text-[10px] uppercase">Model Latency</div>
-                  <div className="text-cyan-400 font-bold mt-0.5">&lt;100ms (NORD)</div>
+                  <div className="text-cyan-400 font-bold mt-0.5">&lt;100ms (Groq LPU)</div>
                 </div>
                 <div>
                   <div className="text-slate-400 text-[10px] uppercase">Supported OEMs</div>

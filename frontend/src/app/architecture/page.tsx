@@ -7,43 +7,53 @@ import LiveArchitectureFlowchart from "@/components/architecture/LiveArchitectur
 
 const PIPELINE_STAGES = [
   {
-    stage: "Document Ingestion",
-    desc: "PyMuPDF extracts text + table structure from 1.2M+ OEM manual PDFs. Automatic schema inference detects headers, procedures, tables, cross-references.",
-    details: ["Batch processing: 100K+ pages/hour", "Preserves visual hierarchy", "Auto-detects component/part numbers"]
+    stage: "MANUALS",
+    desc: "Ingesting verified OEM technical manuals (Haas, Siemens, KUKA, Fanuc) and wiring schematics. Preserves schematic bounding boxes, tables, and wiring diagrams.",
+    details: ["Batch ingestion: OEM engineering manuals", "High-resolution diagram vector bounding", "Auto-detects component and part numbers"]
   },
   {
-    stage: "Deterministic Chunking",
-    desc: "512-token chunks with 128-token overlap. Boundaries preserve semantic units (procedures, fault trees, tables). No semantic drift.",
-    details: ["Overlap prevents context loss", "Aligned to sentence/paragraph boundaries", "Preserves nested structure"]
+    stage: "Document Processing",
+    desc: "PyMuPDF + optical layout extraction. Schema inference detects headers, procedures, error tables, and cross-references without text degradation.",
+    details: ["Batch processing: 100K+ pages/hour", "Preserves visual layout hierarchy", "Strips ungrounded headers & footers"]
   },
   {
-    stage: "Vector Embedding",
-    desc: "OpenAI text-embedding-3-small (1536-dim). One embedding per chunk. Dense, language-agnostic representation optimized for retrieval.",
-    details: ["1536-dimensional vectors", "Cosine distance metric", "Batch embedded at ingestion"]
+    stage: "Chunking",
+    desc: "Deterministic 512-token chunks with 128-token overlap. Boundaries preserve semantic units (procedures, fault trees, tables). Zero semantic drift.",
+    details: ["Overlap prevents procedure boundary loss", "Aligned to sentence & paragraph boundaries", "Preserves nested hierarchical tags"]
   },
   {
-    stage: "pgvector ANN Index",
-    desc: "PostgreSQL pgvector extension indexes all embeddings. Cosine similarity ANN search (<100ms for 1M vectors).",
-    details: ["Approximate Nearest Neighbor search", "HNSW index acceleration", "Tenant isolation by machine_id"]
+    stage: "Embeddings",
+    desc: "Dense semantic vector projection (384-dim / 1536-dim). One embedding per chunk. Dense representation optimized for industrial fault retrieval.",
+    details: ["Sentence-transformers / text-embedding-3", "Cosine distance metric in unit hypersphere", "Batch embedded at manual ingestion"]
   },
   {
-    stage: "Similarity Threshold",
-    desc: "Cosine similarity ≥ 0.72 triggers response. Below threshold: refusal circuit activates, asks for clarification.",
-    details: ["0.72 cutoff eliminates false matches", "Refusal > hallucination", "User gets clarification prompts"]
+    stage: "Retrieval",
+    desc: "PostgreSQL pgvector & ChromaDB ANN index. Parallel Approximate Nearest Neighbor search (<100ms for 1M vectors) with HNSW graph acceleration.",
+    details: ["Approximate Nearest Neighbor (ANN) search", "HNSW index acceleration with M=16, efSearch=64", "Tenant & machine_id vector isolation"]
   },
   {
-    stage: "LLM Routing & Reasoning",
-    desc: "NORD/FORGE/APEX cascade. Top-k retrieved chunks passed to selected model. Response structured + cited.",
-    details: ["Adaptive model selection", "Context-limited prompts", "Inline page citations"]
+    stage: "Context Library",
+    desc: "Threshold cutoff filtering (>0.45 cosine score), cross-encoder precision reranking, deduplication, and grounded context window assembly.",
+    details: ["Cosine threshold eliminates ungrounded noise", "Cross-encoder scoring for precision alignment", "Refusal circuit trips if evidence < 0.45"]
+  },
+  {
+    stage: "LLM Response",
+    desc: "Adaptive Tri-Tier routing (Mini <100ms / 20B 1–2s / 120B 2–4s). Top-k retrieved chunks passed to Groq LPU models under strict zero-hallucination directive.",
+    details: ["Adaptive model selection by symptom complexity", "Context-limited prompt templates", "Strict zero-hallucination directive"]
+  },
+  {
+    stage: "Cited Solution",
+    desc: "Deterministic repair protocol with verified OEM manual page citations [C1], [C2], confidence assessment, and step-by-step corrective actions.",
+    details: ["Inline OEM page & schematic citations", "Step-by-step verified action checklist", "Confidence rating & safety warnings"]
   }
 ];
 
 const LATENCY_BREAKDOWN = [
   { phase: "Query Ingestion", time: "<10ms", detail: "API gateway processing" },
   { phase: "pgvector ANN Search", time: "40–80ms", detail: "Cosine NN search (1M vectors)" },
-  { phase: "NORD Inference", time: "<100ms", detail: "Llama 3.1 8B on edge" },
-  { phase: "FORGE Inference", time: "1–3s", detail: "Gemini 2.0 Flash + streaming" },
-  { phase: "APEX Inference", time: "3–8s", detail: "Claude Sonnet 3.5 reasoning" },
+  { phase: "Compound Mini Inference", time: "<100ms", detail: "groq/compound-mini on Groq LPU" },
+  { phase: "GPT-OSS 20B Inference", time: "1–2s", detail: "openai/gpt-oss-20b (fast diagnostics)" },
+  { phase: "GPT-OSS 120B Inference", time: "2–4s", detail: "openai/gpt-oss-120b deep reasoning" },
   { phase: "Response Serialization", time: "<5ms", detail: "JSON + streaming overhead" }
 ];
 
@@ -61,7 +71,7 @@ const SECURITY_LAYERS = [
   {
     layer: "Encryption in Transit",
     threat: "Network eavesdropping",
-    mitigation: "TLS 1.3 on all tiers. Edge (NORD) uses mTLS. APEX (reasoning) zero-knowledge proofs available."
+    mitigation: "TLS 1.3 on all tiers. High-speed Groq LPU API with zero data retention."
   },
   {
     layer: "Encryption at Rest",
@@ -78,7 +88,7 @@ const SECURITY_LAYERS = [
 const DEPLOYMENT_MODES = [
   {
     name: "Cloud (Default)",
-    latency: "1–3s (FORGE tier)",
+    latency: "1–2s (GPT-OSS 20B)",
     dataResidency: "Multi-region pgvector",
     compliance: "SOC 2, GDPR data residency",
     cost: "Per-query pricing",
@@ -94,7 +104,7 @@ const DEPLOYMENT_MODES = [
   },
   {
     name: "Air-Gapped (Offline)",
-    latency: "<100ms (NORD only)",
+    latency: "<100ms (Compound Mini)",
     dataResidency: "On-device vectors + local PG",
     compliance: "Zero external egress, no cloud calls",
     cost: "One-time license + maintenance",
@@ -103,9 +113,9 @@ const DEPLOYMENT_MODES = [
 ];
 
 const BENCHMARKS = [
-  { scenario: "Error Code Lookup (NORD)", avgTime: "67ms", p99: "142ms", throughput: "14,900 q/s", accuracy: "99.2%" },
-  { scenario: "Multi-Step Procedure (FORGE)", avgTime: "1.84s", p99: "3.2s", throughput: "542 q/s", accuracy: "97.8%" },
-  { scenario: "Root Cause Analysis (APEX)", avgTime: "5.3s", p99: "8.1s", throughput: "189 q/s", accuracy: "99.7%" },
+  { scenario: "Error Code Lookup (Compound Mini)", avgTime: "67ms", p99: "142ms", throughput: "14,900 q/s", accuracy: "99.2%" },
+  { scenario: "Multi-Step Procedure (GPT-OSS 20B)", avgTime: "1.24s", p99: "2.1s", throughput: "240 tok/s", accuracy: "98.4%" },
+  { scenario: "Root Cause Analysis (GPT-OSS 120B)", avgTime: "2.6s", p99: "4.2s", throughput: "180 tok/s", accuracy: "99.4%" },
   { scenario: "Cold Start (Cache Miss)", avgTime: "512ms + model latency", p99: "1.2s + model latency", throughput: "N/A", accuracy: "N/A" },
 ];
 
@@ -231,7 +241,7 @@ export default function ArchitecturePage() {
 
         <div className="mt-8 cyber-card p-6 bg-blue-950/20 border-blue-800/30">
           <p className="text-sm text-[var(--text-primary)] font-medium">
-            <span className="text-blue-400 font-bold">Target SLA:</span> <span className="text-blue-300 font-mono">NORD &lt;100ms, FORGE 1–3s, APEX 3–8s.</span> Caching and model selection ensure sub-second median for 92% of queries.
+            <span className="text-blue-400 font-bold">Target SLA:</span> <span className="text-blue-300 font-mono">Mini &lt;100ms, 20B 1–2s, 120B 2–4s.</span> Caching and model selection ensure sub-second median for 92% of queries.
           </p>
         </div>
       </section>

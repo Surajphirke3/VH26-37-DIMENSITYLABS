@@ -21,12 +21,17 @@ import {
   Zap,
   ShieldCheck,
   CheckCircle2,
+  Monitor,
+  Smartphone,
+  Columns,
+  Trash2,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
-import { getMachines, createConversation } from "@/lib/api";
+import { getMachines, createConversation, listConversations, deleteConversation } from "@/lib/api";
 import type { Machine } from "@/lib/types";
 import MachineSelector from "@/components/chat/MachineSelector";
 import ChatInterface from "@/components/chat/ChatInterface";
+import MobileDeviceSimulator from "@/components/mobile/MobileDeviceSimulator";
 import Spinner from "@/components/ui/Spinner";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import { useTheme } from "@/lib/theme-context";
@@ -74,6 +79,7 @@ export default function DashboardPage() {
   const [conversations, setConversations] = useState<ConvEntry[]>([]);
   const [activeConvId, setActiveConvId] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [viewMode, setViewMode] = useState<"desktop" | "mobile" | "split">("desktop");
 
   useEffect(() => {
     if (!authLoading && !user) router.replace("/login");
@@ -82,8 +88,38 @@ export default function DashboardPage() {
   useEffect(() => {
     if (user) {
       getMachines().then(setMachines).catch(console.error);
+
+      listConversations()
+        .then((items) => {
+          if (items && items.length > 0) {
+            const mapped: ConvEntry[] = items.map((item) => ({
+              id: item.id || item.conversation_id,
+              label: item.title || "Diagnostic Session",
+            }));
+            setConversations(mapped);
+
+            const savedConvId = typeof window !== "undefined" ? localStorage.getItem("mendx_active_conv") : null;
+            if (savedConvId && mapped.some((c) => c.id === savedConvId)) {
+              setActiveConvId(savedConvId);
+            } else if (mapped.length > 0) {
+              setActiveConvId(mapped[0].id);
+            }
+          }
+        })
+        .catch(console.error);
     }
   }, [user]);
+
+  const selectConversation = (id: string | null) => {
+    setActiveConvId(id);
+    if (typeof window !== "undefined") {
+      if (id) {
+        localStorage.setItem("mendx_active_conv", id);
+      } else {
+        localStorage.removeItem("mendx_active_conv");
+      }
+    }
+  };
 
   const startNewConversation = async (machine?: Machine): Promise<string | null> => {
     try {
@@ -91,13 +127,29 @@ export default function DashboardPage() {
       const conv = await createConversation();
       const label = machine
         ? `${machine.name} Session`
-        : `Session ${conversations.length + 1}`;
-      setConversations((prev) => [...prev, { id: conv.conversation_id, label }]);
-      setActiveConvId(conv.conversation_id);
+        : `Diagnostic Session ${conversations.length + 1}`;
+      const newEntry = { id: conv.conversation_id, label };
+      setConversations((prev) => [newEntry, ...prev.filter((c) => c.id !== conv.conversation_id)]);
+      selectConversation(conv.conversation_id);
       return conv.conversation_id;
     } catch (err) {
       console.error("Failed to create conversation", err);
       return null;
+    }
+  };
+
+  const handleDeleteConversation = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    try {
+      await deleteConversation(id);
+      setConversations((prev) => prev.filter((c) => c.id !== id));
+      if (activeConvId === id) {
+        const remaining = conversations.filter((c) => c.id !== id);
+        const nextId = remaining.length > 0 ? remaining[0].id : null;
+        selectConversation(nextId);
+      }
+    } catch (err) {
+      console.error("Failed to delete conversation", err);
     }
   };
 
@@ -263,36 +315,48 @@ export default function DashboardPage() {
               </button>
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-1 overflow-y-auto max-h-[300px]">
               {conversations.length === 0 ? (
                 <div className="px-3 py-4 text-center text-[11px] text-slate-400 dark:text-slate-500">
                   No active sessions. Click &apos;+ New&apos; or pick a quick start below.
                 </div>
               ) : (
                 conversations.map((c) => (
-                  <button
+                  <div
                     key={c.id}
-                    onClick={() => setActiveConvId(c.id)}
-                    className={`w-full text-left px-3 py-2 rounded-xl text-xs transition-all duration-200 truncate flex items-center justify-between group ${
+                    onClick={() => selectConversation(c.id)}
+                    className={`w-full text-left px-3 py-2 rounded-xl text-xs transition-all duration-200 truncate flex items-center justify-between group cursor-pointer ${
                       activeConvId === c.id
                         ? "bg-indigo-600 text-white font-bold shadow-sm"
                         : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/[0.04]"
                     }`}
                   >
-                    <div className="flex items-center gap-2 truncate">
+                    <div className="flex items-center gap-2 truncate min-w-0">
                       <span
-                        className={`w-1.5 h-1.5 rounded-full ${
+                        className={`w-1.5 h-1.5 rounded-full shrink-0 ${
                           activeConvId === c.id ? "bg-white" : "bg-emerald-500"
                         }`}
                       />
                       <span className="truncate">{c.label}</span>
                     </div>
-                    <ChevronRight
-                      className={`w-3 h-3 shrink-0 ${
-                        activeConvId === c.id ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-                      }`}
-                    />
-                  </button>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        type="button"
+                        onClick={(e) => handleDeleteConversation(e, c.id)}
+                        className={`p-1 rounded opacity-0 group-hover:opacity-100 hover:bg-black/20 transition-opacity ${
+                          activeConvId === c.id ? "text-white/80 hover:text-white" : "text-slate-400 hover:text-rose-500"
+                        }`}
+                        title="Delete Session"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                      <ChevronRight
+                        className={`w-3 h-3 ${
+                          activeConvId === c.id ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                        }`}
+                      />
+                    </div>
+                  </div>
                 ))
               )}
             </div>
@@ -361,9 +425,21 @@ export default function DashboardPage() {
                 <h1 className="text-sm font-bold tracking-tight text-[var(--text-primary)]">
                   Diagnostics Control Workspace
                 </h1>
-                {selectedMachine && (
-                  <span className="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
-                    {selectedMachine.name}
+                {selectedMachine ? (
+                  <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
+                    <span>{selectedMachine.name}</span>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedMachine(null)}
+                      className="hover:text-rose-500 transition-colors ml-0.5"
+                      title="Clear machine filter (Search across all machines)"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ) : (
+                  <span className="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                    ALL EQUIPMENT (UNPINNED)
                   </span>
                 )}
               </div>
@@ -371,12 +447,57 @@ export default function DashboardPage() {
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 {selectedMachine
                   ? `TARGET: ${selectedMachine.model} · GROUNDED`
-                  : "READY · NO CONVERSATION ACTIVE"}
+                  : "FLEET MODE · CROSS-MACHINE DISAMBIGUATION ACTIVE"}
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
+            {/* View Mode Switcher: Desktop | Mobile | Both */}
+            <div className="flex items-center gap-1 p-1 rounded-xl bg-slate-100 dark:bg-white/[0.05] border border-slate-200 dark:border-white/[0.08] text-xs font-mono">
+              <button
+                type="button"
+                onClick={() => setViewMode("desktop")}
+                className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  viewMode === "desktop"
+                    ? "bg-indigo-600 text-white shadow-sm"
+                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                }`}
+                title="Desktop Console View"
+              >
+                <Monitor className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Desktop</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setViewMode("mobile")}
+                className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  viewMode === "mobile"
+                    ? "bg-indigo-600 text-white shadow-sm"
+                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                }`}
+                title="Mobile Field Device Simulator"
+              >
+                <Smartphone className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Mobile</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setViewMode("split")}
+                className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  viewMode === "split"
+                    ? "bg-indigo-600 text-white shadow-sm"
+                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                }`}
+                title="Split View: Desktop Console + Mobile Device"
+              >
+                <Columns className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Both</span>
+              </button>
+            </div>
+
             <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-mono text-emerald-600 dark:text-emerald-400">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
               <span>CANopen / Modbus TCP Connected</span>
@@ -387,7 +508,73 @@ export default function DashboardPage() {
         </header>
 
         {/* ── WORKSPACE CONTENT ── */}
-        {activeConvId === null ? (
+        {viewMode === "mobile" ? (
+          <div className="flex-1 overflow-y-auto p-6 flex flex-col items-center justify-center relative z-10 animate-fade-in">
+            <MobileDeviceSimulator
+              initialMachine={selectedMachine ?? undefined}
+              availableMachines={machines}
+            />
+          </div>
+        ) : viewMode === "split" ? (
+          <div className="flex-1 overflow-hidden relative z-10 grid grid-cols-1 xl:grid-cols-12 gap-0 animate-fade-in h-full">
+            {/* Left Column: Desktop Console */}
+            <div className="xl:col-span-7 h-full overflow-hidden border-r border-[var(--border)] flex flex-col">
+              {activeConvId === null ? (
+                <div className="flex-1 overflow-y-auto p-6 lg:p-8 relative z-10 flex flex-col items-center justify-center">
+                  <div className="max-w-xl w-full mx-auto space-y-6 text-center animate-fade-in">
+                    <div className="inline-flex items-center justify-center p-3 rounded-2xl bg-white dark:bg-white/[0.05] border border-slate-200/90 dark:border-white/10 shadow-lg">
+                      <Image
+                        src={isLight ? "/brand-icon-light.png" : "/brand-icon-dark.png"}
+                        alt="MEND-X Industrial Core"
+                        width={40}
+                        height={40}
+                        className="w-10 h-10 object-contain"
+                        priority
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <h2 className="text-xl font-bold text-[var(--text-primary)]">
+                        Dual Diagnostic Console
+                      </h2>
+                      <p className="text-xs text-[var(--text-muted)] max-w-md mx-auto leading-relaxed">
+                        Desktop engineering workstation paired alongside field technician mobile scanner.
+                      </p>
+                    </div>
+                    <div className="pt-2">
+                      <button
+                        onClick={() => startNewConversation(selectedMachine ?? undefined)}
+                        className="px-6 py-3 rounded-xl bg-gradient-to-r from-teal-600 to-indigo-600 hover:from-teal-500 hover:to-indigo-500 text-white font-bold text-xs shadow-md transition-all inline-flex items-center gap-2 cursor-pointer"
+                      >
+                        <Plus className="w-4 h-4" />
+                        <span>Launch Desktop Troubleshooting</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex-1 overflow-hidden relative z-10">
+                  <ChatInterface
+                    conversationId={activeConvId}
+                    machineId={selectedMachine?.id ?? null}
+                    onMachineSelect={(id) => {
+                      const found = machines.find((m) => m.id === id);
+                      if (found) setSelectedMachine(found);
+                    }}
+                    onFirstMessage={handleFirstMessage}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Right Column: Mobile Field Device Simulator */}
+            <div className="xl:col-span-5 h-full overflow-y-auto p-6 bg-slate-950/40 backdrop-blur-sm flex items-center justify-center">
+              <MobileDeviceSimulator
+                initialMachine={selectedMachine ?? undefined}
+                availableMachines={machines}
+              />
+            </div>
+          </div>
+        ) : activeConvId === null ? (
           <div className="flex-1 overflow-y-auto p-6 lg:p-10 relative z-10 flex flex-col items-center justify-center">
             <div className="max-w-4xl w-full mx-auto space-y-8 animate-slide-up">
               
@@ -428,34 +615,31 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* Connected Machine Quick-Select Grid */}
+              {/* Connected Machine Selector Grid */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Wrench className="w-4 h-4 text-indigo-500" />
+                    <Cpu className="w-4 h-4 text-indigo-500" />
                     <span className="text-xs font-mono font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                      Target Equipment Quick-Select
+                      Target Equipment Fleet
                     </span>
                   </div>
-                  <span className="text-[11px] font-mono text-slate-400">
-                    Click any machine to diagnose
+                  <span className="text-[10px] font-mono text-slate-400">
+                    {machines.length} Units Indexed
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {machines.slice(0, 4).map((m) => {
-                    const isCurrent = selectedMachine?.id === m.id;
+                    const isSelected = selectedMachine?.id === m.id;
                     return (
                       <button
                         key={m.id}
-                        onClick={() => {
-                          setSelectedMachine(m);
-                          startNewConversation(m);
-                        }}
-                        className={`p-4 rounded-2xl border text-left transition-all duration-200 group cursor-pointer ${
-                          isCurrent
-                            ? "bg-indigo-50/90 dark:bg-indigo-500/10 border-indigo-500 shadow-md"
-                            : "bg-white/80 dark:bg-white/[0.03] border-slate-200/80 dark:border-white/[0.08] hover:border-indigo-400 dark:hover:border-indigo-500/50 hover:shadow-sm"
+                        onClick={() => setSelectedMachine(isSelected ? null : m)}
+                        className={`p-3.5 rounded-2xl text-left border transition-all cursor-pointer ${
+                          isSelected
+                            ? "bg-indigo-500/10 border-indigo-500 shadow-md shadow-indigo-500/10"
+                            : "bg-white/80 dark:bg-white/[0.03] border-slate-200/80 dark:border-white/[0.08] hover:border-indigo-300 dark:hover:border-white/20"
                         }`}
                       >
                         <div className="flex items-center justify-between mb-2">
@@ -529,13 +713,13 @@ export default function DashboardPage() {
                   <div className="text-[10px] font-mono text-slate-400 uppercase">Edge Routing</div>
                   <div className="text-xs font-bold text-indigo-600 dark:text-indigo-400 mt-0.5 flex items-center justify-center gap-1">
                     <Zap className="w-3 h-3" />
-                    <span>NORD &lt;100ms</span>
+                    <span>Mini &lt;100ms</span>
                   </div>
                 </div>
                 <div className="p-3 rounded-xl bg-slate-50/50 dark:bg-white/[0.02] border border-slate-200/60 dark:border-white/[0.05]">
                   <div className="text-[10px] font-mono text-slate-400 uppercase">Procedural Synthesis</div>
                   <div className="text-xs font-bold text-teal-600 dark:text-cyan-400 mt-0.5">
-                    FORGE Active
+                    GPT-OSS Active
                   </div>
                 </div>
                 <div className="p-3 rounded-xl bg-slate-50/50 dark:bg-white/[0.02] border border-slate-200/60 dark:border-white/[0.05]">

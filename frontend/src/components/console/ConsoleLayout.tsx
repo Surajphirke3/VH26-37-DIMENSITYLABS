@@ -21,6 +21,7 @@ import {
   ChevronRight,
   Menu,
   X,
+  Zap,
 } from "lucide-react";
 
 interface ConsoleNavItem {
@@ -78,6 +79,11 @@ const REFERENCE_NAV: ConsoleNavItem[] = [
     href: "/help",
     label: "Field Handbook",
     icon: HelpCircle,
+  },
+  {
+    href: "/inspector",
+    label: "Judge X-Ray Studio ⚡",
+    icon: Zap,
   },
 ];
 

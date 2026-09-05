@@ -43,7 +43,7 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: str = "change_me_in_production"
 
     # ChromaDB Vector Store
-    CHROMA_PERSIST_DIR: str = "./chroma_db"
+    CHROMA_PERSIST_DIR: str = str(Path(__file__).resolve().parent.parent.parent / "chroma_db")
     CHROMA_COLLECTION_NAME: str = "manual_chunks"
 
     # Redis
@@ -60,17 +60,18 @@ class Settings(BaseSettings):
 
     # Groq
     GROQ_API_KEY: str = "placeholder"
-    GROQ_MODEL: str = "qwen-2.5-32b"
+    GROQ_MODEL: str = "openai/gpt-oss-120b"
 
     # OpenRouter
     OPENROUTER_API_KEY: str = "placeholder"
     OPENROUTER_MODEL: str = "anthropic/claude-3.5-haiku"
     OPENROUTER_SITE_URL: str = ""
 
-    # Ollama (local)
+    # Ollama (local + cloud)
     OLLAMA_BASE_URL: str = "http://localhost:11434"
-    OLLAMA_LLM_MODEL: str = "llama3.2"
+    OLLAMA_LLM_MODEL: str = "qwen3.5:9b"
     OLLAMA_EMBEDDING_MODEL: str = "nomic-embed-text"
+    OLLAMA_API_KEY: str = ""   # Set to use Ollama Cloud (https://ollama.com)
 
     # JWT
     JWT_SECRET_KEY: str = "dev-secret-change-in-production-min-32-chars!"
