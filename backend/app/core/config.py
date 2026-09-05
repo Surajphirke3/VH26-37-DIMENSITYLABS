@@ -69,7 +69,7 @@ class Settings(BaseSettings):
 
     # Ollama (local + cloud)
     OLLAMA_BASE_URL: str = "http://localhost:11434"
-    OLLAMA_LLM_MODEL: str = "qwen3.5:9b"
+    OLLAMA_LLM_MODEL: str = "gpt-oss:20b"
     OLLAMA_EMBEDDING_MODEL: str = "nomic-embed-text"
     OLLAMA_API_KEY: str = ""   # Set to use Ollama Cloud (https://ollama.com)
 

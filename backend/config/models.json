@@ -2,7 +2,7 @@
   "providers": {
     "ollama": {
       "enabled": true,
-      "default_model": "qwen3.5:9b",
+      "default_model": "gpt-oss:20b",
       "models": [
         {
           "id": "auto",
@@ -12,8 +12,15 @@
           "speed": "dynamic"
         },
         {
-          "id": "qwen3.5:9b",
-          "name": "Qwen 3.5 9B (Ollama Cloud & Local)",
+          "id": "gpt-oss:20b",
+          "name": "GPT-OSS 20B (Ollama Cloud Active)",
+          "type": "deep_reasoning",
+          "max_tokens": 4096,
+          "speed": "ultra_fast"
+        },
+        {
+          "id": "gpt-oss:120b",
+          "name": "GPT-OSS 120B (Ollama Cloud Deep)",
           "type": "deep_reasoning",
           "max_tokens": 4096,
           "speed": "fast"
@@ -76,9 +83,9 @@
     }
   },
   "task_routing": {
-    "error_code_triage": "qwen3.5:9b",
-    "balanced_troubleshooting": "qwen3.5:9b",
-    "deep_diagnostics": "qwen3.5:9b",
-    "visual_inspection": "qwen3.5:9b"
+    "error_code_triage": "gpt-oss:20b",
+    "balanced_troubleshooting": "gpt-oss:20b",
+    "deep_diagnostics": "gpt-oss:20b",
+    "visual_inspection": "gpt-oss:20b"
   }
 }

@@ -218,7 +218,7 @@ const PIPELINE_STAGES: PipelineStageDef[] = [
     bgGlow: "rgba(236,72,153,0.12)",
     borderColor: "rgba(236,72,153,0.35)",
     inputContract: "Grounded prompt context + technician inquiry + mandatory citation syntax [C1]",
-    processDescription: "Dispatching to active Groq LPU engine (GPT-OSS 120B / 20B / Compound Mini)",
+    processDescription: "Dispatching to active Ollama Cloud engine (Qwen 3.5 9B / Local Fallback)",
     outputContract: "Structured JSON response with diagnostic assessment, cause breakdown, and citations",
     logMessage: "Dispatching context-limited prompt to AI router for deterministic reasoning...",
   },

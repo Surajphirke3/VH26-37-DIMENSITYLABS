@@ -89,6 +89,12 @@ export interface TroubleshootingResponse {
     rerank_ms?: number;
     llm_ms?: number;
   };
+  ocr_result?: {
+    error_code?: string | null;
+    machine_brand?: string | null;
+    extracted_text?: string;
+    summary?: string;
+  };
   metadata?: Record<string, any>;
 }
 

@@ -111,7 +111,7 @@ export const PIPELINE_STAGES: PipelineStage[] = [
     color: "#ec4899",
     bgGlow: "rgba(236,72,153,0.15)",
     borderColor: "rgba(236,72,153,0.4)",
-    taskDescription: "Dispatching to active Groq LPU engine (GPT-OSS 120B / 20B / Compound Mini)...",
+    taskDescription: "Dispatching to active Ollama Cloud engine (Qwen 3.5 9B / Local Fallback)...",
     techDetails: "Strict zero-hallucination directive, temperature 0.1, mandatory citation grounding tokens.",
   },
   {

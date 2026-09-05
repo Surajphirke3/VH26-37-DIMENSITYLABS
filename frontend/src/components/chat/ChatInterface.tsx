@@ -95,6 +95,19 @@ export default function ChatInterface({
   const [machines, setMachines] = useState<Machine[]>([]);
   const [showMachineDropdown, setShowMachineDropdown] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const machineDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (machineDropdownRef.current && !machineDropdownRef.current.contains(e.target as Node)) {
+        setShowMachineDropdown(false);
+      }
+    };
+    if (showMachineDropdown) {
+      document.addEventListener("mousedown", handler);
+      return () => document.removeEventListener("mousedown", handler);
+    }
+  }, [showMachineDropdown]);
 
   // Load machines for the context HUD
   useEffect(() => {
@@ -303,7 +316,7 @@ export default function ChatInterface({
         </div>
 
         {/* Quick Target Switcher Pill */}
-        <div className="relative">
+        <div className="relative" ref={machineDropdownRef}>
           <button
             type="button"
             onClick={() => setShowMachineDropdown((v) => !v)}

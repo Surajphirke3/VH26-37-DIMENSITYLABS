@@ -233,7 +233,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Machine Selector */}
-          <div className="px-4 py-3.5 border-b border-[var(--border)]">
+          <div className="px-4 py-3.5 border-b border-[var(--border)] relative z-30">
             <p className="text-[10px] font-mono font-bold uppercase tracking-widest mb-2 px-1 text-slate-400 dark:text-slate-500">
               Active Machine Filter
             </p>
@@ -588,8 +588,12 @@ export default function DashboardPage() {
                     conversationId={activeConvId}
                     machineId={selectedMachine?.id ?? null}
                     onMachineSelect={(id) => {
-                      const found = machines.find((m) => m.id === id);
-                      if (found) setSelectedMachine(found);
+                      if (!id) {
+                        setSelectedMachine(null);
+                      } else {
+                        const found = machines.find((m) => m.id === id);
+                        setSelectedMachine(found || null);
+                      }
                     }}
                     onFirstMessage={handleFirstMessage}
                   />
@@ -772,8 +776,12 @@ export default function DashboardPage() {
               conversationId={activeConvId}
               machineId={selectedMachine?.id ?? null}
               onMachineSelect={(id) => {
-                const found = machines.find((m) => m.id === id);
-                if (found) setSelectedMachine(found);
+                if (!id) {
+                  setSelectedMachine(null);
+                } else {
+                  const found = machines.find((m) => m.id === id);
+                  setSelectedMachine(found || null);
+                }
               }}
               onFirstMessage={handleFirstMessage}
             />

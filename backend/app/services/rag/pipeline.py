@@ -69,8 +69,63 @@ class RAGPipeline:
         if conversation_history is None:
             conversation_history = []
 
+        ocr_result = None
+        if image_data:
+            from app.services.ai.ocr import extract_visual_fault_data
+
+            try:
+                ocr_result = await extract_visual_fault_data(image_data)
+                detected_code = ocr_result.get("error_code")
+                detected_brand = ocr_result.get("machine_brand")
+                extracted_text = (ocr_result.get("extracted_text") or "").strip()
+
+                generic_phrases = [
+                    "analyze this attached equipment photo for fault symptoms and diagnostic recommendations.",
+                    "what is this error",
+                    "what is this",
+                    "error code",
+                    "diagnose",
+                    "check image",
+                    "help",
+                    "",
+                ]
+                is_generic = not query or query.strip().lower() in generic_phrases
+
+                if detected_code:
+                    if is_generic:
+                        query = f"Fault code {detected_code}: {extracted_text}" if extracted_text else f"Fault code {detected_code}"
+                    else:
+                        query = f"{query} [Fault Code: {detected_code}] {extracted_text}".strip()
+                elif extracted_text:
+                    if is_generic:
+                        query = extracted_text
+                    else:
+                        query = f"{query} [Visual Scan: {extracted_text}]".strip()
+
+                # If machine is not selected, attempt auto-match by detected brand
+                if not machine_id and detected_brand:
+                    from app.models.machine import Machine
+                    from sqlalchemy import select, or_
+
+                    brand_res = await self.db.execute(
+                        select(Machine).where(
+                            or_(
+                                Machine.name.ilike(f"%{detected_brand}%"),
+                                Machine.model.ilike(f"%{detected_brand}%"),
+                                Machine.manufacturer.ilike(f"%{detected_brand}%"),
+                            )
+                        )
+                    )
+                    matched_m = brand_res.scalars().first()
+                    if matched_m:
+                        machine_id = matched_m.id
+                        machine_name = f"{matched_m.manufacturer} {matched_m.name}"
+                        logger.info("rag.ocr_auto_matched_machine", machine_id=str(machine_id), name=machine_name)
+            except Exception as exc:
+                logger.warning("rag.ocr_preprocessing_failed", error=str(exc))
+
         query_type = self.classifier.classify(query)
-        has_error_code = query_type == QueryType.ERROR_CODE
+        has_error_code = query_type == QueryType.ERROR_CODE or (ocr_result and bool(ocr_result.get("error_code")))
 
         # Language detection
         detector = getattr(self, "language_detector", None)
@@ -174,6 +229,10 @@ class RAGPipeline:
             resp["retrieval_latency_ms"] = retrieval_ms
             resp["rerank_latency_ms"] = rerank_ms
             resp["total_latency_ms"] = int((time.time() - t0) * 1000)
+            resp["ocr_result"] = ocr_result
+            if ocr_result and (ocr_result.get("error_code") or ocr_result.get("extracted_text")):
+                code_str = ocr_result.get("error_code") or "Fault code"
+                resp["notes"] = f"OCR successfully extracted: {code_str}. However, no corresponding section was found in the indexed OEM manuals for this equipment."
             return resp
 
         # 6. LLM generation
@@ -220,6 +279,7 @@ class RAGPipeline:
         llm_result["llm_latency_ms"] = llm_ms
         llm_result["total_latency_ms"] = int((time.time() - t0) * 1000)
         llm_result["disambiguation_options"] = None
+        llm_result["ocr_result"] = ocr_result
 
         logger.info(
             "rag.query_completed",
