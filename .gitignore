@@ -29,3 +29,5 @@ frontend/out/
 *.swp
 
 .claude
+backend/chroma_db/
+backend/chroma_db/chroma.sqlite3
