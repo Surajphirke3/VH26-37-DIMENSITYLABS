@@ -8,6 +8,7 @@ import DowntimeCalculator from "@/components/landing/DowntimeCalculator";
 import DiagnosticSimulator from "@/components/landing/DiagnosticSimulator";
 import EngineeringBlogs from "@/components/landing/EngineeringBlogs";
 import { useTheme } from "@/lib/theme-context";
+import { useLanguage } from "@/lib/i18n/context";
 
 const MARQUEE_ITEMS = [
   "HAAS VF-4 CNC",
@@ -23,7 +24,7 @@ const MARQUEE_ITEMS = [
 ];
 
 const STATS = [
-  { value: "\$260K", label: "Average downtime cost per hour in heavy industry" },
+  { value: "$260K", label: "Average downtime cost per hour in heavy industry" },
   { value: "4.5h", label: "Average time to locate correct manual procedure" },
   { value: "42%", label: "Breakdowns caused by absent or wrong documentation" },
   { value: "<8s", label: "MEND-X time to full verified repair protocol" },
@@ -92,6 +93,7 @@ const FAQ = [
 
 export default function HomePage() {
   const { theme } = useTheme();
+  const { t } = useLanguage();
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
 
   return (
@@ -109,7 +111,9 @@ export default function HomePage() {
         <div className="inline-flex items-center gap-3 mb-10 px-4 py-2 rounded-full glass border border-[var(--border)] animate-slide-up shadow-sm" style={{ animationDelay: "0.1s" }}>
           <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25">
             <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981] animate-pulse" />
-            <span className="font-mono text-[10px] font-bold text-emerald-600 dark:text-emerald-400 tracking-widest uppercase">System Operational</span>
+            <span className="font-mono text-[10px] font-bold text-emerald-600 dark:text-emerald-400 tracking-widest uppercase">
+              {t("landing.systemOperational", "System Operational")}
+            </span>
           </div>
           <span className="w-px h-4 bg-[var(--border)]" />
           <span className="font-mono text-[10px] font-bold text-slate-500 tracking-widest uppercase">MEND-X Core v1.2.1</span>
@@ -125,9 +129,7 @@ export default function HomePage() {
         </div>
 
         <p className="text-base sm:text-lg text-[var(--text-muted)] max-w-2xl leading-relaxed mb-12 animate-slide-up" style={{ animationDelay: "0.3s" }}>
-          Factory lines halt. Alarms trigger. Technicians scramble through 800-page PDFs.
-          <span className="text-[var(--text-primary)] font-semibold mx-1">MEND-X eliminates the blind spot.</span>
-          A zero-hallucination industrial RAG engine that transforms OEM manuals into precise, cited repair protocols.
+          {t("landing.heroDesc", "Factory lines halt. Alarms trigger. Technicians scramble through 800-page PDFs. MEND-X eliminates the blind spot: A zero-hallucination industrial RAG engine that transforms OEM manuals into precise, cited repair protocols.")}
         </p>
 
         {/* Action Buttons */}
@@ -140,13 +142,13 @@ export default function HomePage() {
             <svg className="relative w-4 h-4 z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
-            <span className="relative z-10">Launch Troubleshooting Console</span>
+            <span className="relative z-10">{t("landing.launchConsole", "Launch Troubleshooting Console")}</span>
           </Link>
           <Link
             href="/problem"
             className="group w-full sm:w-auto px-8 py-4 rounded-xl font-semibold text-sm text-[var(--text-primary)] bg-[var(--bg-surface)] hover:bg-[var(--glass-bg-hover)] border border-[var(--border)] transition-all flex items-center justify-center gap-2 shadow-sm"
           >
-            Explore the Crisis
+            {t("landing.exploreCrisis", "Explore the Crisis")}
             <svg className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
             </svg>

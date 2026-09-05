@@ -22,6 +22,7 @@ import {
   RotateCcw,
   Sparkles,
 } from "lucide-react";
+import { useLanguage } from "@/lib/i18n/context";
 
 interface ChatInterfaceProps {
   conversationId: string | null;
@@ -89,6 +90,7 @@ export default function ChatInterface({
   onMachineSelect,
   onFirstMessage,
 }: ChatInterfaceProps) {
+  const { t, language } = useLanguage();
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [expandedTraces, setExpandedTraces] = useState<Record<string, boolean>>({});
@@ -204,7 +206,7 @@ export default function ChatInterface({
     if (messages.length === 0) onFirstMessage?.(query);
     setIsLoading(true);
     try {
-      const res = await sendMessage(conversationId, query, machineId ?? undefined, model, imageData);
+      const res = await sendMessage(conversationId, query, machineId ?? undefined, model, imageData, language);
       addAssistantMessage(res);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Something went wrong.";
@@ -235,7 +237,7 @@ export default function ChatInterface({
     onMachineSelect?.(selectedMachineId);
     setIsLoading(true);
     try {
-      const res = await disambiguate(conversationId, selectedMachineId);
+      const res = await disambiguate(conversationId, selectedMachineId, language);
       addAssistantMessage(res);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Disambiguation failed.";
@@ -258,9 +260,11 @@ export default function ChatInterface({
         <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 mb-4 shadow-lg">
           <Terminal className="w-8 h-8" />
         </div>
-        <h3 className="text-base font-bold text-slate-200">No Active Diagnostic Session</h3>
+        <h3 className="text-base font-bold text-slate-200">
+          {t("chat.noActiveSession", "No Active Diagnostic Session")}
+        </h3>
         <p className="text-xs text-slate-400 max-w-sm mt-1">
-          Select a session from the left sidebar or launch a new one to begin troubleshooting.
+          {t("chat.selectSessionPrompt", "Select a session from the left sidebar or launch a new one to begin troubleshooting.")}
         </p>
       </div>
     );
@@ -289,9 +293,9 @@ export default function ChatInterface({
                 </div>
                 <div className="flex items-center gap-2 text-[10px] font-mono text-emerald-600 dark:text-emerald-400">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
-                  <span>GROUNDED RAG ACTIVE</span>
+                  <span>{t("dashboard.groundedRagActive", "GROUNDED RAG ACTIVE")}</span>
                   <span className="text-slate-400 dark:text-slate-500">·</span>
-                  <span className="text-slate-500 dark:text-slate-400">Air-gapped Vector Store</span>
+                  <span className="text-slate-500 dark:text-slate-400">{t("dashboard.airGappedStore", "Air-gapped Vector Store")}</span>
                 </div>
               </div>
             </div>
@@ -302,13 +306,13 @@ export default function ChatInterface({
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-bold text-amber-600 dark:text-amber-400">Fleet Wide Mode</span>
+                  <span className="text-xs font-bold text-amber-600 dark:text-amber-400">{t("dashboard.fleetMode", "Fleet Wide Mode")}</span>
                   <span className="px-1.5 py-0.2 rounded font-mono text-[9px] font-bold bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20">
-                    CROSS-MACHINE
+                    {t("dashboard.crossMachine", "CROSS-MACHINE")}
                   </span>
                 </div>
                 <p className="text-[10px] font-mono text-slate-500 dark:text-slate-400">
-                  Auto-disambiguating across all indexed OEM manuals
+                  {t("dashboard.autoDisambiguating", "Auto-disambiguating across all indexed OEM manuals")}
                 </p>
               </div>
             </div>
@@ -322,14 +326,14 @@ export default function ChatInterface({
             onClick={() => setShowMachineDropdown((v) => !v)}
             className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-white/10 text-[11px] font-mono text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
           >
-            <span>Target: {currentMachine ? currentMachine.model : "All Fleet"}</span>
+            <span>{t("dashboard.target", "Target")}: {currentMachine ? currentMachine.model : t("dashboard.allMachines", "All Fleet")}</span>
             <ChevronDown className="w-3 h-3 text-slate-400" />
           </button>
 
           {showMachineDropdown && (
             <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/15 p-2 shadow-2xl z-50 animate-fade-in divide-y divide-slate-100 dark:divide-white/5">
               <div className="px-2 py-1.5 text-[10px] font-mono font-bold uppercase text-slate-500 dark:text-slate-400">
-                Ground Diagnostics On:
+                {t("dashboard.groundDiagnosticsOn", "Ground Diagnostics On:")}
               </div>
               <button
                 type="button"
@@ -343,7 +347,7 @@ export default function ChatInterface({
                     : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5"
                 }`}
               >
-                <span>All Equipment (Fleet Mode)</span>
+                <span>{t("dashboard.allEquipment", "All Equipment (Fleet Mode)")}</span>
                 {!machineId && <span className="text-[10px]">✓</span>}
               </button>
 
@@ -389,18 +393,17 @@ export default function ChatInterface({
 
             <div className="space-y-1.5">
               <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
-                MEND-X Industrial Diagnostic Engine
+                {t("chat.diagnosticEngine", "MEND-X Industrial Diagnostic Engine")}
               </h2>
               <p className="text-xs text-slate-600 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
-                Ground every troubleshooting response directly on verified OEM schematics, error fault
-                tables, and field manuals.
+                {t("chat.diagnosticDesc", "Ground every troubleshooting response directly on verified OEM schematics, error fault tables, and field manuals.")}
               </p>
             </div>
 
             {/* Quick Fault Launchers */}
             <div className="pt-2 text-left space-y-2">
               <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block px-1">
-                Quick Test Fault Probes:
+                {t("chat.quickProbes", "Quick Test Fault Probes:")}
               </span>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 {QUICK_DIAGNOSTIC_PRESETS.map((preset, idx) => (
@@ -415,7 +418,7 @@ export default function ChatInterface({
                         {preset.code}
                       </span>
                       <span className="text-[10px] font-mono text-slate-400 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
-                        Launch Probe →
+                        {t("chat.launchProbe", "Launch Probe")} →
                       </span>
                     </div>
                     <p className="text-xs font-bold text-slate-900 dark:text-slate-200 group-hover:text-cyan-600 dark:group-hover:text-white transition-colors">
@@ -442,7 +445,7 @@ export default function ChatInterface({
               /* ── User Operator Bubble ── */
               <div className="max-w-[85%] sm:max-w-[70%] space-y-1">
                 <div className="flex items-center justify-end gap-2 text-[10px] font-mono text-indigo-500 dark:text-indigo-300/80 pr-1 font-semibold">
-                  <span>FIELD OPERATOR TRANSMISSION</span>
+                  <span>{t("chat.fieldTransmission", "FIELD OPERATOR TRANSMISSION")}</span>
                   <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 dark:bg-indigo-400" />
                 </div>
 
@@ -455,7 +458,7 @@ export default function ChatInterface({
                         className="max-h-60 w-full object-cover"
                       />
                       <div className="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-black/70 backdrop-blur-sm text-[9px] font-mono text-emerald-400 border border-emerald-500/30">
-                        OPTICAL SCAN ATTACHED
+                        {t("solution.opticalOcrDetected", "OPTICAL SCAN ATTACHED")}
                       </div>
                     </div>
                   )}
@@ -464,7 +467,7 @@ export default function ChatInterface({
 
                   {msg.model && (
                     <div className="mt-2 pt-2 border-t border-white/15 text-[10px] text-indigo-200 font-mono flex items-center justify-between">
-                      <span>Routed via: {msg.model.replace(/^openai\//, "").replace(/^groq\//, "")}</span>
+                      <span>{t("chat.routedVia", "Routed via")}: {msg.model.replace(/^openai\//, "").replace(/^groq\//, "")}</span>
                       <span>
                         {new Date(msg.timestamp).toLocaleTimeString([], {
                           hour: "2-digit",
@@ -490,7 +493,7 @@ export default function ChatInterface({
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-black tracking-tight text-slate-900 dark:text-white">
-                          MEND-X NEURAL DIAGNOSTICS
+                          {t("chat.neuralDiagnostics", "MEND-X NEURAL DIAGNOSTICS")}
                         </span>
                         <span className="px-1.5 py-0.2 rounded font-mono text-[9px] font-bold bg-cyan-500/10 dark:bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 border border-cyan-500/30">
                           SCADA v2.4
@@ -498,7 +501,7 @@ export default function ChatInterface({
                       </div>
                       <p className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 flex items-center gap-1 font-semibold">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
-                        <span>VERIFIED GROUNDING ISOLATION</span>
+                        <span>{t("chat.groundingIsolation", "VERIFIED GROUNDING ISOLATION")}</span>
                       </p>
                     </div>
                   </div>
@@ -526,7 +529,7 @@ export default function ChatInterface({
                     className="inline-flex items-center gap-2 text-xs font-mono text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 dark:hover:text-cyan-300 font-bold transition-all cursor-pointer group"
                   >
                     <Zap className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400 group-hover:scale-110 transition-transform" />
-                    <span>⚡ {expandedTraces[msg.id] ? "Hide" : "Inspect"} 8-Stage RAG Execution Trace</span>
+                    <span>⚡ {expandedTraces[msg.id] ? t("chat.hideTrace", "Hide") : t("chat.inspectTrace", "Inspect")} {t("chat.traceTitle", "8-Stage RAG Execution Trace")}</span>
                   </button>
 
                   <div className="flex items-center gap-1 text-[10px] font-mono text-slate-400 dark:text-slate-500">
@@ -536,7 +539,7 @@ export default function ChatInterface({
                     <span>→</span>
                     <span>VECTORS</span>
                     <span>→</span>
-                    <span className="text-cyan-600 dark:text-cyan-400 font-bold">CITED SOLUTION</span>
+                    <span className="text-cyan-600 dark:text-cyan-400 font-bold">{t("solution.oemGrounded", "CITED SOLUTION")}</span>
                   </div>
                 </div>
 

@@ -1,6 +1,7 @@
 "use client";
 
 import type { DisambiguationOption } from "@/lib/types";
+import { useLanguage } from "@/lib/i18n/context";
 
 interface DisambiguationCardProps {
   options: DisambiguationOption[];
@@ -8,6 +9,8 @@ interface DisambiguationCardProps {
 }
 
 export default function DisambiguationCard({ options, onSelect }: DisambiguationCardProps) {
+  const { t } = useLanguage();
+
   return (
     <div
       className="rounded-2xl p-4 space-y-4 animate-scale-in bg-indigo-50/70 dark:bg-indigo-950/20 border border-indigo-200 dark:border-indigo-500/30 shadow-sm"
@@ -24,16 +27,16 @@ export default function DisambiguationCard({ options, onSelect }: Disambiguation
         </div>
         <div>
           <p className="text-sm font-bold text-indigo-950 dark:text-indigo-200">
-            Multiple Machines Match
+            {t("chat.disambiguationTitle", "Multiple Machines Match")}
           </p>
           <p className="text-xs text-indigo-600 dark:text-indigo-400">
-            This error code appears in manuals for multiple machines
+            {t("chat.disambiguationDesc", "This error code appears in manuals for multiple machines")}
           </p>
         </div>
       </div>
 
       <p className="text-xs text-slate-600 dark:text-slate-400">
-        Which machine are you troubleshooting?
+        {t("chat.disambiguationPrompt", "Which machine are you troubleshooting?")}
       </p>
 
       <div className="space-y-2">
@@ -55,9 +58,9 @@ export default function DisambiguationCard({ options, onSelect }: Disambiguation
             </div>
             <button
               onClick={() => onSelect(opt.machine_id)}
-              className="shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all hover:scale-105 bg-indigo-600 text-white hover:bg-indigo-500 shadow-sm hover:shadow-indigo-500/20"
+              className="shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all hover:scale-105 bg-indigo-600 text-white hover:bg-indigo-500 shadow-sm hover:shadow-indigo-500/20 cursor-pointer"
             >
-              Select
+              {t("chat.select", "Select")}
             </button>
           </div>
         ))}

@@ -22,6 +22,7 @@ import {
 import type { TroubleshootingResponse } from "@/lib/types";
 import ConfidenceBadge from "@/components/ui/ConfidenceBadge";
 import ManufacturerLogo from "@/components/common/ManufacturerLogo";
+import { useLanguage } from "@/lib/i18n/context";
 
 interface Props {
   response: TroubleshootingResponse;
@@ -29,6 +30,7 @@ interface Props {
 }
 
 export default function StructuredAnswer({ response, onSuggestionClick }: Props) {
+  const { t } = useLanguage();
   const [citationsOpen, setCitationsOpen] = useState(true);
   const [showTimings, setShowTimings] = useState(false);
   const [copiedCitationId, setCopiedCitationId] = useState<string | null>(null);
@@ -54,7 +56,7 @@ export default function StructuredAnswer({ response, onSuggestionClick }: Props)
           {/* Zero-Hallucination Grounded Badge */}
           <span className="inline-flex items-center gap-1 text-[10px] font-mono px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25 font-bold">
             <ShieldCheck className="w-3 h-3 text-emerald-500" />
-            <span>OEM GROUNDED</span>
+            <span>{t("solution.oemGrounded", "OEM GROUNDED")}</span>
           </span>
 
           {modelUsed && (
@@ -97,19 +99,19 @@ export default function StructuredAnswer({ response, onSuggestionClick }: Props)
         <div className="grid grid-cols-3 gap-2 p-3 rounded-xl bg-slate-100/90 dark:bg-slate-950/70 border border-indigo-500/30 dark:border-indigo-500/25 text-center font-mono text-xs animate-fade-in shadow-sm">
           <div className="border-r border-slate-200 dark:border-white/10 pr-2">
             <span className="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 block font-semibold">
-              Vector Search
+              {t("solution.vectorSearch", "Vector Search")}
             </span>
             <span className="font-bold text-cyan-600 dark:text-cyan-400">{latencyBreakdown.retrieval_ms || 0}ms</span>
           </div>
           <div className="border-r border-slate-200 dark:border-white/10 pr-2">
             <span className="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 block font-semibold">
-              Cross-Rerank
+              {t("solution.rerank", "Cross-Rerank")}
             </span>
             <span className="font-bold text-amber-600 dark:text-amber-400">{latencyBreakdown.rerank_ms || 0}ms</span>
           </div>
           <div>
             <span className="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 block font-semibold">
-              Inference Stream
+              {t("solution.inference", "Inference Stream")}
             </span>
             <span className="font-bold text-emerald-600 dark:text-emerald-400">{latencyBreakdown.llm_ms || 0}ms</span>
           </div>
@@ -122,7 +124,7 @@ export default function StructuredAnswer({ response, onSuggestionClick }: Props)
           <div className="flex items-center justify-between gap-2 flex-wrap mb-1.5">
             <div className="flex items-center gap-2 text-cyan-800 dark:text-cyan-300 font-mono font-bold">
               <Camera className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
-              <span>OPTICAL OCR DETECTED</span>
+              <span>{t("solution.opticalOcrDetected", "OPTICAL OCR DETECTED")}</span>
               {response.ocr_result.error_code && (
                 <span className="px-2 py-0.5 rounded-md bg-cyan-600 text-white font-mono font-black text-[11px] shadow-sm">
                   {response.ocr_result.error_code}
@@ -147,7 +149,7 @@ export default function StructuredAnswer({ response, onSuggestionClick }: Props)
       <div className="p-4 rounded-xl bg-white dark:bg-slate-950/60 border border-slate-200 dark:border-white/[0.08] shadow-sm space-y-1.5">
         <div className="flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-widest text-cyan-600 dark:text-cyan-400">
           <Zap className="w-3.5 h-3.5 text-cyan-500 dark:text-cyan-400" />
-          <span>Diagnostic Assessment</span>
+          <span>{t("solution.diagnosticAssessment", "Diagnostic Assessment")}</span>
         </div>
         <p className="font-medium text-sm leading-relaxed text-slate-900 dark:text-slate-100">
           {response.summary}
@@ -159,7 +161,7 @@ export default function StructuredAnswer({ response, onSuggestionClick }: Props)
         <div className="rounded-xl px-4 py-3.5 bg-indigo-50/90 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-500/30 relative overflow-hidden">
           <div className="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-b from-indigo-500 to-cyan-400" />
           <p className="text-[10px] font-mono font-bold uppercase tracking-widest mb-1 text-indigo-700 dark:text-indigo-400 flex items-center gap-1.5">
-            <span>TECHNICAL SPECIFICATION & MEANING</span>
+            <span>{t("solution.technicalMeaning", "TECHNICAL SPECIFICATION & MEANING")}</span>
           </p>
           <p className="text-slate-800 dark:text-indigo-200 text-xs leading-relaxed font-mono">
             {response.error_meaning}
@@ -172,7 +174,7 @@ export default function StructuredAnswer({ response, onSuggestionClick }: Props)
         <div className="space-y-2">
           <div className="flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-            <span>Probable Root Causes ({response.probable_causes.length})</span>
+            <span>{t("solution.probableCauses", "Probable Root Causes")} ({response.probable_causes.length})</span>
           </div>
           <div className="grid grid-cols-1 gap-2">
             {response.probable_causes.map((c, i) => (
@@ -197,7 +199,7 @@ export default function StructuredAnswer({ response, onSuggestionClick }: Props)
         <div className="space-y-3 pt-1">
           <div className="flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
             <Wrench className="w-3.5 h-3.5 text-emerald-500" />
-            <span>Isolation & Remediation Procedure</span>
+            <span>{t("solution.correctiveSteps", "Isolation & Remediation Procedure")}</span>
           </div>
 
           <div className="space-y-2.5">
@@ -224,7 +226,7 @@ export default function StructuredAnswer({ response, onSuggestionClick }: Props)
                     <AlertTriangle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
                     <div>
                       <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-rose-700 dark:text-rose-400 block mb-0.5">
-                        CRITICAL SAFETY NOTICE · LOTO MANDATORY
+                        {t("solution.safetyWarning", "CRITICAL SAFETY NOTICE · LOTO MANDATORY")}
                       </span>
                       <p className="text-xs font-medium text-rose-900 dark:text-rose-200 leading-relaxed">
                         {step.warning}
@@ -243,7 +245,7 @@ export default function StructuredAnswer({ response, onSuggestionClick }: Props)
         <div className="space-y-2 pt-2">
           <div className="flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
             <HelpCircle className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400" />
-            <span>Interactive Diagnostic Probes</span>
+            <span>{t("solution.interactiveProbes", "Interactive Diagnostic Probes")}</span>
           </div>
           <div className="flex flex-wrap gap-2">
             {response.follow_up_suggestions.map((s, i) => (
@@ -271,10 +273,10 @@ export default function StructuredAnswer({ response, onSuggestionClick }: Props)
           >
             <span className="flex items-center gap-2">
               <FileText className="w-4 h-4 text-amber-500" />
-              <span>VERIFIED OEM CITATIONS & SCHEMATICS ({response.citations.length})</span>
+              <span>{t("solution.verifiedCitations", "VERIFIED OEM CITATIONS & SCHEMATICS")} ({response.citations.length})</span>
             </span>
             <span className="text-[10px] font-mono text-indigo-600 dark:text-indigo-400 flex items-center gap-1">
-              <span>{citationsOpen ? "COLLAPSE" : "EXPAND"}</span>
+              <span>{citationsOpen ? t("solution.collapse", "COLLAPSE") : t("solution.expand", "EXPAND")}</span>
               <ChevronDown
                 className={`w-3.5 h-3.5 transition-transform ${citationsOpen ? "rotate-180" : ""}`}
               />
@@ -288,7 +290,7 @@ export default function StructuredAnswer({ response, onSuggestionClick }: Props)
                   <div className="flex items-center justify-between gap-2 flex-wrap">
                     <div className="flex items-center gap-2 min-w-0">
                       <span className="px-2 py-0.5 rounded font-mono text-[10px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30 shrink-0">
-                        PAGE {c.page_start}
+                        {t("solution.page", "PAGE")} {c.page_start}
                         {c.page_end && c.page_end !== c.page_start ? `–${c.page_end}` : ""}
                       </span>
                       <p className="font-semibold text-slate-800 dark:text-slate-200 truncate">
@@ -302,7 +304,7 @@ export default function StructuredAnswer({ response, onSuggestionClick }: Props)
                           href={`/documents/${c.manual_id}`}
                           className="text-[11px] font-mono text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 inline-flex items-center gap-1 transition-colors"
                         >
-                          <span>Open PDF</span>
+                          <span>{t("solution.openPdf", "Open PDF")}</span>
                           <ExternalLink className="w-3 h-3" />
                         </Link>
                       )}
@@ -310,7 +312,7 @@ export default function StructuredAnswer({ response, onSuggestionClick }: Props)
                         type="button"
                         onClick={() => copyCitation(c.excerpt, c.citation_id)}
                         className="p-1 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded transition-colors cursor-pointer"
-                        title="Copy verbatim citation snippet"
+                        title={t("solution.copyExcerpt", "Copy verbatim citation snippet")}
                       >
                         {copiedCitationId === c.citation_id ? (
                           <Check className="w-3.5 h-3.5 text-emerald-500" />

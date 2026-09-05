@@ -64,6 +64,7 @@ class RAGPipeline:
         conversation_history: list | None = None,
         model: str | None = None,
         image_data: str | None = None,
+        target_language: str | None = None,
     ) -> dict:
         t0 = time.time()
         if conversation_history is None:
@@ -80,8 +81,8 @@ class RAGPipeline:
                 extracted_text = (ocr_result.get("extracted_text") or "").strip()
 
                 generic_phrases = [
-                    "analyze this attached equipment photo for fault symptoms and diagnostic recommendations.",
-                    "what is this error",
+                    "analyze image",
+                    "analyze this image",
                     "what is this",
                     "error code",
                     "diagnose",
@@ -127,9 +128,14 @@ class RAGPipeline:
         query_type = self.classifier.classify(query)
         has_error_code = query_type == QueryType.ERROR_CODE or (ocr_result and bool(ocr_result.get("error_code")))
 
-        # Language detection
+        # Language detection & resolution
         detector = getattr(self, "language_detector", None)
-        if detector:
+        if target_language and target_language.lower() != "auto":
+            detected_lang = target_language.lower()
+            lang_name = target_language.upper()
+            is_cjk = detected_lang in ("zh", "ja", "ko")
+            is_rtl = detected_lang in ("ar", "ur", "he")
+        elif detector:
             lang_meta = detector.detect(query)
             detected_lang = lang_meta.get("language", "en")
             lang_name = lang_meta.get("language_name", "English")

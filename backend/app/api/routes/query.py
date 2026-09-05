@@ -33,6 +33,7 @@ async def single_query(
         machine_name=request.machine_name or "",
         model=request.model,
         image_data=request.image_data,
+        target_language=request.target_language,
     )
     logger.info(
         "query.single_turn",

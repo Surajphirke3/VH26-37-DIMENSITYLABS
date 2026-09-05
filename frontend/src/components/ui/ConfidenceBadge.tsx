@@ -1,4 +1,7 @@
+"use client";
+
 import { AlertTriangle, ShieldCheck, AlertCircle } from "lucide-react";
+import { useLanguage } from "@/lib/i18n/context";
 
 interface ConfidenceBadgeProps {
   level: "HIGH" | "MEDIUM" | "LOW" | null | undefined;
@@ -7,7 +10,6 @@ interface ConfidenceBadgeProps {
 
 const config = {
   HIGH: {
-    label: "High Confidence",
     bg: "rgba(16,185,129,0.12)",
     border: "rgba(16,185,129,0.3)",
     color: "#6ee7b7",
@@ -16,7 +18,6 @@ const config = {
     icon: ShieldCheck,
   },
   MEDIUM: {
-    label: "Medium Confidence",
     bg: "rgba(245,158,11,0.12)",
     border: "rgba(245,158,11,0.3)",
     color: "#fcd34d",
@@ -25,7 +26,6 @@ const config = {
     icon: AlertCircle,
   },
   LOW: {
-    label: "Low Confidence",
     bg: "rgba(239,68,68,0.12)",
     border: "rgba(239,68,68,0.3)",
     color: "#fca5a5",
@@ -36,9 +36,17 @@ const config = {
 };
 
 export default function ConfidenceBadge({ level, score }: ConfidenceBadgeProps) {
+  const { t } = useLanguage();
   if (!level) return null;
-  const { label, bg, border, color, dot, glow, icon: Icon } = config[level];
+  const { bg, border, color, dot, glow, icon: Icon } = config[level];
   const pct = score !== undefined && score !== null ? Math.round(score * 100) : null;
+
+  const label =
+    level === "HIGH"
+      ? t("solution.confidenceHigh", "High Confidence")
+      : level === "MEDIUM"
+      ? t("solution.confidenceMed", "Medium Confidence")
+      : t("solution.confidenceLow", "Low Confidence");
 
   return (
     <div className="flex flex-col gap-2 w-full">
@@ -55,7 +63,7 @@ export default function ConfidenceBadge({ level, score }: ConfidenceBadgeProps) 
           <span>{label}</span>
           {pct !== null && (
             <span className="font-mono text-[10px] opacity-85 px-1.5 py-0.2 rounded bg-black/20">
-              {pct}% match
+              {pct}% {t("solution.match", "match")}
             </span>
           )}
         </span>

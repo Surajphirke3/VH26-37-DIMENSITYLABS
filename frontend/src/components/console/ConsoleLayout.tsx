@@ -5,8 +5,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import ThemeToggle from "@/components/ui/ThemeToggle";
+import LanguageSelector from "@/components/common/LanguageSelector";
 import { useTheme } from "@/lib/theme-context";
 import { useAuth } from "@/lib/auth-context";
+import { useLanguage } from "@/lib/i18n/context";
 import {
   FileText,
   UploadCloud,
@@ -26,7 +28,8 @@ import {
 
 interface ConsoleNavItem {
   href: string;
-  label: string;
+  key: string;
+  defaultLabel: string;
   icon: React.ComponentType<{ className?: string }>;
   badge?: string;
 }
@@ -34,32 +37,38 @@ interface ConsoleNavItem {
 const PRIMARY_NAV: ConsoleNavItem[] = [
   {
     href: "/dashboard",
-    label: "Diagnostics Chat",
+    key: "nav.diagnosticsChat",
+    defaultLabel: "Diagnostics Chat",
     icon: Activity,
   },
   {
     href: "/documents",
-    label: "Technical Manuals",
+    key: "nav.technicalManuals",
+    defaultLabel: "Technical Manuals",
     icon: FileText,
   },
   {
     href: "/upload",
-    label: "Upload Engine",
+    key: "nav.uploadEngine",
+    defaultLabel: "Upload Engine",
     icon: UploadCloud,
   },
   {
     href: "/search",
-    label: "Vector Deep Search",
+    key: "nav.vectorSearch",
+    defaultLabel: "Vector Deep Search",
     icon: Search,
   },
   {
     href: "/status",
-    label: "Infrastructure Status",
+    key: "nav.infrastructureStatus",
+    defaultLabel: "Infrastructure Status",
     icon: Layers,
   },
   {
     href: "/settings",
-    label: "System Settings",
+    key: "nav.systemSettings",
+    defaultLabel: "System Settings",
     icon: Sliders,
   },
 ];
@@ -67,22 +76,26 @@ const PRIMARY_NAV: ConsoleNavItem[] = [
 const REFERENCE_NAV: ConsoleNavItem[] = [
   {
     href: "/models",
-    label: "Model Specifications",
+    key: "nav.modelSpecs",
+    defaultLabel: "Model Specifications",
     icon: Cpu,
   },
   {
     href: "/architecture",
-    label: "Live Architecture",
+    key: "nav.liveArchitecture",
+    defaultLabel: "Live Architecture",
     icon: Layers,
   },
   {
     href: "/help",
-    label: "Field Handbook",
+    key: "nav.fieldHandbook",
+    defaultLabel: "Field Handbook",
     icon: HelpCircle,
   },
   {
     href: "/inspector",
-    label: "Judge X-Ray Studio ⚡",
+    key: "nav.judgeStudio",
+    defaultLabel: "Judge X-Ray Studio ⚡",
     icon: Zap,
   },
 ];
@@ -93,6 +106,7 @@ export default function ConsoleLayout({ children }: { children: React.ReactNode 
   const { theme } = useTheme();
   const isLight = theme === "light";
   const { user, logout } = useAuth();
+  const { t } = useLanguage();
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
@@ -135,12 +149,12 @@ export default function ConsoleLayout({ children }: { children: React.ReactNode 
                   MEND<span className="text-teal-600 dark:text-teal-400">-X</span>
                 </span>
                 <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 uppercase tracking-wide">
-                  CONSOLE
+                  {t("nav.console", "CONSOLE")}
                 </span>
               </div>
               <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 uppercase tracking-widest font-semibold flex items-center gap-1 mt-0.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                SYSTEM ONLINE
+                {t("nav.systemOnline", "SYSTEM ONLINE")}
               </span>
             </div>
           </Link>
@@ -151,7 +165,7 @@ export default function ConsoleLayout({ children }: { children: React.ReactNode 
           {/* Group 1: Core Operations */}
           <div>
             <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 px-3 mb-2">
-              Console Operations
+              {t("nav.operations", "Console Operations")}
             </p>
             <nav className="space-y-1">
               {PRIMARY_NAV.map((item) => {
@@ -172,7 +186,7 @@ export default function ConsoleLayout({ children }: { children: React.ReactNode 
                   >
                     <div className="flex items-center gap-2.5">
                       <Icon className={`w-4 h-4 ${active ? "text-white" : "text-slate-400 dark:text-slate-500"}`} />
-                      <span>{item.label}</span>
+                      <span>{t(item.key, item.defaultLabel)}</span>
                     </div>
                     {active && <ChevronRight className="w-3.5 h-3.5 text-white/80" />}
                   </Link>
@@ -184,7 +198,7 @@ export default function ConsoleLayout({ children }: { children: React.ReactNode 
           {/* Group 2: Specs & Handbook */}
           <div>
             <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 px-3 mb-2">
-              Specs & Documentation
+              {t("nav.referenceManuals", "Specs & Documentation")}
             </p>
             <nav className="space-y-1">
               {REFERENCE_NAV.map((item) => {
@@ -203,7 +217,7 @@ export default function ConsoleLayout({ children }: { children: React.ReactNode 
                   >
                     <div className="flex items-center gap-2.5">
                       <Icon className={`w-4 h-4 ${active ? "text-white" : "text-slate-400 dark:text-slate-500"}`} />
-                      <span>{item.label}</span>
+                      <span>{t(item.key, item.defaultLabel)}</span>
                     </div>
                   </Link>
                 );
@@ -211,15 +225,16 @@ export default function ConsoleLayout({ children }: { children: React.ReactNode 
             </nav>
           </div>
 
-          {/* Group 3: Exit to Public Site */}
-          <div className="pt-2 border-t border-[var(--border)]">
+          {/* Group 3: Language & Exit to Public Site */}
+          <div className="pt-2 border-t border-[var(--border)] space-y-1">
+            <LanguageSelector variant="sidebar-item" />
             <Link
               href="/"
               className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-indigo-500/10 transition-colors group"
             >
               <div className="flex items-center gap-2.5">
                 <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-indigo-500" />
-                <span>Marketing Portal</span>
+                <span>{t("nav.portal", "Portal ↗")}</span>
               </div>
               <span className="text-[10px] font-mono text-slate-400 group-hover:text-indigo-500">Exit ↗</span>
             </Link>
@@ -283,7 +298,7 @@ export default function ConsoleLayout({ children }: { children: React.ReactNode 
         <div className="lg:hidden fixed inset-0 z-30 bg-black/60 backdrop-blur-sm pt-16 flex flex-col animate-fade-in">
           <div className="flex-1 bg-[var(--bg-surface)] p-4 space-y-4 overflow-y-auto">
             <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
-              Console Operations
+              {t("nav.operations", "Console Operations")}
             </p>
             {PRIMARY_NAV.map((item) => {
               const active = pathname === item.href;
@@ -299,17 +314,17 @@ export default function ConsoleLayout({ children }: { children: React.ReactNode 
                   }`}
                 >
                   <Icon className="w-4 h-4" />
-                  <span>{item.label}</span>
+                  <span>{t(item.key, item.defaultLabel)}</span>
                 </Link>
               );
             })}
 
             <div className="pt-3 border-t border-[var(--border)] flex items-center justify-between">
               <Link href="/" className="text-xs font-mono text-indigo-500">
-                ← Exit to Portal
+                ← {t("nav.portal", "Exit to Portal")}
               </Link>
               <button onClick={handleLogout} className="text-xs font-semibold text-rose-500">
-                Sign Out
+                {t("nav.signOut", "Sign Out")}
               </button>
             </div>
           </div>
@@ -322,21 +337,16 @@ export default function ConsoleLayout({ children }: { children: React.ReactNode 
         <header className="h-16 border-b border-[var(--border)] bg-[var(--bg-surface)]/80 backdrop-blur-md sticky top-0 z-20 px-6 sm:px-8 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="hidden sm:flex items-center gap-2 text-xs font-mono text-slate-400 dark:text-slate-500">
-              <span>Console</span>
+              <span>{t("nav.console", "Console")}</span>
               <span>/</span>
               <span className="font-semibold text-slate-800 dark:text-slate-200">
-                {currentNav?.label || "Workspace"}
+                {currentNav ? t(currentNav.key, currentNav.defaultLabel) : "Workspace"}
               </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
-            {/* Live Infrastructure Tag */}
-            <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span>PLC TELEMETRY ACTIVE</span>
-            </div>
-
+          <div className="flex items-center gap-3">
+            <LanguageSelector variant="header-pill" />
             <ThemeToggle />
           </div>
         </header>

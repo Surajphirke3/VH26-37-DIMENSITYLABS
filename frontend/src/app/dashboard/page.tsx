@@ -34,7 +34,9 @@ import ChatInterface from "@/components/chat/ChatInterface";
 import MobileDeviceSimulator from "@/components/mobile/MobileDeviceSimulator";
 import Spinner from "@/components/ui/Spinner";
 import ThemeToggle from "@/components/ui/ThemeToggle";
+import LanguageSelector from "@/components/common/LanguageSelector";
 import { useTheme } from "@/lib/theme-context";
+import { useLanguage } from "@/lib/i18n/context";
 import ManufacturerLogo from "@/components/common/ManufacturerLogo";
 
 interface ConvEntry {
@@ -72,6 +74,7 @@ const COMMON_FAULT_PROBES = [
 export default function DashboardPage() {
   const { user, isLoading: authLoading, logout } = useAuth();
   const { theme } = useTheme();
+  const { t } = useLanguage();
   const isLight = theme === "light";
   const router = useRouter();
 
@@ -213,12 +216,12 @@ export default function DashboardPage() {
                     MEND<span className="text-teal-600 dark:text-teal-400">-X</span>
                   </span>
                   <span className="px-1.5 py-0.5 rounded text-[8px] font-mono font-bold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 uppercase">
-                    CONSOLE
+                    {t("nav.console", "CONSOLE")}
                   </span>
                 </div>
                 <span className="text-[9px] font-mono text-emerald-600 dark:text-emerald-400 uppercase tracking-wider font-semibold flex items-center gap-1 mt-0.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  SYSTEM ONLINE
+                  {t("nav.systemOnline", "SYSTEM ONLINE")}
                 </span>
               </div>
             </Link>
@@ -228,14 +231,14 @@ export default function DashboardPage() {
               className="text-[10px] font-mono text-slate-400 hover:text-indigo-500 transition-colors px-1.5 py-1 rounded hover:bg-slate-100 dark:hover:bg-white/[0.05]"
               title="Return to Public Website"
             >
-              Portal ↗
+              {t("nav.portal", "Portal ↗")}
             </Link>
           </div>
 
           {/* Machine Selector */}
           <div className="px-4 py-3.5 border-b border-[var(--border)] relative z-30">
             <p className="text-[10px] font-mono font-bold uppercase tracking-widest mb-2 px-1 text-slate-400 dark:text-slate-500">
-              Active Machine Filter
+              {t("dashboard.activeMachineFilter", "Active Machine Filter")}
             </p>
             <MachineSelector
               machines={machines}
@@ -247,7 +250,7 @@ export default function DashboardPage() {
           {/* Grounded Document & Equipment References */}
           <div className="px-3 py-3 border-b border-[var(--border)]">
             <p className="text-[10px] font-mono font-bold uppercase tracking-widest mb-2 px-2 text-slate-400 dark:text-slate-500">
-              Grounded Documentation
+              {t("dashboard.groundedDocumentation", "Grounded Documentation")}
             </p>
             <div className="space-y-1 text-xs">
               <Link
@@ -259,8 +262,8 @@ export default function DashboardPage() {
                     <FileText className="w-3.5 h-3.5" />
                   </div>
                   <div>
-                    <span className="font-semibold block">Select Manuals</span>
-                    <span className="text-[10px] font-mono text-slate-500">Inspect OEM Schematics</span>
+                    <span className="font-semibold block">{t("dashboard.selectManuals", "Select Manuals")}</span>
+                    <span className="text-[10px] font-mono text-slate-500">{t("dashboard.inspectSchematics", "Inspect OEM Schematics")}</span>
                   </div>
                 </div>
                 <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 font-bold">
@@ -276,8 +279,8 @@ export default function DashboardPage() {
                   <div className="flex items-center gap-2">
                     <Settings className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
                     <div>
-                      <span className="block text-xs font-bold">Admin Management</span>
-                      <span className="text-[10px] font-mono text-indigo-400/70">Uploads &amp; Fleet Config</span>
+                      <span className="block text-xs font-bold">{t("dashboard.adminManagement", "Admin Management")}</span>
+                      <span className="text-[10px] font-mono text-indigo-400/70">{t("dashboard.uploadsAndConfig", "Uploads & Fleet Config")}</span>
                     </div>
                   </div>
                   <span className="text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300">
@@ -292,7 +295,7 @@ export default function DashboardPage() {
           <div className="flex-1 px-3 py-3 overflow-y-auto">
             <div className="flex items-center justify-between mb-2 px-2">
               <p className="text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">
-                Diagnostic Sessions
+                {t("dashboard.diagnosticSessions", "Diagnostic Sessions")}
               </p>
               <button
                 onClick={() => startNewConversation(selectedMachine ?? undefined)}
@@ -300,14 +303,14 @@ export default function DashboardPage() {
                 title="Start a new diagnostic session"
               >
                 <Plus className="w-3 h-3" />
-                <span>New</span>
+                <span>{t("dashboard.newSession", "New")}</span>
               </button>
             </div>
 
             <div className="space-y-1.5 overflow-y-auto max-h-[320px] px-0.5">
               {conversations.length === 0 ? (
                 <div className="px-3 py-6 text-center text-[11px] text-slate-500 border border-dashed border-white/10 rounded-xl">
-                  No active sessions. Click &apos;+ New&apos; to initiate diagnostic intake.
+                  {t("dashboard.noActiveSessions", "No active sessions. Click '+ New' to initiate diagnostic intake.")}
                 </div>
               ) : (
                 conversations.map((c) => (
@@ -414,7 +417,7 @@ export default function DashboardPage() {
 
         {/* Top SCADA Flight Deck Header */}
         <header
-          className="flex items-center justify-between px-6 py-3 shrink-0 border-b border-[var(--border)] backdrop-blur-md relative z-10 bg-[var(--bg-surface)]/85"
+          className="flex items-center justify-between px-6 py-3 shrink-0 border-b border-[var(--border)] backdrop-blur-md relative z-30 bg-[var(--bg-surface)]/85"
         >
           <div className="flex items-center gap-3 min-w-0">
             <button
@@ -436,7 +439,7 @@ export default function DashboardPage() {
               <div className="flex items-center gap-2 flex-wrap">
                 <div className="flex items-center gap-1.5">
                   <span className="font-mono font-black text-xs uppercase tracking-wider text-slate-800 dark:text-slate-100">
-                    DIAGNOSTICS HUD
+                    {t("dashboard.hudTitle", "DIAGNOSTICS HUD")}
                   </span>
                   <span className="px-1.5 py-0.5 rounded font-mono text-[9px] font-bold bg-cyan-500/10 dark:bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 border border-cyan-500/30">
                     v2.4
@@ -458,7 +461,7 @@ export default function DashboardPage() {
                 ) : (
                   <span className="px-2 py-0.5 rounded-lg text-[10px] font-mono font-bold bg-amber-500/10 dark:bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30 flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-amber-400 animate-pulse" />
-                    FLEET MODE (UNPINNED)
+                    {t("dashboard.fleetMode", "Fleet Wide Mode")}
                   </span>
                 )}
               </div>
@@ -485,7 +488,7 @@ export default function DashboardPage() {
                 title="Desktop Console View"
               >
                 <Monitor className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Desktop</span>
+                <span className="hidden sm:inline">{t("dashboard.desktop", "Desktop")}</span>
               </button>
 
               <button
@@ -499,7 +502,7 @@ export default function DashboardPage() {
                 title="Mobile Field Device Simulator"
               >
                 <Smartphone className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Field Mobile</span>
+                <span className="hidden sm:inline">{t("dashboard.fieldMobile", "Field Mobile")}</span>
               </button>
 
               <button
@@ -513,7 +516,7 @@ export default function DashboardPage() {
                 title="Split View: Desktop Console + Mobile Device"
               >
                 <Columns className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Dual Split</span>
+                <span className="hidden sm:inline">{t("dashboard.dualSplit", "Dual Split")}</span>
               </button>
             </div>
 
@@ -529,10 +532,11 @@ export default function DashboardPage() {
                 title="Switch to Administrative Management Console"
               >
                 <Settings className="w-3.5 h-3.5" />
-                <span>Admin Console</span>
+                <span>{t("nav.adminConsole", "Admin Console")}</span>
               </Link>
             )}
 
+            <LanguageSelector variant="header-pill" />
             <ThemeToggle />
           </div>
         </header>
