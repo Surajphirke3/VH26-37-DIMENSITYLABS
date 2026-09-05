@@ -301,7 +301,7 @@ export default function ModelsPage() {
                 <button
                   key={mName}
                   onClick={() => setSelectedModel(mName)}
-                  className={`px-6 py-3 rounded-xl font-bold text-xs transition-all flex items-center gap-3 cursor-pointer ${
+                  className={`px-6 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-3 cursor-pointer ${
                     isSelected
                       ? "bg-white dark:bg-[#161822] text-slate-900 dark:text-white shadow-md border"
                       : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
@@ -316,9 +316,9 @@ export default function ModelsPage() {
                   />
                   <span>{item.name}</span>
                   <span
-                    className="hidden sm:inline font-mono text-[10px] px-2 py-0.5 rounded-md"
+                    className="hidden sm:inline font-mono text-xs px-2 py-0.5 rounded-md"
                     style={{
-                      background: isSelected ? item.accentBg : "transparent",
+                      background: item.accentBg,
                       color: item.accentColor,
                     }}
                   >
@@ -359,7 +359,7 @@ export default function ModelsPage() {
                   {activeSpec.tierLabel}
                 </span>
                 {activeSpec.deploymentSpecs.edgeReady && (
-                  <span className="font-mono text-[10px] px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25 font-bold">
+                  <span className="font-mono text-xs px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25 font-bold">
                     EDGE DEPLOYABLE
                   </span>
                 )}
@@ -371,36 +371,36 @@ export default function ModelsPage() {
                   <Image
                     src={theme === "light" ? activeSpec.logoLight : activeSpec.logoDark}
                     alt={activeSpec.name}
-                    width={140}
-                    height={55}
+                    width={160}
+                    height={60}
                     className="object-contain"
                   />
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
                   {activeSpec.tagline}
                 </h2>
-                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                <p className="text-base text-slate-600 dark:text-slate-300 leading-relaxed">
                   {activeSpec.summary}
                 </p>
               </div>
 
               {/* Hardware & Spec Callouts */}
-              <div className="space-y-2.5 pt-4 border-t border-slate-100 dark:border-white/[0.08]">
-                <div className="flex items-center justify-between text-xs py-1">
+              <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-white/[0.08]">
+                <div className="flex items-center justify-between text-sm py-1">
                   <span className="text-slate-500 font-mono">Underlying LLM Engine</span>
                   <span className="font-semibold text-slate-900 dark:text-slate-200">{activeSpec.engine}</span>
                 </div>
-                <div className="flex items-center justify-between text-xs py-1">
+                <div className="flex items-center justify-between text-sm py-1">
                   <span className="text-slate-500 font-mono">Average Latency</span>
                   <span className="font-mono font-bold" style={{ color: activeSpec.accentColor }}>
                     {activeSpec.latency}
                   </span>
                 </div>
-                <div className="flex items-center justify-between text-xs py-1">
+                <div className="flex items-center justify-between text-sm py-1">
                   <span className="text-slate-500 font-mono">Context Window</span>
-                  <span className="font-mono text-slate-700 dark:text-slate-300">{activeSpec.contextWindow}</span>
+                  <span className="font-mono font-semibold text-slate-900 dark:text-slate-200">{activeSpec.contextWindow}</span>
                 </div>
-                <div className="flex items-center justify-between text-xs py-1">
+                <div className="flex items-center justify-between text-sm py-1">
                   <span className="text-slate-500 font-mono">Inference Throughput</span>
                   <span className="font-mono text-slate-700 dark:text-slate-300">{activeSpec.deploymentSpecs.throughput}</span>
                 </div>
