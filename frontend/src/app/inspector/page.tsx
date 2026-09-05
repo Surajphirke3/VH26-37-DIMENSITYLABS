@@ -607,9 +607,9 @@ export default function TechnicalInspectorPage() {
                     className="w-full px-2.5 py-1.5 text-xs rounded-xl bg-slate-50 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08] text-slate-800 dark:text-slate-200 outline-none font-mono"
                   >
                     <option value="auto">Auto-Router</option>
-                    <option value="openai/gpt-oss-120b">GPT-OSS 120B (Groq)</option>
-                    <option value="openai/gpt-oss-20b">GPT-OSS 20B (Groq Fast)</option>
-                    <option value="groq/compound-mini">Groq Compound Mini</option>
+                    <option value="openai/gpt-oss-120b">Apex — GPT-OSS 120B (Groq)</option>
+                    <option value="openai/gpt-oss-20b">Forge — GPT-OSS 20B (Groq Fast)</option>
+                    <option value="groq/compound-mini">Nord — Groq Compound Mini (Fast Edge)</option>
                   </select>
                 </div>
 

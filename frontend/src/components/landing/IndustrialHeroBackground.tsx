@@ -165,9 +165,6 @@ export default function IndustrialHeroBackground() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-[var(--bg-base)]/60 to-[var(--bg-base)]" />
       </div>
 
-      {/* ─── Animated Vertical Laser Scanline Sweep ─── */}
-      <div className="absolute inset-x-0 h-44 bg-gradient-to-b from-transparent via-teal-500/10 dark:via-cyan-500/15 to-transparent -top-44 animate-scanline pointer-events-none" />
-
       {/* ─── Real-Time HTML5 Particle & Circuit Canvas ─── */}
       <canvas
         ref={canvasRef}

@@ -152,7 +152,7 @@ const ARCHITECTURE_NODES: Record<string, ArchitectureNode> = {
   },
   model_nord: {
     id: "model_nord",
-    name: "Groq Compound Mini (Fast Edge)",
+    name: "Nord (Fast Edge)",
     subsystem: "Sub-100ms Groq LPU Inference",
     tech: "groq/compound-mini (Groq LPU)",
     fileSource: "backend/app/services/ai/groq.py",
@@ -166,7 +166,7 @@ const ARCHITECTURE_NODES: Record<string, ArchitectureNode> = {
   },
   model_forge: {
     id: "model_forge",
-    name: "GPT-OSS 20B (Diagnostic Engine)",
+    name: "Forge (Diagnostic Engine)",
     subsystem: "High-Throughput Procedural Specialist",
     tech: "openai/gpt-oss-20b (Structured JSON)",
     fileSource: "backend/app/services/ai/groq.py",
@@ -180,7 +180,7 @@ const ARCHITECTURE_NODES: Record<string, ArchitectureNode> = {
   },
   model_apex: {
     id: "model_apex",
-    name: "GPT-OSS 120B (Deep Reasoning)",
+    name: "Apex (Deep Reasoning)",
     subsystem: "Multi-Source Diagnostic Sovereign",
     tech: "openai/gpt-oss-120b (128k Deep Context)",
     fileSource: "backend/app/services/ai/groq.py",

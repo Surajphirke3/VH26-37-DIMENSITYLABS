@@ -59,8 +59,8 @@ const SOLUTION_PILLARS = [
   },
   {
     title: "Tri-Tier Adaptive Routing",
-    desc: "Simple error codes (Compound Mini <100ms). Multi-step procedures (GPT-OSS 20B 1–2s). Critical root cause (GPT-OSS 120B 2–4s). Severity-matched LLM routing eliminates wasted compute and speeds diagnosis.",
-    metrics: ["Groq Compound Mini", "GPT-OSS 20B fast workhorse", "GPT-OSS 120B deep reasoning"]
+    desc: "Simple error codes (Nord <100ms). Multi-step procedures (Forge 1–2s). Critical root cause (Apex 2–4s). Severity-matched LLM routing eliminates wasted compute and speeds diagnosis.",
+    metrics: ["Nord (Groq Edge)", "Forge (Fast Workhorse)", "Apex (Deep Reasoning)"]
   },
   {
     title: "Zero-Hallucination Defense",

@@ -13,7 +13,7 @@ const DISPATCHES = [
     desc: "A deep dive into our deterministic chunking algorithms tailored for unstructured PDF documents, cutting down false positives by 94% on legacy maintenance records."
   },
   {
-    title: "Tri-Tier LLM Architecture: Why we deployed dynamic Groq LPU routing for Compound Mini, GPT-OSS 20B, and 120B.",
+    title: "Tri-Tier LLM Architecture: Why we deployed dynamic Groq LPU routing for Nord, Forge, and Apex.",
     date: "Aug 02, 2026",
     tag: "ENGINEERING",
     readTime: "12 min read",
