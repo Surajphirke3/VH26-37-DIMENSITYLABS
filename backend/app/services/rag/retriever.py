@@ -149,10 +149,39 @@ class HybridRetriever:
                 LIMIT :top_k
             """)
             result = await self.db.execute(fallback_sql, params)
-            return [(row[0], float(row[1])) for row in result.fetchall()]
+            rows = result.fetchall()
+            if rows:
+                return [(row[0], float(row[1])) for row in rows]
         except Exception as exc:
-            logger.warning("retriever.keyword_search.failed", error=str(exc))
-            return []
+            logger.warning("retriever.keyword_search.fallback_failed", error=str(exc))
+
+        # Fallback 2: Alphanumeric ILIKE search for non-English manuals (e.g. Chinese)
+        # where Postgres 'english' tsvector does not segment Chinese characters.
+        import re
+        tokens = re.findall(r'[A-Za-z0-9\-\.]+', query)
+        code_tokens = [t for t in tokens if t.lower() not in ('alarm', 'error', 'code', 'the', 'is', 'in', 'and', 'what', 'how', 'to', 'fix')]
+        if code_tokens:
+            ilike_clauses = " OR ".join(f"c.content ILIKE :tok_{i}" for i in range(len(code_tokens)))
+            ilike_sql = text(f"""
+                SELECT c.id, 1.0 AS score
+                FROM chunks c
+                WHERE ({ilike_clauses}) {machine_filter}
+                ORDER BY (CASE WHEN c.content ILIKE '%报警%' OR c.content ILIKE '%alarm%' OR c.content ILIKE '%error%' THEN 0 ELSE 1 END) ASC
+                LIMIT :top_k
+            """)
+            ilike_params = {f"tok_{i}": f"%{t}%" for i, t in enumerate(code_tokens)}
+            ilike_params["top_k"] = top_k
+            if target_uuid:
+                ilike_params["machine_id"] = target_uuid
+            try:
+                res = await self.db.execute(ilike_sql, ilike_params)
+                ilike_rows = res.fetchall()
+                if ilike_rows:
+                    return [(row[0], float(row[1])) for row in ilike_rows]
+            except Exception as exc:
+                logger.warning("retriever.keyword_search.ilike_failed", error=str(exc))
+
+        return []
 
     def _rrf_fuse(
         self,

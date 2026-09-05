@@ -15,6 +15,7 @@ from app.db.chroma import ChromaRepository
 from app.services.ingestion.chunker import ManualChunker
 from app.services.ingestion.embedder import EmbeddingService
 from app.services.ingestion.pdf_parser import PDFParser
+from app.services.rag.language_detector import LanguageDetector
 
 logger = get_logger("ingestion.pipeline")
 
@@ -27,6 +28,7 @@ class IngestionPipeline:
         self.parser = PDFParser()
         self.chunker = ManualChunker()
         self.embedder = EmbeddingService()
+        self.lang_detector = LanguageDetector()
 
     async def run(self, manual_id: UUID, job_id: UUID) -> None:
         """Run full ingestion pipeline: parse → chunk → embed → persist."""
@@ -45,6 +47,12 @@ class IngestionPipeline:
 
             # --- Chunk ---
             chunks = self.chunker.chunk_pages(pages)
+
+            # --- Detect manual language from first 3 pages ---
+            sample_text = " ".join(p.text[:500] for p in pages[:3])
+            manual_lang = self.lang_detector.detect_manual_language(sample_text)
+            logger.info("ingestion.language_detected", manual_id=str(manual_id), language=manual_lang)
+
             await self._update_job(job_id, progress_pct=35)
 
             # --- Embed & persist in batches ---
@@ -96,7 +104,8 @@ class IngestionPipeline:
                         "page_start": db_chunk.page_start,
                         "page_end": db_chunk.page_end,
                         "chunk_type": db_chunk.chunk_type,
-                        "section_path": db_chunk.section_path or ""
+                        "section_path": db_chunk.section_path or "",
+                        "language": manual_lang,
                     })
 
                 # Insert into ChromaDB

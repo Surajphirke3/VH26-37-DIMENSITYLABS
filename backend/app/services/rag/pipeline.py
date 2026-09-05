@@ -77,8 +77,14 @@ class RAGPipeline:
         if detector:
             lang_meta = detector.detect(query)
             detected_lang = lang_meta.get("language", "en")
+            lang_name = lang_meta.get("language_name", "English")
+            is_cjk = lang_meta.get("is_cjk", False)
+            is_rtl = lang_meta.get("is_rtl", False)
         else:
             detected_lang = "en"
+            lang_name = "English"
+            is_cjk = False
+            is_rtl = False
 
         # Resolve AI model
         router = getattr(self, "model_router", None)
@@ -179,6 +185,7 @@ class RAGPipeline:
             conversation_history,
             model=resolved_model,
             image_data=image_data,
+            detected_lang=detected_lang,
         )
         llm_ms = int((time.time() - t_llm) * 1000)
 
@@ -204,6 +211,9 @@ class RAGPipeline:
         llm_result["citations"] = citations
         llm_result["evidence_score"] = evidence.evidence_score
         llm_result["language_detected"] = detected_lang
+        llm_result["language_name"] = lang_name
+        llm_result["is_cjk_response"] = is_cjk
+        llm_result["is_rtl_response"] = is_rtl
         llm_result["model_used"] = resolved_model
         llm_result["retrieval_latency_ms"] = retrieval_ms
         llm_result["rerank_latency_ms"] = rerank_ms

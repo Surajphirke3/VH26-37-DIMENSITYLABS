@@ -20,21 +20,25 @@ class OllamaLLM(LLMProvider):
         self._base_url = base_url.rstrip("/")
         self._model = model
 
-    async def generate(self, prompt: str) -> str:
-        async with httpx.AsyncClient(timeout=180) as client:
-            resp = await client.post(
-                f"{self._base_url}/api/generate",
-                json={"model": self._model, "prompt": prompt, "stream": False},
-            )
-            resp.raise_for_status()
-            return _strip_think(resp.json()["response"])
-
-    async def generate_json(self, prompt: str) -> str:
+    async def generate(self, prompt: str, model: str | None = None, **kwargs) -> str:
         async with httpx.AsyncClient(timeout=180) as client:
             resp = await client.post(
                 f"{self._base_url}/api/generate",
                 json={
-                    "model": self._model,
+                    "model": model or self._model,
+                    "prompt": prompt,
+                    "stream": False,
+                },
+            )
+            resp.raise_for_status()
+            return _strip_think(resp.json()["response"])
+
+    async def generate_json(self, prompt: str, model: str | None = None, **kwargs) -> str:
+        async with httpx.AsyncClient(timeout=180) as client:
+            resp = await client.post(
+                f"{self._base_url}/api/generate",
+                json={
+                    "model": model or self._model,
                     "prompt": prompt,
                     "stream": False,
                     "format": "json",
