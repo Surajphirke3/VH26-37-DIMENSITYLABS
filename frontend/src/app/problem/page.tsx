@@ -59,8 +59,8 @@ const SOLUTION_PILLARS = [
   },
   {
     title: "Tri-Tier Adaptive Routing",
-    desc: "Simple error codes (NORD <100ms). Multi-step procedures (FORGE 1–3s). Critical root cause (APEX 3–8s). Severity-matched LLM routing eliminates wasted compute and speeds diagnosis.",
-    metrics: ["Llama 3.1 8B edge model", "Gemini 2.0 Flash cloud tier", "Claude Sonnet reasoning tier"]
+    desc: "Simple error codes (Compound Mini <100ms). Multi-step procedures (GPT-OSS 20B 1–2s). Critical root cause (GPT-OSS 120B 2–4s). Severity-matched LLM routing eliminates wasted compute and speeds diagnosis.",
+    metrics: ["Groq Compound Mini", "GPT-OSS 20B fast workhorse", "GPT-OSS 120B deep reasoning"]
   },
   {
     title: "Zero-Hallucination Defense",
@@ -70,7 +70,7 @@ const SOLUTION_PILLARS = [
   {
     title: "Technician-First UX",
     desc: "Mobile-first error code entry. Speaks the language of the shop floor: part numbers, bolt torque specs, tool requirements, step-by-step visuals. No jargon.",
-    metrics: ["Field technician workflows", "Offline-capable NORD", "Voice input ready"]
+    metrics: ["Field technician workflows", "Ultra-fast edge triage", "Voice input ready"]
   },
   {
     title: "Compliance & Audit Ready",

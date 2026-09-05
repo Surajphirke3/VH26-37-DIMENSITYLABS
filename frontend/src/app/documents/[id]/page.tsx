@@ -3,7 +3,7 @@
 import React, { useState, useEffect, use } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import LandingLayout from "@/components/landing/LandingLayout";
+import ConsoleLayout from "@/components/console/ConsoleLayout";
 import Spinner from "@/components/ui/Spinner";
 import { getManualDetail, getManualChunks, reprocessManual } from "@/lib/api";
 import type { Manual, Machine, ManualChunk } from "@/lib/types";
@@ -83,34 +83,34 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
 
   if (loading) {
     return (
-      <LandingLayout>
+      <ConsoleLayout>
         <div className="min-h-[70vh] flex flex-col items-center justify-center">
           <Spinner size="lg" />
           <p className="text-xs text-[var(--text-muted)] mt-4">Loading document details…</p>
         </div>
-      </LandingLayout>
+      </ConsoleLayout>
     );
   }
 
   if (!manual) {
     return (
-      <LandingLayout>
-        <div className="pt-32 pb-20 text-center max-w-xl mx-auto">
+      <ConsoleLayout>
+        <div className="pt-20 pb-20 text-center max-w-xl mx-auto">
           <h2 className="text-2xl font-bold text-[var(--text-primary)]">Document not found</h2>
           <p className="text-xs text-[var(--text-muted)] mt-2">The requested manual ID does not exist or has been deleted.</p>
           <Link href="/documents" className="mt-6 inline-block px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-semibold">
             Back to Documents
           </Link>
         </div>
-      </LandingLayout>
+      </ConsoleLayout>
     );
   }
 
   const totalPages = Math.ceil(totalChunks / pageSize) || 1;
 
   return (
-    <LandingLayout>
-      <div className="pt-24 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <ConsoleLayout>
+      <div className="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         {/* Breadcrumb & Navigation */}
         <div className="flex items-center gap-2 text-xs text-[var(--text-muted)] mb-6">
           <Link href="/documents" className="hover:text-indigo-600 dark:hover:text-indigo-400">
@@ -341,6 +341,6 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
           </div>
         )}
       </div>
-    </LandingLayout>
+    </ConsoleLayout>
   );
 }

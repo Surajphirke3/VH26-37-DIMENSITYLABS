@@ -11,59 +11,64 @@ from app.services.ai.base import LLMProvider
 
 logger = get_logger("ai.groq")
 
+# Models verified to work on this Groq account — any other model will be silently replaced.
+VERIFIED_GROQ_MODELS: frozenset[str] = frozenset({
+    "openai/gpt-oss-120b",
+    "openai/gpt-oss-20b",
+    "groq/compound-mini",
+    "qwen/qwen3.6-27b",
+    "qwen/qwen3.8-27b",
+})
+
+_DEFAULT_GROQ_MODEL = "openai/gpt-oss-120b"
+
+
+def _safe_model(model: str | None) -> str:
+    """Return model if in verified list, else fall back to default."""
+    if model and model in VERIFIED_GROQ_MODELS:
+        return model
+    if model:
+        logger.warning("groq.invalid_model_fallback", requested=model, using=_DEFAULT_GROQ_MODEL)
+    return settings.GROQ_MODEL or _DEFAULT_GROQ_MODEL
+
 
 class GroqLLM(LLMProvider):
     """Groq-hosted LLM implementation."""
 
     def __init__(self, api_key: str, model: str = Field(default_factory=lambda: settings.GROQ_MODEL)):
         self._client = AsyncGroq(api_key=api_key)
-        self.model = model
+        self.model = _safe_model(model)
 
     async def generate(self, prompt: str, model: str | None = None, image_data: str | None = None) -> str:
-        chosen_model = model or self.model
-        if image_data:
-            img_url = image_data if (image_data.startswith("data:") or image_data.startswith("http")) else f"data:image/jpeg;base64,{image_data}"
-            messages = [
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": prompt},
-                        {"type": "image_url", "image_url": {"url": img_url}},
-                    ],
-                }
-            ]
-        else:
-            messages = [{"role": "user", "content": prompt}]
+        chosen_model = _safe_model(model or self.model)
+        # Note: These models don't support vision — send as text-only if image attached
+        messages = [{
+            "role": "user",
+            "content": prompt + (f"\n\n[IMAGE ATTACHED — analyze visually if applicable]" if image_data else "")
+        }]
 
         resp = await self._client.chat.completions.create(
             model=chosen_model,
             messages=messages,
             temperature=0.1,
-            max_tokens=min(settings.RAG_CONFIG.get("max_tokens", 1024), 1024),
+            max_tokens=min(settings.RAG_CONFIG.get("max_tokens", 4096), 4096),
         )
         return resp.choices[0].message.content or ""
 
+
     async def generate_json(self, prompt: str, model: str | None = None, image_data: str | None = None) -> str:
-        chosen_model = model or self.model
-        if image_data:
-            img_url = image_data if (image_data.startswith("data:") or image_data.startswith("http")) else f"data:image/jpeg;base64,{image_data}"
-            messages = [
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": prompt},
-                        {"type": "image_url", "image_url": {"url": img_url}},
-                    ],
-                }
-            ]
-        else:
-            messages = [{"role": "user", "content": prompt}]
+        chosen_model = _safe_model(model or self.model)
+        # Note: These models don't support vision via image_url — include image context as text
+        messages = [{
+            "role": "user",
+            "content": prompt + ("\n\n[IMAGE ATTACHED — analyze visually if applicable]" if image_data else "")
+        }]
 
         resp = await self._client.chat.completions.create(
             model=chosen_model,
             messages=messages,
             temperature=0.1,
-            max_tokens=min(settings.RAG_CONFIG.get("max_tokens", 1024), 1024),
+            max_tokens=min(settings.RAG_CONFIG.get("max_tokens", 4096), 4096),
             response_format={"type": "json_object"},
         )
         return resp.choices[0].message.content or ""

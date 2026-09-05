@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import type { Message, TroubleshootingResponse } from "@/lib/types";
-import { sendMessage, disambiguate } from "@/lib/api";
+import { sendMessage, disambiguate, getConversationMessages } from "@/lib/api";
+import ExecutionPipelineTracker from "@/components/common/ExecutionPipelineTracker";
 import MessageInput from "@/components/chat/MessageInput";
 import StructuredAnswer from "@/components/chat/StructuredAnswer";
 import DisambiguationCard from "@/components/chat/DisambiguationCard";
@@ -49,9 +50,55 @@ export default function ChatInterface({
 }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [expandedTraces, setExpandedTraces] = useState<Record<string, boolean>>({});
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => { setMessages([]); }, [conversationId]);
+  const toggleTrace = (id: string) => {
+    setExpandedTraces((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  useEffect(() => {
+    if (!conversationId) {
+      setMessages([]);
+      return;
+    }
+
+    let isMounted = true;
+    setIsLoading(true);
+
+    getConversationMessages(conversationId)
+      .then((data) => {
+        if (!isMounted) return;
+        const history: Message[] = (data.messages || []).map((m) => ({
+          id: m.id,
+          role: m.role,
+          content: m.content,
+          response: m.response || (m.role === "assistant" && m.answer_type ? {
+            answer_type: m.answer_type as any,
+            summary: m.content,
+            probable_causes: [],
+            corrective_steps: [],
+            citations: [],
+            follow_up_suggestions: [],
+            confidence_level: m.confidence_level as any,
+            evidence_score: m.evidence_score ?? undefined,
+            total_latency_ms: m.total_latency_ms ?? undefined,
+          } : undefined),
+          timestamp: m.created_at || new Date().toISOString(),
+        }));
+        setMessages(history);
+      })
+      .catch((err) => {
+        console.error("Failed to load message history:", err);
+      })
+      .finally(() => {
+        if (isMounted) setIsLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [conversationId]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -197,7 +244,7 @@ export default function ChatInterface({
                 <p>{msg.content}</p>
                 {msg.model && (
                   <div className="mt-1.5 pt-1 border-t border-white/20 text-[10px] text-white/75 font-mono">
-                    Model: {msg.model}
+                    Model: {msg.model.replace(/^openai\//, "").replace(/^groq\//, "")}
                   </div>
                 )}
               </div>
@@ -230,39 +277,44 @@ export default function ChatInterface({
                       (s) => handleSend(s)
                     )
                   : <p className="text-sm text-slate-700 dark:text-[#94a3b8]">{msg.content}</p>}
+
+                {/* Grounded Pipeline Trace Toggle */}
+                <div className="mt-3 pt-2.5 border-t border-slate-100 dark:border-white/[0.05] flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={() => toggleTrace(msg.id)}
+                    className="inline-flex items-center gap-1.5 text-[11px] font-mono text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 font-bold transition-colors cursor-pointer"
+                  >
+                    <span>⚡ {expandedTraces[msg.id] ? "Hide" : "View"} 8-Stage Execution Trace</span>
+                  </button>
+                  <span className="text-[10px] font-mono text-slate-400">
+                    MANUALS → CHUNKS → VECTORS → CITED SOLUTION
+                  </span>
+                </div>
+
+                {expandedTraces[msg.id] && (
+                  <div className="mt-3 animate-fade-in">
+                    <ExecutionPipelineTracker
+                      isExecuting={false}
+                      query={messages.find((_, i) => i === idx - 1)?.content}
+                      variant="compact"
+                    />
+                  </div>
+                )}
               </div>
             )}
           </div>
         ))}
 
-        {/* Typing Indicator */}
+        {/* Live Background Pipeline Tracker While Executing */}
         {isLoading && (
-          <div className="flex justify-start animate-fade-in">
-            <div
-              className="px-5 py-4 rounded-2xl rounded-tl-sm bg-white dark:bg-[rgba(15,17,23,0.9)] border border-slate-200 dark:border-white/[0.07] shadow-sm dark:shadow-[0_4px_24px_rgba(0,0,0,0.5)] transition-colors"
-            >
-              <div className="flex items-center gap-2 mb-2">
-                <div
-                  className="w-5 h-5 rounded-full flex items-center justify-center bg-emerald-500/10 border border-emerald-500/20"
-                >
-                  <svg className="w-3 h-3 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2h-2" />
-                  </svg>
-                </div>
-                <span className="text-xs font-medium text-emerald-600 dark:text-[#10b981]">
-                  MEND - X AI
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="flex gap-1.5">
-                  <div className="typing-dot" />
-                  <div className="typing-dot" />
-                  <div className="typing-dot" />
-                </div>
-                <span className="text-xs text-slate-500 dark:text-[#334155]">
-                  Searching manuals…
-                </span>
-              </div>
+          <div className="flex justify-start animate-fade-in w-full">
+            <div className="max-w-[95%] sm:max-w-[85%] w-full">
+              <ExecutionPipelineTracker
+                isExecuting={isLoading}
+                query={messages[messages.length - 1]?.content}
+                variant="compact"
+              />
             </div>
           </div>
         )}

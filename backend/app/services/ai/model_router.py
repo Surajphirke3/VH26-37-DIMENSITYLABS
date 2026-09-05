@@ -45,10 +45,15 @@ class ModelRouter:
         return models
 
     def get_default_model(self) -> Optional[str]:
-        """Return the configured default model."""
-        for provider_name, provider_data in self._config.get("providers", {}).items():
-            if provider_data.get("enabled"):
-                default = provider_data.get("default_model")
+        """Return the configured default model for the active provider."""
+        active_provider = settings.LLM_PROVIDER.lower()
+        provider_data = self._config.get("providers", {}).get(active_provider, {})
+        if provider_data.get("enabled") and provider_data.get("default_model"):
+            return provider_data.get("default_model")
+
+        for provider_name, p_data in self._config.get("providers", {}).items():
+            if p_data.get("enabled"):
+                default = p_data.get("default_model")
                 if default:
                     return default
         return None
@@ -64,7 +69,10 @@ class ModelRouter:
         Priority: explicit_model > task-based routing > provider default > fallback.
         """
         if explicit_model:
-            return explicit_model
+            known_ids = {m["id"] for m in self.get_available_models()}
+            if explicit_model in known_ids:
+                return explicit_model
+            logger.warning("model_router.fallback_from_unsupported_model", unsupported_model=explicit_model)
 
         if task:
             routed = self.get_model_for_task(task)

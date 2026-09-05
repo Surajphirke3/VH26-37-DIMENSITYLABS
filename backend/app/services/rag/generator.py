@@ -7,16 +7,22 @@ from app.services.ai.factory import get_llm_provider
 
 logger = get_logger("rag.generator")
 
+# ---------------------------------------------------------------------------
+# System prompt (language-agnostic instructions + language directive injected
+# at call time via _build_prompt)
+# ---------------------------------------------------------------------------
 _SYSTEM_PROMPT = """You are an expert industrial diagnostics engineer and maintenance assistant for MEND - X (From Failure to Function).
 
 MISSION & CAPABILITIES:
 1. Natural Language Symptom Understanding: Comprehend natural language descriptions of industrial equipment failures, unusual sounds, overheating, vibration, pressure drops, leakage, or maintenance routines in addition to exact alphanumeric fault codes (e.g. E101, F204).
 2. Deep Diagnostic Synthesis: Synthesize the technical context from parsed OEM manuals and tables into an intelligible, actionable diagnosis.
-3. Strict Grounding Guardrails:
-   - ONLY answer using facts, steps, and specifications found in the retrieved context. Never fabricate mechanical or electrical fixes.
-   - Every step and assertion must cite its source passage using [1], [2], etc., matching the context blocks.
+3. Strict Grounding & Extraction:
+   - The RETRIEVED CONTEXT contains authoritative OEM manual excerpts for the equipment and its subsystems.
+   - When the user query matches an error code (e.g. F001, F002, E101) or symptom found in the retrieved context, you MUST produce answer_type="solution" with complete error_meaning, probable_causes, step-by-step corrective_steps, and citations matching the source passages.
+   - Every corrective step must cite its source block using [1], [2], etc.
    - Preserve all safety precautions, warnings (DANGER, WARNING, CAUTION), PPE requirements, and lockout/tagout (LOTO) protocols.
-   - If the manual lacks information to solve the specific symptom, set answer_type="insufficient_information", explain what is known from the manual, and recommend specific inspection points or OEM contact in notes.
+   - ONLY set answer_type="insufficient_information" if the retrieved passages genuinely do NOT mention or describe the queried code/symptom.
+4. MULTILINGUAL RESPONSE: You MUST respond in the same language as the user's query. If the query is in Chinese, respond in Chinese. If Hindi, respond in Hindi. If English, respond in English. The retrieved context may be in a different language — translate and synthesize it as needed. Technical codes, model numbers, and part numbers should remain in their original format (e.g. "E101", "F204") regardless of response language.
 """
 
 _RESPONSE_SCHEMA = """{
@@ -38,19 +44,49 @@ _RESPONSE_SCHEMA = """{
   "follow_up_suggestions": ["Actionable follow-up query or verification check 1", "Follow-up check 2"]
 }"""
 
+# Language name map for the response directive
+_LANG_NAMES: dict[str, str] = {
+    "en":    "English",
+    "zh":    "Simplified Chinese (简体中文)",
+    "zh-cn": "Simplified Chinese (简体中文)",
+    "zh-tw": "Traditional Chinese (繁體中文)",
+    "ja":    "Japanese (日本語)",
+    "ko":    "Korean (한국어)",
+    "ar":    "Arabic (العربية)",
+    "de":    "German (Deutsch)",
+    "fr":    "French (Français)",
+    "es":    "Spanish (Español)",
+    "pt":    "Portuguese (Português)",
+    "ru":    "Russian (Русский)",
+    "hi":    "Hindi (हिंदी)",
+    "mr":    "Marathi (मराठी)",
+    "gu":    "Gujarati (ગુજરાતી)",
+    "ta":    "Tamil (தமிழ்)",
+    "te":    "Telugu (తెలుగు)",
+    "bn":    "Bengali (বাংলা)",
+    "kn":    "Kannada (ಕನ್ನಡ)",
+    "ml":    "Malayalam (മലയാളം)",
+    "pa":    "Punjabi (ਪੰਜਾਬੀ)",
+    "ur":    "Urdu (اردو)",
+}
+
 
 def _build_prompt(
     query: str,
     chunks: list,
     machine_name: str,
     conversation_history: list,
+    detected_lang: str = "en",
 ) -> str:
     context_blocks = []
     for i, chunk in enumerate(chunks, 1):
+        # Note the chunk's own language if available
+        chunk_lang = getattr(chunk, "language", "en")
+        lang_note = f" [Manual language: {chunk_lang.upper()}]" if chunk_lang and chunk_lang != "en" else ""
         context_blocks.append(
             f"[{i}] Source: {chunk.manual_name} | {chunk.machine_name} | "
             f"Page {chunk.page_start}-{chunk.page_end} | "
-            f"{chunk.section_path or 'Unknown section'}\n"
+            f"{chunk.section_path or 'Unknown section'}{lang_note}\n"
             f"{chunk.content[:1000]}"
         )
     context = "\n\n---\n\n".join(context_blocks)
@@ -61,12 +97,22 @@ def _build_prompt(
         for msg in conversation_history[-3:]:
             history += f"{msg['role'].upper()}: {msg['content'][:300]}\n"
 
+    # Language response directive
+    lang_name = _LANG_NAMES.get(detected_lang, detected_lang.upper())
+    lang_directive = (
+        f"\n\nLANGUAGE DIRECTIVE: The user's query is in {lang_name}. "
+        f"You MUST write your ENTIRE response (summary, probable_causes, corrective_steps, notes, "
+        f"follow_up_suggestions) in {lang_name}. "
+        f"Technical codes (e.g. E101, F204), part numbers, and model numbers stay in their original format."
+    )
+
     return (
         f"{_SYSTEM_PROMPT}"
         f"{history}\n\n"
         f"MACHINE CONTEXT: {machine_name or 'Unknown'}\n\n"
         f"RETRIEVED CONTEXT:\n{context}\n\n"
-        f"USER QUERY: {query}\n\n"
+        f"USER QUERY: {query}"
+        f"{lang_directive}\n\n"
         f"Respond in valid JSON matching this schema:\n{_RESPONSE_SCHEMA}"
     )
 
@@ -92,8 +138,9 @@ class LLMGenerator:
         conversation_history: list,
         model: str | None = None,
         image_data: str | None = None,
+        detected_lang: str = "en",
     ) -> dict:
-        prompt = _build_prompt(query, chunks, machine_name, conversation_history)
+        prompt = _build_prompt(query, chunks, machine_name, conversation_history, detected_lang)
 
         for attempt in range(2):
             try:

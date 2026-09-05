@@ -132,17 +132,41 @@ class ChromaRepository:
         client = cls.get_client()
         if client is not None:
             if cls._collection is None:
-                # Cosine similarity metric required by specification
-                cls._collection = client.get_or_create_collection(
-                    name=settings.CHROMA_COLLECTION_NAME,
-                    metadata={"hnsw:space": "cosine"},
-                )
+                # Always fetch fresh from client to avoid stale in-process cache
+                try:
+                    cls._collection = client.get_or_create_collection(
+                        name=settings.CHROMA_COLLECTION_NAME,
+                        metadata={"hnsw:space": "cosine"},
+                    )
+                except Exception as exc:
+                    logger.error("chroma.get_collection_failed", error=str(exc))
+                    cls._collection = None
+                    return cls._get_fallback()
             return cls._collection
 
-        # Fallback in-memory cosine store
+        return cls._get_fallback()
+
+    @classmethod
+    def _get_fallback(cls):
         if cls._fallback_store is None:
             cls._fallback_store = _InMemoryVectorStore()
         return cls._fallback_store
+
+    @classmethod
+    def reset_collection(cls):
+        """Delete and recreate the ChromaDB collection (e.g. after dimension mismatch)."""
+        client = cls.get_client()
+        if client is None:
+            return
+        try:
+            client.delete_collection(settings.CHROMA_COLLECTION_NAME)
+        except Exception:
+            pass
+        cls._collection = client.create_collection(
+            name=settings.CHROMA_COLLECTION_NAME,
+            metadata={"hnsw:space": "cosine"},
+        )
+        logger.warning("chroma.collection_reset", reason="dimension_mismatch_recovery")
 
     @classmethod
     def insert_batch(
@@ -163,8 +187,27 @@ class ChromaRepository:
             )
             logger.info("chroma.insert_batch", count=len(ids))
         except Exception as exc:
-            logger.error("chroma.insert_batch.failed", error=str(exc))
-            raise
+            err_str = str(exc).lower()
+            # Auto-recover from dimension mismatch (stale collection from a
+            # previous embedding model with different output size)
+            if "dimension" in err_str or "embedding" in err_str:
+                logger.warning(
+                    "chroma.dimension_mismatch_detected",
+                    error=str(exc),
+                    action="resetting_collection",
+                )
+                cls.reset_collection()
+                coll = cls.get_collection()
+                coll.add(
+                    ids=ids,
+                    embeddings=embeddings,
+                    metadatas=metadatas,
+                    documents=documents,
+                )
+                logger.info("chroma.insert_batch_after_reset", count=len(ids))
+            else:
+                logger.error("chroma.insert_batch.failed", error=str(exc))
+                raise
 
     @classmethod
     def similarity_search(

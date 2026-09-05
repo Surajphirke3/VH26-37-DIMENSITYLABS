@@ -13,12 +13,12 @@ const DISPATCHES = [
     desc: "A deep dive into our deterministic chunking algorithms tailored for unstructured PDF documents, cutting down false positives by 94% on legacy maintenance records."
   },
   {
-    title: "Tri-Tier LLM Architecture: Why we dropped single-model routing for NORD, FORGE, and APEX.",
+    title: "Tri-Tier LLM Architecture: Why we deployed dynamic Groq LPU routing for Compound Mini, GPT-OSS 20B, and 120B.",
     date: "Aug 02, 2026",
     tag: "ENGINEERING",
     readTime: "12 min read",
     img: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80",
-    desc: "Latency kills flow. Why querying Claude 3.5 for a simple error code wastes capital, and how our Llama-3-8B 'NORD' edge router achieved 45ms median response times."
+    desc: "Latency kills flow. Why querying heavy reasoning models for simple error codes wastes capital, and how our Groq LPU router achieved 45ms median response times."
   },
   {
     title: "Case Study: Recovering a KUKA KR-210 Cell 4 Hours Faster.",

@@ -14,7 +14,7 @@ import {
   Sparkles,
   Info,
 } from "lucide-react";
-import LandingLayout from "@/components/landing/LandingLayout";
+import ConsoleLayout from "@/components/console/ConsoleLayout";
 import { getSystemConfig, getModels } from "@/lib/api";
 import { AIModel } from "@/lib/types";
 
@@ -28,7 +28,7 @@ export default function SettingsPage() {
   const [rerankTopN, setRerankTopN] = useState<number>(5);
   const [similarityThreshold, setSimilarityThreshold] = useState<number>(0.45);
   const [denseWeight, setDenseWeight] = useState<number>(0.7);
-  const [defaultModel, setDefaultModel] = useState<string>("llama-3.3-70b-versatile");
+  const [defaultModel, setDefaultModel] = useState<string>("openai/gpt-oss-120b");
   const [temperature, setTemperature] = useState<number>(0.1);
   const [maxTokens, setMaxTokens] = useState<number>(2048);
   const [defaultLanguage, setDefaultLanguage] = useState<string>("en");
@@ -38,6 +38,7 @@ export default function SettingsPage() {
 
   useEffect(() => {
     // Load existing settings if saved locally
+    const GROQ_VALID_MODELS = new Set(["openai/gpt-oss-120b", "openai/gpt-oss-20b", "groq/compound-mini"]);
     const saved = localStorage.getItem("mendx_settings");
     if (saved) {
       try {
@@ -46,7 +47,10 @@ export default function SettingsPage() {
         if (parsed.rerankTopN) setRerankTopN(parsed.rerankTopN);
         if (parsed.similarityThreshold) setSimilarityThreshold(parsed.similarityThreshold);
         if (parsed.denseWeight) setDenseWeight(parsed.denseWeight);
-        if (parsed.defaultModel) setDefaultModel(parsed.defaultModel);
+        // Validate model — reject stale/invalid models from older app versions
+        if (parsed.defaultModel && GROQ_VALID_MODELS.has(parsed.defaultModel)) {
+          setDefaultModel(parsed.defaultModel);
+        }
         if (parsed.temperature !== undefined) setTemperature(parsed.temperature);
         if (parsed.maxTokens) setMaxTokens(parsed.maxTokens);
         if (parsed.defaultLanguage) setDefaultLanguage(parsed.defaultLanguage);
@@ -92,7 +96,7 @@ export default function SettingsPage() {
     setRerankTopN(5);
     setSimilarityThreshold(0.45);
     setDenseWeight(0.7);
-    setDefaultModel("llama-3.3-70b-versatile");
+    setDefaultModel("openai/gpt-oss-120b");
     setTemperature(0.1);
     setMaxTokens(2048);
     setDefaultLanguage("en");
@@ -103,8 +107,8 @@ export default function SettingsPage() {
   };
 
   return (
-    <LandingLayout>
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <ConsoleLayout>
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
@@ -283,7 +287,11 @@ export default function SettingsPage() {
                     </option>
                   ))}
                   {models.length === 0 && (
-                    <option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile (Groq)</option>
+                    <>
+                      <option value="openai/gpt-oss-120b">GPT-OSS 120B (Groq)</option>
+                      <option value="openai/gpt-oss-20b">GPT-OSS 20B (Groq Fast)</option>
+                      <option value="groq/compound-mini">Groq Compound Mini</option>
+                    </>
                   )}
                 </select>
                 <span className="text-[11px] text-muted-foreground mt-1 block">
@@ -434,6 +442,6 @@ export default function SettingsPage() {
           </div>
         </form>
       </div>
-    </LandingLayout>
+    </ConsoleLayout>
   );
 }

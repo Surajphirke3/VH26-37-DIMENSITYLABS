@@ -7,43 +7,53 @@ import LiveArchitectureFlowchart from "@/components/architecture/LiveArchitectur
 
 const PIPELINE_STAGES = [
   {
-    stage: "Document Ingestion",
-    desc: "PyMuPDF extracts text + table structure from 1.2M+ OEM manual PDFs. Automatic schema inference detects headers, procedures, tables, cross-references.",
-    details: ["Batch processing: 100K+ pages/hour", "Preserves visual hierarchy", "Auto-detects component/part numbers"]
+    stage: "MANUALS",
+    desc: "Ingesting verified OEM technical manuals (Haas, Siemens, KUKA, Fanuc) and wiring schematics. Preserves schematic bounding boxes, tables, and wiring diagrams.",
+    details: ["Batch ingestion: OEM engineering manuals", "High-resolution diagram vector bounding", "Auto-detects component and part numbers"]
   },
   {
-    stage: "Deterministic Chunking",
-    desc: "512-token chunks with 128-token overlap. Boundaries preserve semantic units (procedures, fault trees, tables). No semantic drift.",
-    details: ["Overlap prevents context loss", "Aligned to sentence/paragraph boundaries", "Preserves nested structure"]
+    stage: "Document Processing",
+    desc: "PyMuPDF + optical layout extraction. Schema inference detects headers, procedures, error tables, and cross-references without text degradation.",
+    details: ["Batch processing: 100K+ pages/hour", "Preserves visual layout hierarchy", "Strips ungrounded headers & footers"]
   },
   {
-    stage: "Vector Embedding",
-    desc: "OpenAI text-embedding-3-small (1536-dim). One embedding per chunk. Dense, language-agnostic representation optimized for retrieval.",
-    details: ["1536-dimensional vectors", "Cosine distance metric", "Batch embedded at ingestion"]
+    stage: "Chunking",
+    desc: "Deterministic 512-token chunks with 128-token overlap. Boundaries preserve semantic units (procedures, fault trees, tables). Zero semantic drift.",
+    details: ["Overlap prevents procedure boundary loss", "Aligned to sentence & paragraph boundaries", "Preserves nested hierarchical tags"]
   },
   {
-    stage: "pgvector ANN Index",
-    desc: "PostgreSQL pgvector extension indexes all embeddings. Cosine similarity ANN search (<100ms for 1M vectors).",
-    details: ["Approximate Nearest Neighbor search", "HNSW index acceleration", "Tenant isolation by machine_id"]
+    stage: "Embeddings",
+    desc: "Dense semantic vector projection (384-dim / 1536-dim). One embedding per chunk. Dense representation optimized for industrial fault retrieval.",
+    details: ["Sentence-transformers / text-embedding-3", "Cosine distance metric in unit hypersphere", "Batch embedded at manual ingestion"]
   },
   {
-    stage: "Similarity Threshold",
-    desc: "Cosine similarity ≥ 0.72 triggers response. Below threshold: refusal circuit activates, asks for clarification.",
-    details: ["0.72 cutoff eliminates false matches", "Refusal > hallucination", "User gets clarification prompts"]
+    stage: "Retrieval",
+    desc: "PostgreSQL pgvector & ChromaDB ANN index. Parallel Approximate Nearest Neighbor search (<100ms for 1M vectors) with HNSW graph acceleration.",
+    details: ["Approximate Nearest Neighbor (ANN) search", "HNSW index acceleration with M=16, efSearch=64", "Tenant & machine_id vector isolation"]
   },
   {
-    stage: "LLM Routing & Reasoning",
-    desc: "NORD/FORGE/APEX cascade. Top-k retrieved chunks passed to selected model. Response structured + cited.",
-    details: ["Adaptive model selection", "Context-limited prompts", "Inline page citations"]
+    stage: "Context Library",
+    desc: "Threshold cutoff filtering (>0.45 cosine score), cross-encoder precision reranking, deduplication, and grounded context window assembly.",
+    details: ["Cosine threshold eliminates ungrounded noise", "Cross-encoder scoring for precision alignment", "Refusal circuit trips if evidence < 0.45"]
+  },
+  {
+    stage: "LLM Response",
+    desc: "Adaptive Tri-Tier routing (Mini <100ms / 20B 1–2s / 120B 2–4s). Top-k retrieved chunks passed to Groq LPU models under strict zero-hallucination directive.",
+    details: ["Adaptive model selection by symptom complexity", "Context-limited prompt templates", "Strict zero-hallucination directive"]
+  },
+  {
+    stage: "Cited Solution",
+    desc: "Deterministic repair protocol with verified OEM manual page citations [C1], [C2], confidence assessment, and step-by-step corrective actions.",
+    details: ["Inline OEM page & schematic citations", "Step-by-step verified action checklist", "Confidence rating & safety warnings"]
   }
 ];
 
 const LATENCY_BREAKDOWN = [
   { phase: "Query Ingestion", time: "<10ms", detail: "API gateway processing" },
   { phase: "pgvector ANN Search", time: "40–80ms", detail: "Cosine NN search (1M vectors)" },
-  { phase: "NORD Inference", time: "<100ms", detail: "Llama 3.1 8B on edge" },
-  { phase: "FORGE Inference", time: "1–3s", detail: "Gemini 2.0 Flash + streaming" },
-  { phase: "APEX Inference", time: "3–8s", detail: "Claude Sonnet 3.5 reasoning" },
+  { phase: "Compound Mini Inference", time: "<100ms", detail: "groq/compound-mini on Groq LPU" },
+  { phase: "GPT-OSS 20B Inference", time: "1–2s", detail: "openai/gpt-oss-20b (fast diagnostics)" },
+  { phase: "GPT-OSS 120B Inference", time: "2–4s", detail: "openai/gpt-oss-120b deep reasoning" },
   { phase: "Response Serialization", time: "<5ms", detail: "JSON + streaming overhead" }
 ];
 
@@ -61,7 +71,7 @@ const SECURITY_LAYERS = [
   {
     layer: "Encryption in Transit",
     threat: "Network eavesdropping",
-    mitigation: "TLS 1.3 on all tiers. Edge (NORD) uses mTLS. APEX (reasoning) zero-knowledge proofs available."
+    mitigation: "TLS 1.3 on all tiers. High-speed Groq LPU API with zero data retention."
   },
   {
     layer: "Encryption at Rest",
@@ -78,7 +88,7 @@ const SECURITY_LAYERS = [
 const DEPLOYMENT_MODES = [
   {
     name: "Cloud (Default)",
-    latency: "1–3s (FORGE tier)",
+    latency: "1–2s (GPT-OSS 20B)",
     dataResidency: "Multi-region pgvector",
     compliance: "SOC 2, GDPR data residency",
     cost: "Per-query pricing",
@@ -94,7 +104,7 @@ const DEPLOYMENT_MODES = [
   },
   {
     name: "Air-Gapped (Offline)",
-    latency: "<100ms (NORD only)",
+    latency: "<100ms (Compound Mini)",
     dataResidency: "On-device vectors + local PG",
     compliance: "Zero external egress, no cloud calls",
     cost: "One-time license + maintenance",
@@ -103,9 +113,9 @@ const DEPLOYMENT_MODES = [
 ];
 
 const BENCHMARKS = [
-  { scenario: "Error Code Lookup (NORD)", avgTime: "67ms", p99: "142ms", throughput: "14,900 q/s", accuracy: "99.2%" },
-  { scenario: "Multi-Step Procedure (FORGE)", avgTime: "1.84s", p99: "3.2s", throughput: "542 q/s", accuracy: "97.8%" },
-  { scenario: "Root Cause Analysis (APEX)", avgTime: "5.3s", p99: "8.1s", throughput: "189 q/s", accuracy: "99.7%" },
+  { scenario: "Error Code Lookup (Compound Mini)", avgTime: "67ms", p99: "142ms", throughput: "14,900 q/s", accuracy: "99.2%" },
+  { scenario: "Multi-Step Procedure (GPT-OSS 20B)", avgTime: "1.24s", p99: "2.1s", throughput: "240 tok/s", accuracy: "98.4%" },
+  { scenario: "Root Cause Analysis (GPT-OSS 120B)", avgTime: "2.6s", p99: "4.2s", throughput: "180 tok/s", accuracy: "99.4%" },
   { scenario: "Cold Start (Cache Miss)", avgTime: "512ms + model latency", p99: "1.2s + model latency", throughput: "N/A", accuracy: "N/A" },
 ];
 
@@ -231,7 +241,7 @@ export default function ArchitecturePage() {
 
         <div className="mt-8 cyber-card p-6 bg-blue-950/20 border-blue-800/30">
           <p className="text-sm text-[var(--text-primary)] font-medium">
-            <span className="text-blue-400 font-bold">Target SLA:</span> <span className="text-blue-300 font-mono">NORD &lt;100ms, FORGE 1–3s, APEX 3–8s.</span> Caching and model selection ensure sub-second median for 92% of queries.
+            <span className="text-blue-400 font-bold">Target SLA:</span> <span className="text-blue-300 font-mono">Mini &lt;100ms, 20B 1–2s, 120B 2–4s.</span> Caching and model selection ensure sub-second median for 92% of queries.
           </p>
         </div>
       </section>
@@ -317,81 +327,29 @@ export default function ArchitecturePage() {
           </h2>
         </div>
 
-        {/* Tab selectors */}
-        <div className="flex items-center gap-3 mb-8 flex-wrap">
-          {MODELS.map((m) => (
-            <button
-              key={m.name}
-              onClick={() => setSelectedModel(m.name)}
-              className={`flex items-center gap-2.5 px-5 py-2.5 rounded-xl border text-sm font-bold transition-all ${
-                selectedModel === m.name
-                  ? "text-slate-900 dark:text-white border-indigo-400/50 dark:border-white/[0.15] bg-indigo-50 dark:bg-white/[0.06] shadow-sm dark:shadow-none"
-                  : "text-slate-500 border-slate-200 dark:border-white/[0.05] hover:text-slate-900 dark:hover:text-slate-300 hover:border-slate-300 dark:hover:border-white/[0.1]"
-              }`}
-            >
-              <Image
-                src={theme === "light" ? m.logoLight : m.logoDark}
-                alt={m.name}
-                width={52}
-                height={22}
-                style={{ width: "auto", height: "auto" }}
-                className="object-contain"
-              />
-            </button>
-          ))}
-        </div>
-      </section>
-
-        {/* Active model detail */}
-        <div
-          className="rounded-2xl p-7 sm:p-10 border grid grid-cols-1 md:grid-cols-2 gap-8 transition-all bg-white dark:bg-transparent shadow-sm dark:shadow-none"
-          style={{ borderColor: `${model.color}30` }}
-        >
-          <div>
-            <div className="flex items-center gap-3 mb-4">
-              <Image
-                src={theme === "light" ? model.logoLight : model.logoDark}
-                alt={model.name}
-                width={100}
-                height={44}
-                style={{ width: "auto", height: "auto" }}
-                className="object-contain"
-              />
-            </div>
-            <div className="font-mono text-xs text-slate-500 mb-1">Underlying Model</div>
-            <div className="font-bold text-sm text-slate-900 dark:text-white mb-4">{model.model}</div>
-            <div className="font-mono text-xs text-slate-500 mb-1">Typical Latency</div>
-            <div className="font-black text-2xl font-mono mb-6" style={{ color: model.color }}>{model.latency}</div>
-
-            <div className="font-mono text-[10px] text-slate-500 uppercase tracking-widest mb-3">Best used for</div>
-            <ul className="space-y-2">
-              {model.useCases.map((u) => (
-                <li key={u} className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300">
-                  <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: model.color }} />
-                  {u}
-                </li>
+        <div className="overflow-x-auto mt-8">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-[var(--border)]">
+                <th className="text-left px-4 py-3 font-black text-[var(--text-primary)]">Scenario</th>
+                <th className="text-left px-4 py-3 font-mono text-[10px] font-bold text-amber-500 uppercase tracking-widest">Avg Latency</th>
+                <th className="text-left px-4 py-3 font-mono text-[10px] font-bold text-slate-500 uppercase tracking-widest">P99</th>
+                <th className="text-left px-4 py-3 font-mono text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Throughput</th>
+                <th className="text-left px-4 py-3 font-mono text-[10px] font-bold text-cyan-500 uppercase tracking-widest">Accuracy</th>
+              </tr>
+            </thead>
+            <tbody>
+              {BENCHMARKS.map((b, i) => (
+                <tr key={i} className="border-b border-[var(--border)] hover:bg-[var(--bg-surface)]/30 transition-colors">
+                  <td className="px-4 py-4 font-semibold text-[var(--text-primary)]">{b.scenario}</td>
+                  <td className="px-4 py-4 font-mono font-bold text-amber-500">{b.avgTime}</td>
+                  <td className="px-4 py-4 font-mono text-[var(--text-muted)]">{b.p99}</td>
+                  <td className="px-4 py-4 font-mono text-emerald-500">{b.throughput}</td>
+                  <td className="px-4 py-4 font-mono text-cyan-400 font-bold">{b.accuracy}</td>
+                </tr>
               ))}
-            </ul>
-          </div>
-
-          <div className="animate-slide-in-right relative">
-            <div className="absolute inset-0 bg-indigo-500/10 blur-[80px] rounded-full pointer-events-none" />
-            <div className="cyber-card p-8 relative z-10 bg-black/20 backdrop-blur-3xl border border-indigo-500/20">
-              <div className="font-mono text-xs space-y-3 text-indigo-300">
-                <div><span className="text-slate-500">// Query from technician on KUKA KR-210</span></div>
-                <div><span className="text-amber-400">query:</span> <span className="text-white">"servo overcurrent fault code"</span></div>
-                <div><span className="text-amber-400">machine_id:</span> <span className="text-white">"kuka_kr210_cell_4"</span></div>
-                <div className="mt-4"><span className="text-slate-500">// pgvector ANN filters:</span></div>
-                <div>WHERE machine_id = <span className="text-white">'kuka_kr210_cell_4'</span></div>
-                <div>AND cosine_similarity <span className="text-amber-400">≥</span> <span className="text-white">0.72</span></div>
-                <div className="mt-4"><span className="text-slate-500">// Result: 3 relevant manual sections</span></div>
-                <div className="text-emerald-400">✓ KUKA KR-210 Service Bulletin 2F-40-01, page 84</div>
-                <div className="text-emerald-400">✓ Servo Drive Troubleshooting Tree (matching IGBT module)</div>
-                <div className="text-emerald-400">✓ Axis 4 Fault Code Reference Table</div>
-                <div className="mt-4 text-slate-500">// Machine B queries never see these results.</div>
-              </div>
-            </div>
-          </div>
+            </tbody>
+          </table>
         </div>
       </section>
 

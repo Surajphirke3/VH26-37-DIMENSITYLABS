@@ -6,21 +6,32 @@ import { usePathname } from "next/navigation";
 import Image from "next/image";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import { useTheme } from "@/lib/theme-context";
+import { useAuth } from "@/lib/auth-context";
+import IndustrialHeroBackground from "@/components/landing/IndustrialHeroBackground";
 
-const NAV_LINKS = [
+interface NavLinkItem {
+  href: string;
+  label: string;
+  isModels?: boolean;
+}
+
+const PUBLIC_LINKS: NavLinkItem[] = [
   { href: "/", label: "Home" },
-  { href: "/dashboard", label: "Diagnostics" },
-  { href: "/documents", label: "Documents" },
-  { href: "/search", label: "Search" },
-  { href: "/models", label: "Models" },
-  { href: "/status", label: "Status" },
+  { href: "/problem", label: "Problem & Solution" },
+  { href: "/models", label: "Our Models", isModels: true },
   { href: "/architecture", label: "Architecture" },
+  { href: "/workflow", label: "How It Works" },
   { href: "/help", label: "Help" },
+  { href: "/inspector", label: "Judge Inspection ⚡" },
 ];
+
+
 
 export default function LandingLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { theme } = useTheme();
+  const { user, logout } = useAuth();
+  const navLinks = PUBLIC_LINKS;
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [modelsDropdownOpen, setModelsDropdownOpen] = useState(false);
@@ -41,12 +52,15 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
       {/* Top Ambient Glow Bar */}
       <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-1 bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-80 z-50 pointer-events-none blur-[1px]" />
 
+      {/* Cinematic Industrial Atmospheric Background & Laser Particle Telemetry */}
+      <IndustrialHeroBackground />
+
       {/* ── Sticky Navbar ── */}
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           scrolled
-            ? "bg-[var(--bg-base)]/85 backdrop-blur-2xl border-b border-[var(--border)] shadow-2xl shadow-indigo-950/20 py-1"
-            : "bg-transparent py-2"
+            ? "bg-[var(--bg-base)]/95 backdrop-blur-2xl border-b border-[var(--border)] shadow-xl shadow-black/10 py-1"
+            : "bg-[var(--bg-base)]/90 backdrop-blur-xl border-b border-[var(--border)]/70 py-1.5"
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
@@ -72,7 +86,7 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
 
           {/* Desktop Nav Links */}
           <nav className="hidden lg:flex items-center gap-1 bg-slate-100/80 dark:bg-white/[0.04] p-1.5 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] backdrop-blur-md shadow-sm">
-            {NAV_LINKS.map((link) => {
+            {navLinks.map((link) => {
               const active = pathname === link.href;
 
               if (link.isModels) {
@@ -87,12 +101,12 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
                       href={link.href}
                       className={`px-3.5 py-1.5 text-xs font-semibold rounded-xl transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap ${
                         active
-                          ? "text-white bg-indigo-600 shadow-sm"
+                          ? "text-slate-900 dark:text-white bg-white dark:bg-white/[0.12] shadow-sm font-bold border border-slate-200/80 dark:border-white/[0.08]"
                           : "text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/[0.08]"
                       }`}
                     >
                       <span>{link.label}</span>
-                      <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded-md ${active ? "bg-white/20 text-white" : "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold"}`}>
+                      <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-md bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold">
                         3
                       </span>
                       <svg
@@ -117,7 +131,7 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
                             </span>
                           </div>
 
-                          {/* NORD */}
+                          {/* Compound Mini */}
                           <Link
                             href="/models"
                             className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors group"
@@ -126,9 +140,9 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
                               <span className="w-2.5 h-2.5 rounded-full bg-blue-500 shrink-0 shadow-[0_0_8px_#3b82f6]" />
                               <div>
                                 <div className="font-bold text-xs text-slate-900 dark:text-white group-hover:text-blue-500 transition-colors">
-                                  NORD
+                                  Compound Mini
                                 </div>
-                                <div className="text-[10px] text-slate-500 dark:text-slate-400">Edge Triage · Llama 3.1</div>
+                                <div className="text-[10px] text-slate-500 dark:text-slate-400">Edge Triage · Groq LPU</div>
                               </div>
                             </div>
                             <span className="font-mono text-[10px] px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold border border-blue-200 dark:border-blue-500/20 whitespace-nowrap">
@@ -136,7 +150,7 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
                             </span>
                           </Link>
 
-                          {/* FORGE */}
+                          {/* GPT-OSS 20B */}
                           <Link
                             href="/models"
                             className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors group"
@@ -145,17 +159,17 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
                               <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0 shadow-[0_0_8px_#f59e0b]" />
                               <div>
                                 <div className="font-bold text-xs text-slate-900 dark:text-white group-hover:text-amber-500 transition-colors">
-                                  FORGE
+                                  GPT-OSS 20B
                                 </div>
-                                <div className="text-[10px] text-slate-500 dark:text-slate-400">Multi-Step Repair · Gemini 2.0</div>
+                                <div className="text-[10px] text-slate-500 dark:text-slate-400">Diagnostic Engine · Groq Fast</div>
                               </div>
                             </div>
                             <span className="font-mono text-[10px] px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold border border-amber-200 dark:border-amber-500/20 whitespace-nowrap">
-                              1–3s
+                              1–2s
                             </span>
                           </Link>
 
-                          {/* APEX */}
+                          {/* GPT-OSS 120B */}
                           <Link
                             href="/models"
                             className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors group"
@@ -164,13 +178,13 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
                               <span className="w-2.5 h-2.5 rounded-full bg-violet-500 shrink-0 shadow-[0_0_8px_#8b5cf6]" />
                               <div>
                                 <div className="font-bold text-xs text-slate-900 dark:text-white group-hover:text-violet-500 transition-colors">
-                                  APEX
+                                  GPT-OSS 120B
                                 </div>
-                                <div className="text-[10px] text-slate-500 dark:text-slate-400">Root Cause · Claude 3.5</div>
+                                <div className="text-[10px] text-slate-500 dark:text-slate-400">Deep Reasoning · Groq LPU</div>
                               </div>
                             </div>
                             <span className="font-mono text-[10px] px-2 py-0.5 rounded-md bg-violet-50 dark:bg-violet-500/10 text-violet-600 dark:text-violet-400 font-bold border border-violet-200 dark:border-violet-500/20 whitespace-nowrap">
-                              3–8s
+                              2–4s
                             </span>
                           </Link>
 
@@ -195,8 +209,8 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
                   href={link.href}
                   className={`px-3.5 py-1.5 text-xs font-semibold rounded-xl transition-all duration-200 whitespace-nowrap ${
                     active
-                      ? "text-white bg-indigo-600 shadow-sm"
-                      : "text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/[0.08]"
+                      ? "text-slate-900 dark:text-white bg-white dark:bg-white/[0.12] shadow-sm font-bold border border-slate-200/80 dark:border-white/[0.08]"
+                      : "text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/[0.08] border border-transparent"
                   }`}
                 >
                   {link.label}
@@ -218,17 +232,37 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
 
             <div className="hidden sm:block h-4 w-px bg-slate-200 dark:bg-white/10" />
 
-            {/* Sign In */}
-            <Link
-              href="/login"
-              className="text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white px-2.5 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/[0.05] transition-colors whitespace-nowrap shrink-0"
-            >
-              Sign In
-            </Link>
+            {/* Authenticated User or Sign In */}
+            {user ? (
+              <div className="flex items-center gap-2.5">
+                <div className="hidden sm:flex flex-col text-right leading-none">
+                  <span className="text-xs font-bold text-[var(--text-primary)] max-w-[110px] truncate">
+                    {user.full_name || user.email.split("@")[0]}
+                  </span>
+                  <span className="text-[9px] font-mono text-emerald-500 uppercase font-bold mt-0.5">
+                    {user.role}
+                  </span>
+                </div>
+                <button
+                  onClick={logout}
+                  className="text-xs font-semibold text-rose-500 hover:text-rose-400 px-2 py-1 rounded-lg hover:bg-rose-500/10 transition-colors whitespace-nowrap"
+                  title="Sign Out"
+                >
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                className="text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white px-2.5 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/[0.05] transition-colors whitespace-nowrap shrink-0"
+              >
+                Sign In
+              </Link>
+            )}
 
             {/* Console button */}
             <Link
-              href="/dashboard"
+              href={user ? "/dashboard" : "/login"}
               className="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 shadow-md shadow-indigo-600/25 transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 hover:scale-[1.02] active:scale-95"
             >
               <span>Console</span>
@@ -259,7 +293,7 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
         {/* Mobile Menu Dropdown */}
         {mobileOpen && (
           <div className="md:hidden bg-[var(--bg-surface)]/98 backdrop-blur-2xl border-t border-[var(--border)] px-4 py-4 space-y-2 animate-slide-down shadow-2xl">
-            {NAV_LINKS.map((link) => {
+            {navLinks.map((link) => {
               const active = pathname === link.href;
               return (
                 <Link

@@ -19,7 +19,7 @@ import {
   Database,
   RefreshCw,
 } from "lucide-react";
-import LandingLayout from "@/components/landing/LandingLayout";
+import ConsoleLayout from "@/components/console/ConsoleLayout";
 import { searchKnowledgeBase, getMachines } from "@/lib/api";
 import { SearchResultItem, Machine } from "@/lib/types";
 
@@ -80,8 +80,8 @@ export default function SearchPage() {
   };
 
   return (
-    <LandingLayout>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <ConsoleLayout>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-amber-500 mb-2">
@@ -320,6 +320,6 @@ export default function SearchPage() {
           </div>
         )}
       </div>
-    </LandingLayout>
+    </ConsoleLayout>
   );
 }

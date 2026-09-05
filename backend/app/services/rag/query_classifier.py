@@ -4,7 +4,7 @@ import re
 from enum import Enum
 
 ERROR_CODE_RE = re.compile(
-    r'\b(E\d{2,4}|ERR[-\s]\d{2,4}|F\d{2,4}|Fault\s+\d{2,4}|Error\s+\d{2,4})\b',
+    r'\b(E\d{2,5}|ERR[-\s]\d{2,5}|F\d{2,5}|Fault\s+\d{2,5}|Error\s+\d{2,5})\b',
     re.IGNORECASE,
 )
 

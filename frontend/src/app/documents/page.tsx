@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import LandingLayout from "@/components/landing/LandingLayout";
+import ConsoleLayout from "@/components/console/ConsoleLayout";
 import Spinner from "@/components/ui/Spinner";
 import { getManuals, getMachines, deleteManual, reprocessManual } from "@/lib/api";
 import type { Manual, Machine } from "@/lib/types";
@@ -107,8 +107,8 @@ export default function DocumentsPage() {
   }, [manuals, search, machineFilter, statusFilter]);
 
   return (
-    <LandingLayout>
-      <div className="pt-24 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <ConsoleLayout>
+      <div className="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         {/* Header section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
@@ -484,6 +484,6 @@ export default function DocumentsPage() {
           </div>
         )}
       </div>
-    </LandingLayout>
+    </ConsoleLayout>
   );
 }
