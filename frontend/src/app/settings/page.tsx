@@ -17,8 +17,11 @@ import {
 import ConsoleLayout from "@/components/console/ConsoleLayout";
 import { getSystemConfig, getModels } from "@/lib/api";
 import { AIModel } from "@/lib/types";
+import { useLanguage } from "@/lib/i18n/context";
+import { SUPPORTED_LANGUAGES, SupportedLanguage } from "@/lib/i18n/translations";
 
 export default function SettingsPage() {
+  const { language, setLanguage, t } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [savedToast, setSavedToast] = useState(false);
   const [models, setModels] = useState<AIModel[]>([]);
@@ -31,10 +34,15 @@ export default function SettingsPage() {
   const [defaultModel, setDefaultModel] = useState<string>("openai/gpt-oss-120b");
   const [temperature, setTemperature] = useState<number>(0.1);
   const [maxTokens, setMaxTokens] = useState<number>(2048);
-  const [defaultLanguage, setDefaultLanguage] = useState<string>("en");
+  const [defaultLanguage, setDefaultLanguage] = useState<string>(language || "en");
   const [autoDetectLanguage, setAutoDetectLanguage] = useState<boolean>(true);
   const [strictGuardrails, setStrictGuardrails] = useState<boolean>(true);
   const [requireGrounding, setRequireGrounding] = useState<boolean>(true);
+
+  // Sync state if global language changes
+  useEffect(() => {
+    if (language) setDefaultLanguage(language);
+  }, [language]);
 
   useEffect(() => {
     // Load existing settings if saved locally
@@ -100,6 +108,7 @@ export default function SettingsPage() {
     setTemperature(0.1);
     setMaxTokens(2048);
     setDefaultLanguage("en");
+    setLanguage("en");
     setAutoDetectLanguage(true);
     setStrictGuardrails(true);
     setRequireGrounding(true);
@@ -114,13 +123,13 @@ export default function SettingsPage() {
           <div>
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-amber-500 mb-1">
               <Sliders className="w-4 h-4" />
-              <span>Pipeline Calibration</span>
+              <span>{t("settings.pipelineCalibration", "Pipeline Calibration")}</span>
             </div>
             <h1 className="text-3xl font-extrabold text-foreground tracking-tight sm:text-4xl">
-              System Settings & RAG Tuning
+              {t("settings.title", "System Settings & RAG Tuning")}
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Configure vector retrieval depth, cross-encoder thresholds, default inference models, and safety boundaries.
+              {t("settings.subtitle", "Configure vector retrieval depth, cross-encoder thresholds, default inference models, and safety boundaries.")}
             </p>
           </div>
 
@@ -128,18 +137,18 @@ export default function SettingsPage() {
             <button
               type="button"
               onClick={handleResetDefaults}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-secondary hover:bg-secondary/80 text-foreground text-xs font-semibold rounded-lg transition-colors border border-border"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-secondary hover:bg-secondary/80 text-foreground text-xs font-semibold rounded-lg transition-colors border border-border cursor-pointer"
             >
               <RotateCcw className="w-3.5 h-3.5 text-muted-foreground" />
-              <span>Reset Defaults</span>
+              <span>{t("settings.resetDefaults", "Reset Defaults")}</span>
             </button>
             <button
               type="button"
               onClick={handleSave}
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold rounded-lg shadow transition-colors"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold rounded-lg shadow transition-colors cursor-pointer"
             >
               <Save className="w-3.5 h-3.5" />
-              <span>Save Changes</span>
+              <span>{t("settings.saveConfig", "Save Changes")}</span>
             </button>
           </div>
         </div>
@@ -147,7 +156,7 @@ export default function SettingsPage() {
         {savedToast && (
           <div className="mb-6 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 text-sm flex items-center gap-2">
             <CheckCircle2 className="w-5 h-5" />
-            <span>Settings successfully saved and applied to your workspace!</span>
+            <span>{t("settings.saved", "Settings successfully saved and applied to your workspace!")}</span>
           </div>
         )}
 
@@ -156,10 +165,12 @@ export default function SettingsPage() {
           <div className="bg-card border border-border rounded-xl p-6 sm:p-8 shadow-sm">
             <div className="flex items-center gap-2.5 mb-2">
               <Database className="w-5 h-5 text-amber-500" />
-              <h2 className="text-lg font-bold text-foreground">ChromaDB Retrieval & Cross-Encoder Reranking</h2>
+              <h2 className="text-lg font-bold text-foreground">
+                {t("settings.retrievalTitle", "ChromaDB Retrieval & Cross-Encoder Reranking")}
+              </h2>
             </div>
             <p className="text-xs text-muted-foreground mb-6">
-              Parameters controlling candidate retrieval from the cosine vector space and subsequent cross-encoder precision filtering.
+              {t("settings.retrievalDesc", "Parameters controlling candidate retrieval from the cosine vector space and subsequent cross-encoder precision filtering.")}
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -167,10 +178,10 @@ export default function SettingsPage() {
               <div>
                 <div className="flex justify-between items-center mb-2">
                   <label className="text-xs font-semibold text-foreground">
-                    Initial Vector Candidates (Top-K)
+                    {t("settings.topKLabel", "Initial Vector Candidates (Top-K)")}
                   </label>
                   <span className="text-xs font-mono font-bold text-amber-500 bg-secondary px-2 py-0.5 rounded">
-                    {topK} chunks
+                    {topK} {t("settings.chunks", "chunks")}
                   </span>
                 </div>
                 <input
@@ -183,7 +194,7 @@ export default function SettingsPage() {
                   className="w-full accent-amber-500 h-2 bg-secondary rounded-lg cursor-pointer"
                 />
                 <span className="text-[11px] text-muted-foreground mt-1 block">
-                  Raw candidate chunks retrieved from ChromaDB before reranking (Recommended: 10-20).
+                  {t("settings.topKDesc", "Raw candidate chunks retrieved from ChromaDB before reranking (Recommended: 10-20).")}
                 </span>
               </div>
 
@@ -191,10 +202,10 @@ export default function SettingsPage() {
               <div>
                 <div className="flex justify-between items-center mb-2">
                   <label className="text-xs font-semibold text-foreground">
-                    Top-N Reranked to Context
+                    {t("settings.rerankLabel", "Top-N Reranked to Context")}
                   </label>
                   <span className="text-xs font-mono font-bold text-amber-500 bg-secondary px-2 py-0.5 rounded">
-                    {rerankTopN} chunks
+                    {rerankTopN} {t("settings.chunks", "chunks")}
                   </span>
                 </div>
                 <input
@@ -207,7 +218,7 @@ export default function SettingsPage() {
                   className="w-full accent-amber-500 h-2 bg-secondary rounded-lg cursor-pointer"
                 />
                 <span className="text-[11px] text-muted-foreground mt-1 block">
-                  Highest-scoring chunks supplied to the LLM context prompt (Recommended: 3-5).
+                  {t("settings.rerankDesc", "Highest-scoring chunks supplied to the LLM context prompt (Recommended: 3-5).")}
                 </span>
               </div>
 
@@ -215,7 +226,7 @@ export default function SettingsPage() {
               <div>
                 <div className="flex justify-between items-center mb-2">
                   <label className="text-xs font-semibold text-foreground">
-                    Cosine Similarity Cutoff Threshold
+                    {t("settings.similarityLabel", "Cosine Similarity Cutoff Threshold")}
                   </label>
                   <span className="text-xs font-mono font-bold text-amber-500 bg-secondary px-2 py-0.5 rounded">
                     {(similarityThreshold * 100).toFixed(0)}%
@@ -231,7 +242,7 @@ export default function SettingsPage() {
                   className="w-full accent-amber-500 h-2 bg-secondary rounded-lg cursor-pointer"
                 />
                 <span className="text-[11px] text-muted-foreground mt-1 block">
-                  Rejects chunks with similarity scores below this cutoff to prevent irrelevant context.
+                  {t("settings.similarityDesc", "Rejects chunks with similarity scores below this cutoff to prevent irrelevant context.")}
                 </span>
               </div>
 
@@ -239,7 +250,7 @@ export default function SettingsPage() {
               <div>
                 <div className="flex justify-between items-center mb-2">
                   <label className="text-xs font-semibold text-foreground">
-                    Hybrid Retrieval Balance
+                    {t("settings.hybridLabel", "Hybrid Retrieval Balance")}
                   </label>
                   <span className="text-xs font-mono font-bold text-amber-500 bg-secondary px-2 py-0.5 rounded">
                     {(denseWeight * 100).toFixed(0)}% Dense / {((1 - denseWeight) * 100).toFixed(0)}% BM25
@@ -255,7 +266,7 @@ export default function SettingsPage() {
                   className="w-full accent-amber-500 h-2 bg-secondary rounded-lg cursor-pointer"
                 />
                 <span className="text-[11px] text-muted-foreground mt-1 block">
-                  Ratio between semantic dense vector search and keyword/exact alarm code search.
+                  {t("settings.hybridDesc", "Ratio between semantic dense vector search and keyword/exact alarm code search.")}
                 </span>
               </div>
             </div>
@@ -265,16 +276,18 @@ export default function SettingsPage() {
           <div className="bg-card border border-border rounded-xl p-6 sm:p-8 shadow-sm">
             <div className="flex items-center gap-2.5 mb-2">
               <Cpu className="w-5 h-5 text-amber-500" />
-              <h2 className="text-lg font-bold text-foreground">Groq Model Inference</h2>
+              <h2 className="text-lg font-bold text-foreground">
+                {t("settings.groqTitle", "Groq Model Inference")}
+              </h2>
             </div>
             <p className="text-xs text-muted-foreground mb-6">
-              Control LLM model selection and generation determinism for technical diagnostic instructions.
+              {t("settings.groqDesc", "Control LLM model selection and generation determinism for technical diagnostic instructions.")}
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-xs font-semibold text-foreground mb-2">
-                  Default Reasoning Model
+                  {t("settings.defaultModelLabel", "Default Reasoning Model")}
                 </label>
                 <select
                   value={defaultModel}
@@ -295,14 +308,14 @@ export default function SettingsPage() {
                   )}
                 </select>
                 <span className="text-[11px] text-muted-foreground mt-1 block">
-                  Used for primary procedural synthesis and troubleshooting answers.
+                  {t("settings.defaultModelDesc", "Used for primary procedural synthesis and troubleshooting answers.")}
                 </span>
               </div>
 
               <div>
                 <div className="flex justify-between items-center mb-2">
                   <label className="text-xs font-semibold text-foreground">
-                    Temperature (Determinism)
+                    {t("settings.tempLabel", "Temperature (Determinism)")}
                   </label>
                   <span className="text-xs font-mono font-bold text-amber-500 bg-secondary px-2 py-0.5 rounded">
                     {temperature.toFixed(2)}
@@ -318,7 +331,7 @@ export default function SettingsPage() {
                   className="w-full accent-amber-500 h-2 bg-secondary rounded-lg cursor-pointer"
                 />
                 <span className="text-[11px] text-muted-foreground mt-1 block">
-                  Lower values (0.05-0.15) enforce strict technical accuracy without hallucinations.
+                  {t("settings.tempDesc", "Lower values (0.05-0.15) enforce strict technical accuracy without hallucinations.")}
                 </span>
               </div>
             </div>
@@ -328,30 +341,33 @@ export default function SettingsPage() {
           <div className="bg-card border border-border rounded-xl p-6 sm:p-8 shadow-sm">
             <div className="flex items-center gap-2.5 mb-2">
               <Languages className="w-5 h-5 text-amber-500" />
-              <h2 className="text-lg font-bold text-foreground">Multilingual Configuration</h2>
+              <h2 className="text-lg font-bold text-foreground">
+                {t("settings.multilingualTitle", "Multilingual Configuration")}
+              </h2>
             </div>
             <p className="text-xs text-muted-foreground mb-6">
-              MEND - X natively processes queries in 8+ languages for regional field operators.
+              {t("settings.multilingualSubtitle", "MEND-X natively processes queries in 10 languages for global field operators.")}
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-xs font-semibold text-foreground mb-2">
-                  Preferred Output Language
+                  {t("settings.preferredLang", "Preferred Output Language")}
                 </label>
                 <select
                   value={defaultLanguage}
-                  onChange={(e) => setDefaultLanguage(e.target.value)}
+                  onChange={(e) => {
+                    const val = e.target.value as SupportedLanguage;
+                    setDefaultLanguage(val);
+                    setLanguage(val);
+                  }}
                   className="w-full bg-background border border-border rounded-lg p-2.5 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-amber-500"
                 >
-                  <option value="en">English (Default)</option>
-                  <option value="hi">Hindi (हिंदी)</option>
-                  <option value="mr">Marathi (मराठी)</option>
-                  <option value="gu">Gujarati (ગુજરાતી)</option>
-                  <option value="ta">Tamil (தமிழ்)</option>
-                  <option value="te">Telugu (తెలుగు)</option>
-                  <option value="kn">Kannada (ಕನ್ನಡ)</option>
-                  <option value="bn">Bengali (বাংলা)</option>
+                  {SUPPORTED_LANGUAGES.map((lang) => (
+                    <option key={lang.code} value={lang.code}>
+                      {lang.flag} {lang.name} ({lang.nativeName})
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -365,10 +381,10 @@ export default function SettingsPage() {
                   />
                   <div>
                     <span className="text-xs font-semibold text-foreground block">
-                      Auto-detect Input Query Language
+                      {t("settings.autoDetect", "Auto-detect Input Query Language")}
                     </span>
                     <span className="text-[11px] text-muted-foreground">
-                      Automatically replies in the exact language used by the technician in the prompt.
+                      {t("settings.autoDetectDesc", "Automatically replies in the exact language used by the technician in the prompt.")}
                     </span>
                   </div>
                 </label>
@@ -380,10 +396,12 @@ export default function SettingsPage() {
           <div className="bg-card border border-border rounded-xl p-6 sm:p-8 shadow-sm">
             <div className="flex items-center gap-2.5 mb-2">
               <Shield className="w-5 h-5 text-amber-500" />
-              <h2 className="text-lg font-bold text-foreground">Safety Guardrails & Anti-Hallucination</h2>
+              <h2 className="text-lg font-bold text-foreground">
+                {t("settings.safetyTitle", "Safety Guardrails & Anti-Hallucination")}
+              </h2>
             </div>
             <p className="text-xs text-muted-foreground mb-6">
-              Protect operators from dangerous or unverified equipment repairs.
+              {t("settings.safetyDesc", "Protect operators from dangerous or unverified equipment repairs.")}
             </p>
 
             <div className="space-y-4">
@@ -396,10 +414,10 @@ export default function SettingsPage() {
                 />
                 <div>
                   <span className="text-xs font-semibold text-foreground block">
-                    Strict Prompt Injection & Jailbreak Defense
+                    {t("settings.strictGuardrails", "Strict Prompt Injection & Jailbreak Defense")}
                   </span>
                   <span className="text-[11px] text-muted-foreground">
-                    Blocks prompt override patterns, system prompt extraction, and out-of-domain conversational attempts.
+                    {t("settings.strictGuardrailsDesc", "Blocks prompt override patterns, system prompt extraction, and out-of-domain conversational attempts.")}
                   </span>
                 </div>
               </label>
@@ -413,10 +431,10 @@ export default function SettingsPage() {
                 />
                 <div>
                   <span className="text-xs font-semibold text-foreground block">
-                    Enforce Verifiable Citation Grounding
+                    {t("settings.requireGrounding", "Enforce Verifiable Citation Grounding")}
                   </span>
                   <span className="text-[11px] text-muted-foreground">
-                    Mandates that every actionable repair step links to an indexed manual section and page number before display.
+                    {t("settings.requireGroundingDesc", "Mandates that every actionable repair step links to an indexed manual section and page number before display.")}
                   </span>
                 </div>
               </label>
@@ -430,14 +448,14 @@ export default function SettingsPage() {
               onClick={handleResetDefaults}
               className="px-4 py-2.5 bg-secondary hover:bg-secondary/80 text-foreground text-xs font-semibold rounded-lg transition-colors border border-border"
             >
-              Reset to Recommended
+              {t("settings.resetDefaults", "Reset to Recommended")}
             </button>
             <button
               type="submit"
               className="inline-flex items-center gap-2 px-6 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold rounded-lg shadow transition-colors"
             >
               <Save className="w-4 h-4" />
-              <span>Save Configuration</span>
+              <span>{t("settings.saveConfig", "Save Configuration")}</span>
             </button>
           </div>
         </form>

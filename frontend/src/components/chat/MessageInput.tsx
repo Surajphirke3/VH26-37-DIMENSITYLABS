@@ -9,6 +9,8 @@ interface MessageInputProps {
 }
 
 import { getModels } from "@/lib/api";
+import { useLanguage } from "@/lib/i18n/context";
+import LanguageSelector from "@/components/common/LanguageSelector";
 
 const ERROR_CODE_RE = /\b[A-Z]{1,4}[-_]?\d{2,5}\b/;
 
@@ -28,6 +30,7 @@ const DEFAULT_MODELS: ModelOption[] = [
 ];
 
 export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
+  const { t } = useLanguage();
   const [value, setValue] = useState("");
   const [selectedModel, setSelectedModel] = useState("auto");
   const [availableModels, setAvailableModels] = useState<ModelOption[]>(DEFAULT_MODELS);
@@ -225,20 +228,21 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
           {hasErrorCode ? (
             <div className="animate-fade-in flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-amber-500/15 border border-amber-500/35 text-amber-600 dark:text-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.15)]">
               <span className="w-2 h-2 rounded-full bg-amber-500 dark:bg-amber-400 animate-ping" />
-              <span>FAULT PATTERN DETECTED → DIRECT OEM MANUAL SEARCH ACTIVATED</span>
+              <span>{t("chat.faultPatternDetected", "FAULT PATTERN DETECTED → DIRECT OEM MANUAL SEARCH ACTIVATED")}</span>
             </div>
           ) : (
             <div className="hidden sm:flex items-center gap-1.5 text-[10px] font-mono text-slate-500 dark:text-slate-400">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
-              <span>TERMINAL READY</span>
-              <span className="text-slate-400 dark:text-slate-600">·</span>
-              <span>TYPE SYMPTOM OR ERROR CODE</span>
+              <span>{t("chat.terminalReady", "TERMINAL READY · TYPE SYMPTOM OR ERROR CODE")}</span>
             </div>
           )}
         </div>
 
         {/* Model routing selector pill */}
         <div className="flex items-center gap-1.5 ml-auto text-xs">
+          {/* ── Language Selector ── */}
+          <LanguageSelector variant="header-pill" showLabel={true} direction="up" />
+
           <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 shadow-sm">
             <Cpu className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
             <select
@@ -271,7 +275,7 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
             <p className="text-xs font-mono font-bold text-slate-900 dark:text-white truncate">{imageName || "Equipment Attachment"}</p>
             <div className="flex items-center gap-1.5 text-[10px] font-mono text-emerald-600 dark:text-emerald-400">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
-              <span>Optical OCR Active · Auto-extracts Error Codes &amp; Text</span>
+              <span>{t("chat.ocrActive", "Optical OCR Active · Auto-extracts Error Codes & Text")}</span>
             </div>
           </div>
           <button
@@ -303,7 +307,7 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
           onClick={() => fileInputRef.current?.click()}
           disabled={isLoading}
           className="shrink-0 w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-700/80 text-amber-600 dark:text-amber-400 transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95"
-          title="Attach equipment photo / nameplate"
+          title={t("chat.attachImage", "Attach equipment photo / nameplate")}
         >
           <ImageIcon className="w-4 h-4" />
         </button>
@@ -314,7 +318,7 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
           onClick={handleCameraClick}
           disabled={isLoading}
           className="shrink-0 w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-700/80 text-cyan-600 dark:text-cyan-400 transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95"
-          title="Open camera & optical OCR scanner"
+          title={t("chat.capturePhoto", "Open camera & optical OCR scanner")}
         >
           <Camera className="w-4 h-4" />
         </button>
@@ -328,7 +332,7 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
             onKeyDown={handleKey}
             disabled={isLoading}
             rows={2}
-            placeholder="Enter fault code (e.g. Alarm 102, F01043), symptom description, or attach photo…"
+            placeholder={t("chat.placeholder", "Enter fault code (e.g. Alarm 102, F01043), symptom description, or attach photo…")}
             className="w-full px-3 py-2 text-xs sm:text-sm font-sans rounded-xl leading-relaxed bg-transparent border-0 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none"
             style={{
               minHeight: "48px",
@@ -342,7 +346,7 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
                 className="w-3.5 h-3.5 rounded-full border-2 border-cyan-400/20 border-t-cyan-500"
                 style={{ animation: "spin 0.8s linear infinite" }}
               />
-              <span className="hidden sm:inline font-semibold">Grounding...</span>
+              <span className="hidden sm:inline font-semibold">{t("chat.grounding", "Grounding...")}</span>
             </div>
           )}
         </div>
@@ -357,9 +361,9 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
               ? "bg-slate-200 dark:bg-slate-800/60 border border-slate-300/60 dark:border-white/5 text-slate-400 dark:text-slate-500 cursor-not-allowed"
               : "bg-gradient-to-r from-cyan-500 via-indigo-600 to-indigo-700 text-white shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
           }`}
-          aria-label="Send query"
+          aria-label={t("chat.send", "Send")}
         >
-          <span>SEND</span>
+          <span>{t("chat.send", "SEND")}</span>
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
           </svg>
@@ -367,7 +371,7 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
       </div>
 
       <div className="mt-2 flex items-center justify-between px-1 text-[10px] font-mono text-slate-500 dark:text-slate-400 flex-wrap gap-1">
-        <span>↵ Enter to transmit · Shift+↵ for new line · Multilingual & Multimodal</span>
+        <span>{t("chat.keyboardHints", "↵ Enter to transmit · Shift+↵ for new line · Multilingual & Multimodal")}</span>
         <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400" />
           MODBUS / CANopen CONNECTED

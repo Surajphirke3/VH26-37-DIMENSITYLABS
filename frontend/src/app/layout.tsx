@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { SessionProvider } from "@/lib/auth-context";
 import { ThemeProvider } from "@/lib/theme-context";
+import { LanguageProvider } from "@/lib/i18n/context";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -43,7 +44,9 @@ export default function RootLayout({
       </head>
       <body className="font-sans antialiased min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)] transition-colors duration-200">
         <ThemeProvider>
-          <SessionProvider>{children}</SessionProvider>
+          <SessionProvider>
+            <LanguageProvider>{children}</LanguageProvider>
+          </SessionProvider>
         </ThemeProvider>
       </body>
     </html>

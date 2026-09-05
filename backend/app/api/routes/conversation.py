@@ -151,6 +151,7 @@ async def send_message(
             conversation_history=history,
             model=request.model,
             image_data=request.image_data,
+            target_language=request.target_language,
         )
 
     # ── Persist assistant message with another fresh session ───────────────────
@@ -197,6 +198,7 @@ async def disambiguate(
     rag = await RAGPipeline(db).query(
         query=last.content, machine_id=machine_id,
         machine_name=body.get("machine_name", ""), conversation_history=history,
+        target_language=body.get("target_language"),
     )
     asst = _persist_assistant(db, conversation_id, rag)
     db.add(asst)

@@ -12,6 +12,7 @@ class QueryRequest(BaseModel):
     machine_name: Optional[str] = Field(default=None, max_length=255)
     model: Optional[str] = Field(default=None, description="Explicit Groq model ID override")
     image_data: Optional[str] = Field(default=None, description="Base64 encoded image or image URL for multimodal queries")
+    target_language: Optional[str] = Field(default=None, description="Explicit response target language code (e.g. en, hi, mr, gu, ta, de, es, fr, zh, ja)")
 
 
 class CorrectionStep(BaseModel):

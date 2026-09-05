@@ -244,7 +244,8 @@ export const sendMessage = (
   query: string,
   machineId?: string,
   model?: string,
-  imageData?: string
+  imageData?: string,
+  targetLanguage?: string
 ): Promise<TroubleshootingResponse> =>
   apiFetch<TroubleshootingResponse>(`/api/v1/conversations/${conversationId}/messages`, {
     method: "POST",
@@ -253,17 +254,19 @@ export const sendMessage = (
       machine_id: machineId,
       model,
       image_data: imageData,
+      target_language: targetLanguage,
     }),
   });
 
 // backend: {success, data: {message, machine_id}} — returns no answer, caller ignores body
 export const disambiguate = (
   conversationId: string,
-  machineId: string
+  machineId: string,
+  targetLanguage?: string
 ): Promise<TroubleshootingResponse> =>
   apiFetch<TroubleshootingResponse>(`/api/v1/conversations/${conversationId}/disambiguate`, {
     method: "POST",
-    body: JSON.stringify({ machine_id: machineId }),
+    body: JSON.stringify({ machine_id: machineId, target_language: targetLanguage }),
   });
 
 // backend: {success, data: {conversation_id, machine_id, title, messages: [...]}}

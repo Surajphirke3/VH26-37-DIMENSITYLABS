@@ -1,3 +1,7 @@
+"use client";
+
+import { useLanguage } from "@/lib/i18n/context";
+
 interface RefusalMessageProps {
   type: string;
   summary: string;
@@ -13,14 +17,16 @@ export default function RefusalMessage({
   suggestions,
   onSuggestionClick,
 }: RefusalMessageProps) {
+  const { t } = useLanguage();
+
   const getTitle = () => {
     switch (type) {
       case "clarification_needed":
-        return "Clarification Needed";
+        return t("chat.clarificationNeeded", "Clarification Needed");
       case "insufficient_information":
-        return "Insufficient Information";
+        return t("chat.insufficientInfo", "Insufficient Information");
       default:
-        return "Information Needed";
+        return t("chat.informationNeeded", "Information Needed");
     }
   };
 
@@ -58,7 +64,7 @@ export default function RefusalMessage({
       {suggestions.length > 0 && (
         <div className="pl-11">
           <p className="text-xs font-semibold mb-2 text-amber-800 dark:text-amber-400">
-            Try asking:
+            {t("chat.tryAsking", "Try asking:")}
           </p>
           <div className="flex flex-wrap gap-2">
             {suggestions.map((s, i) => (
