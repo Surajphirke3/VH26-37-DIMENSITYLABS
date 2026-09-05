@@ -145,50 +145,50 @@ const ARCHITECTURE_NODES: Record<string, ArchitectureNode> = {
     description: "Dispatches query to optimal intelligence tier based on query complexity score, latency budget, and context window demands.",
     latencyBudget: "< 4ms",
     inputContract: `{\n  "query_type": "ERROR_CODE",\n  "evidence_score": 0.892,\n  "complexity_score": 0.32\n}`,
-    outputContract: `{\n  "selected_tier": "GPT-OSS 120B",\n  "model_id": "openai/gpt-oss-120b",\n  "max_tokens": 4096\n}`,
-    codeSnippet: `def route_model(task: str, complexity: float) -> str:\n    if task == "error_code_triage":\n        return "openai/gpt-oss-20b"      # Fast triage (<100ms)\n    elif complexity < 0.70:\n        return "openai/gpt-oss-20b"      # Multi-step (1-2s)\n    else:\n        return "openai/gpt-oss-120b"     # Deep reasoning (2-3s)`,
+    outputContract: `{\n  "selected_tier": "Apex 4B Trained",\n  "model_id": "apex-4b-custom",\n  "max_tokens": 4096\n}`,
+    codeSnippet: `def route_model(task: str, complexity: float) -> str:\n    if task == "error_code_triage":\n        return "nord-1b"      # Fast triage (<100ms)\n    elif complexity < 0.70:\n        return "forge-2b"     # Multi-step (1-2s)\n    else:\n        return "apex-4b"      # Deep reasoning (2-3s)`,
     tier: "inference",
     statusColor: "#6366f1"
   },
   model_nord: {
     id: "model_nord",
-    name: "Nord (Fast Edge)",
-    subsystem: "Sub-100ms Groq LPU Inference",
-    tech: "groq/compound-mini (Groq LPU)",
+    name: "Nord (Fast Edge 1B)",
+    subsystem: "Sub-100ms Edge LPU Inference",
+    tech: "Nord-1B (1B Parameters · Groq LPU)",
     fileSource: "backend/app/services/ai/groq.py",
-    description: "Blazing fast edge inference for instant fault code lookups, sensor parameter ranges, and urgent safety instructions.",
+    description: "Blazing fast 1B edge inference for instant fault code lookups, sensor parameter ranges, and urgent safety instructions.",
     latencyBudget: "< 95ms",
     inputContract: `{\n  "system": "OEM Grounded Assistant",\n  "context": "Sec 4.2 Haas VF-2 Spindle E-402...",\n  "query": "E-402"\n}`,
     outputContract: `{\n  "error_meaning": "Spindle VFD Overcurrent",\n  "step_1": "Inspect coolant pump fuse",\n  "confidence": "HIGH"\n}`,
-    codeSnippet: `async def generate_mini(prompt: str, context: str) -> dict:\n    return await groq_client.chat.completions.create(\n        model="groq/compound-mini",\n        messages=[{"role": "system", "content": SYS_PROMPT}, {"role": "user", "content": prompt}],\n        temperature=0.0\n    )`,
+    codeSnippet: `async def generate_mini(prompt: str, context: str) -> dict:\n    return await groq_client.chat.completions.create(\n        model="nord-1b",\n        messages=[{"role": "system", "content": SYS_PROMPT}, {"role": "user", "content": prompt}],\n        temperature=0.0\n    )`,
     tier: "inference",
     statusColor: "#3b82f6"
   },
   model_forge: {
     id: "model_forge",
-    name: "Forge (Diagnostic Engine)",
+    name: "Forge (Diagnostic Engine 2B)",
     subsystem: "High-Throughput Procedural Specialist",
-    tech: "openai/gpt-oss-20b (Structured JSON)",
+    tech: "Forge-2B (2B Parameters · Structured JSON)",
     fileSource: "backend/app/services/ai/groq.py",
-    description: "High-speed reasoning model capable of generating ordered assembly steps, torque sequences, and verified tooling requirements.",
-    latencyBudget: "1.0–1.8s",
+    description: "High-speed 2B reasoning model capable of generating ordered assembly steps, torque sequences, and verified tooling requirements.",
+    latencyBudget: "600ms–1.2s",
     inputContract: `{\n  "schema": RepairProcedureSchema,\n  "context": [...],\n  "query": "E-402 corrective procedure"\n}`,
     outputContract: `{\n  "root_cause": "VFD Overcurrent Trip",\n  "steps": ["Step 1: Lockout tagout", "Step 2: Check inverter heatsink", "Step 3: Measure 480V line"],\n  "citations": [87, 88]\n}`,
-    codeSnippet: `async def generate_gpt20b(prompt: str, chunks: list[Chunk]) -> dict:\n    return await groq_client.chat.completions.create(\n        model="openai/gpt-oss-20b",\n        messages=[{"role": "user", "content": format_rag(prompt, chunks)}],\n        response_format={"type": "json_object"}\n    )`,
+    codeSnippet: `async def generate_forge2b(prompt: str, chunks: list[Chunk]) -> dict:\n    return await groq_client.chat.completions.create(\n        model="forge-2b",\n        messages=[{"role": "user", "content": format_rag(prompt, chunks)}],\n        response_format={"type": "json_object"}\n    )`,
     tier: "inference",
     statusColor: "#f59e0b"
   },
   model_apex: {
     id: "model_apex",
-    name: "Apex (Deep Reasoning)",
+    name: "Apex (Domain-Trained 4B)",
     subsystem: "Multi-Source Diagnostic Sovereign",
-    tech: "openai/gpt-oss-120b (128k Deep Context)",
+    tech: "Apex-4B (4B Parameter Fine-Tuned Model)",
     fileSource: "backend/app/services/ai/groq.py",
-    description: "Deep analytical synthesis for multi-system cascade failures, complex electrical schematics, and cross-manual disambiguation.",
-    latencyBudget: "2.0–3.8s",
-    inputContract: `{\n  "multi_manual_context": 12000_tokens,\n  "cross_references": 8,\n  "schematics": true\n}`,
+    description: "Custom-trained 4B analytical model fine-tuned on OEM technical service manuals for cascading failures and cross-system kinematics.",
+    latencyBudget: "1.4s–2.6s",
+    inputContract: `{\n  "multi_manual_context": 8000_tokens,\n  "cross_references": 8,\n  "schematics": true\n}`,
     outputContract: `{\n  "cascading_failure_analysis": "Primary failure at harmonic drive bearing...",\n  "corrective_workflow": [...],\n  "preventive_mtbf": "2400 hours"\n}`,
-    codeSnippet: `async def generate_gpt120b(prompt: str, chunks: list[Chunk]) -> dict:\n    return await groq_client.chat.completions.create(\n        model="openai/gpt-oss-120b",\n        max_tokens=4096,\n        messages=[{"role": "user", "content": format_deep_rag(prompt, chunks)}],\n        response_format={"type": "json_object"}\n    )`,
+    codeSnippet: `async def generate_apex4b(prompt: str, chunks: list[Chunk]) -> dict:\n    return await groq_client.chat.completions.create(\n        model="apex-4b",\n        max_tokens=4096,\n        messages=[{"role": "user", "content": format_deep_rag(prompt, chunks)}],\n        response_format={"type": "json_object"}\n    )`,
     tier: "inference",
     statusColor: "#8b5cf6"
   },
@@ -306,7 +306,7 @@ const SCENARIOS: Scenario[] = [
     badge: "Deep Reasoning Synthesis",
     badgeColor: "bg-violet-500/10 text-violet-500 border-violet-500/20",
     query: "Simultaneous thermal elongation on X/Y ball screws with hydraulic back-pressure spike",
-    description: "High-complexity diagnostic inquiry across multiple sub-assemblies. Routed directly to GPT-OSS 120B for cross-chapter causal graph generation.",
+    description: "High-complexity diagnostic inquiry across multiple sub-assemblies. Routed directly to Apex 4B Trained for cross-chapter causal graph generation.",
     expectedRoute: [
       "client_gateway",
       "classifier",
@@ -320,13 +320,13 @@ const SCENARIOS: Scenario[] = [
       "citation_hydrator",
       "sse_streamer"
     ],
-    expectedModel: "GPT-OSS 120B",
+    expectedModel: "Apex 4B Trained",
     expectedOutcome: "success",
     metrics: {
       totalLatency: "2,680 ms",
       evidenceScore: 0.94,
       citations: 6,
-      model: "GPT-OSS 120B (Groq LPU)"
+      model: "Apex 4B Trained (Groq LPU)"
     }
   }
 ];
@@ -753,7 +753,7 @@ export default function LiveArchitectureFlowchart() {
               <span className="text-[11px] font-mono uppercase tracking-wider font-bold text-indigo-600 dark:text-indigo-400">
                 Tier 5 · Adaptive Model Cascade Router
               </span>
-              <span className="text-[10px] font-mono text-[var(--text-muted)]">Mini &lt;100ms | 20B 1–2s | 120B 2–4s</span>
+              <span className="text-[10px] font-mono text-[var(--text-muted)]">Nord 1B &lt;100ms | Forge 2B 1–2s | Apex 4B 2–4s</span>
             </div>
 
             <FlowNodeCard

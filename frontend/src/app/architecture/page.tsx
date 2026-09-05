@@ -38,7 +38,7 @@ const PIPELINE_STAGES = [
   },
   {
     stage: "LLM Response",
-    desc: "Adaptive Tri-Tier routing (Mini <100ms / 20B 1–2s / 120B 2–4s). Top-k retrieved chunks passed to Groq LPU models under strict zero-hallucination directive.",
+    desc: "Adaptive Tri-Tier routing (Nord 1B <100ms / Forge 2B 1–2s / Apex 4B Trained 2–4s). Top-k retrieved chunks passed to Groq LPU models under strict zero-hallucination directive.",
     details: ["Adaptive model selection by symptom complexity", "Context-limited prompt templates", "Strict zero-hallucination directive"]
   },
   {
@@ -241,7 +241,7 @@ export default function ArchitecturePage() {
 
         <div className="mt-8 cyber-card p-6 bg-blue-950/20 border-blue-800/30">
           <p className="text-sm text-[var(--text-primary)] font-medium">
-            <span className="text-blue-400 font-bold">Target SLA:</span> <span className="text-blue-300 font-mono">Mini &lt;100ms, 20B 1–2s, 120B 2–4s.</span> Caching and model selection ensure sub-second median for 92% of queries.
+            <span className="text-blue-400 font-bold">Target SLA:</span> <span className="text-blue-300 font-mono">Nord 1B &lt;100ms, Forge 2B 1–2s, Apex 4B 2–4s.</span> Caching and model selection ensure sub-second median for 92% of queries.
           </p>
         </div>
       </section>

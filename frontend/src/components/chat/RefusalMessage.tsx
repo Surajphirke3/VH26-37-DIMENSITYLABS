@@ -1,6 +1,7 @@
 "use client";
 
 import { useLanguage } from "@/lib/i18n/context";
+import { HelpCircle, AlertCircle, ArrowRight, Sparkles } from "lucide-react";
 
 interface RefusalMessageProps {
   type: string;
@@ -19,61 +20,59 @@ export default function RefusalMessage({
 }: RefusalMessageProps) {
   const { t } = useLanguage();
 
-  const getTitle = () => {
-    switch (type) {
-      case "clarification_needed":
-        return t("chat.clarificationNeeded", "Clarification Needed");
-      case "insufficient_information":
-        return t("chat.insufficientInfo", "Insufficient Information");
-      default:
-        return t("chat.informationNeeded", "Information Needed");
-    }
-  };
+  const isClarification = type === "clarification_needed" || type === "insufficient_information";
+  const title = isClarification
+    ? t("chat.clarificationNeeded", "Diagnostic Clarification Required")
+    : t("chat.informationNeeded", "Additional Context Needed");
 
   return (
-    <div
-      className="rounded-2xl p-4 space-y-3 animate-scale-in bg-amber-500/10 border border-amber-500/20 shadow-sm"
-    >
+    <div className="rounded-2xl p-5 space-y-4 animate-fade-in bg-gradient-to-br from-amber-500/[0.07] via-slate-900/40 to-indigo-500/[0.04] border border-amber-500/25 dark:border-amber-500/20 shadow-lg backdrop-blur-md">
       {/* Header */}
-      <div className="flex items-start gap-3">
-        <div
-          className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 bg-amber-500/20 border border-amber-500/30"
-        >
-          <svg className="w-4 h-4 text-amber-600 dark:text-amber-400" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd"
-              d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z"
-              clipRule="evenodd" />
-          </svg>
+      <div className="flex items-start gap-3.5">
+        <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 bg-amber-500/15 border border-amber-500/30 text-amber-500 dark:text-amber-400 shadow-sm">
+          {isClarification ? (
+            <HelpCircle className="w-5 h-5" />
+          ) : (
+            <AlertCircle className="w-5 h-5" />
+          )}
         </div>
-        <div>
-          <p className="text-sm font-bold text-amber-900 dark:text-amber-200">
-            {getTitle()}
-          </p>
-          <p className="text-sm mt-0.5 text-amber-800 dark:text-amber-400">
+        <div className="space-y-1 min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+              {title}
+            </h4>
+            <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20">
+              INSPECTION INTAKE
+            </span>
+          </div>
+          <p className="text-sm font-medium text-slate-800 dark:text-slate-200 leading-relaxed">
             {summary}
           </p>
         </div>
       </div>
 
       {notes && (
-        <p className="text-xs pl-11 text-amber-800 dark:text-amber-500/90">
+        <div className="pl-12 text-xs text-slate-600 dark:text-slate-400 leading-relaxed border-l-2 border-amber-500/30 my-1 py-0.5">
           {notes}
-        </p>
+        </div>
       )}
 
       {suggestions.length > 0 && (
-        <div className="pl-11">
-          <p className="text-xs font-semibold mb-2 text-amber-800 dark:text-amber-400">
-            {t("chat.tryAsking", "Try asking:")}
+        <div className="pt-2 border-t border-amber-500/15 space-y-2.5">
+          <p className="text-[11px] font-mono font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+            <Sparkles className="w-3 h-3 text-amber-500" />
+            {t("chat.tryAsking", "Recommended Diagnostic Queries:")}
           </p>
-          <div className="flex flex-wrap gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {suggestions.map((s, i) => (
               <button
                 key={i}
+                type="button"
                 onClick={() => onSuggestionClick?.(s)}
-                className="text-xs px-3 py-1.5 rounded-full font-medium transition-all hover:scale-105 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-900 dark:text-amber-200"
+                className="text-left text-xs px-3.5 py-2.5 rounded-xl font-medium transition-all duration-200 bg-white/60 dark:bg-slate-900/80 hover:bg-amber-500/10 dark:hover:bg-amber-500/15 border border-slate-200 dark:border-white/10 hover:border-amber-500/40 text-slate-800 dark:text-slate-200 hover:text-amber-600 dark:hover:text-amber-300 flex items-center justify-between group shadow-sm cursor-pointer"
               >
-                {s}
+                <span className="truncate mr-2">{s}</span>
+                <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-amber-500 group-hover:translate-x-0.5 transition-all shrink-0" />
               </button>
             ))}
           </div>

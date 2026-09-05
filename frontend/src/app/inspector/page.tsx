@@ -70,7 +70,7 @@ const JUDGE_SCENARIOS: JudgeScenario[] = [
   {
     id: "siemens-profinet",
     label: "Siemens S7-1500 Bus Timeout",
-    badge: "GPT-OSS 120B (Workhorse)",
+    badge: "Apex 4B (Workhorse)",
     tagColor: "text-amber-500 bg-amber-500/10 border-amber-500/25",
     machineName: "Siemens S7-1500",
     query: "Siemens S7-1500 PLC PROFINET communication timeout error 0x80 on remote I/O rack. How to troubleshoot?",
@@ -80,7 +80,7 @@ const JUDGE_SCENARIOS: JudgeScenario[] = [
   {
     id: "kuka-resolver",
     label: "KUKA KR210 Resolver Drift",
-    badge: "GPT-OSS 120B (Reasoning)",
+    badge: "Apex 4B Trained (Reasoning)",
     tagColor: "text-purple-500 bg-purple-500/10 border-purple-500/25",
     machineName: "KUKA KR210",
     query: "KUKA KR210 robot arm Axis 3 kinematic resolver drift exceeding 0.05 degrees during payload transition.",
@@ -607,9 +607,9 @@ export default function TechnicalInspectorPage() {
                     className="w-full px-2.5 py-1.5 text-xs rounded-xl bg-slate-50 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08] text-slate-800 dark:text-slate-200 outline-none font-mono"
                   >
                     <option value="auto">Auto-Router</option>
-                    <option value="openai/gpt-oss-120b">Apex — GPT-OSS 120B (Groq)</option>
-                    <option value="openai/gpt-oss-20b">Forge — GPT-OSS 20B (Groq Fast)</option>
-                    <option value="groq/compound-mini">Nord — Groq Compound Mini (Fast Edge)</option>
+                    <option value="openai/gpt-oss-120b">Apex — 4B Trained (Groq LPU)</option>
+                    <option value="openai/gpt-oss-20b">Forge — 2B Diagnostics (Groq Fast)</option>
+                    <option value="groq/compound-mini">Nord — 1B Fast Edge (Groq)</option>
                   </select>
                 </div>
 

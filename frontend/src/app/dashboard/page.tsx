@@ -420,109 +420,89 @@ export default function DashboardPage() {
 
         {/* Top SCADA Flight Deck Header */}
         <header
-          className="flex items-center justify-between px-3 sm:px-6 py-2 sm:py-2.5 h-14 sm:h-16 shrink-0 border-b border-[var(--border)] backdrop-blur-md relative z-30 bg-[var(--bg-surface)]/85 gap-2 min-w-0"
+          className="flex items-center justify-between px-3 sm:px-6 h-14 shrink-0 border-b border-[var(--border)] backdrop-blur-xl relative z-30 bg-[var(--bg-surface)]/90 gap-2 min-w-0"
         >
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0 truncate">
+          <div className="flex items-center gap-2.5 min-w-0 truncate">
             <button
               onClick={() => setSidebarOpen((v) => !v)}
-              className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/[0.05] transition-colors text-slate-400 hover:text-white cursor-pointer shrink-0"
+              className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/[0.06] transition-colors text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer shrink-0"
               title={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
 
-            <div className="min-w-0 truncate">
-              <div className="flex items-center gap-2 min-w-0 truncate">
-                <div className="flex items-center gap-1.5 shrink-0">
-                  <span className="font-mono font-black text-xs uppercase tracking-wider text-slate-800 dark:text-slate-100">
-                    {t("dashboard.hudTitle", "DIAGNOSTICS HUD")}
-                  </span>
-                  <span className="px-1.5 py-0.5 rounded font-mono text-[9px] font-bold bg-cyan-500/10 dark:bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 border border-cyan-500/30">
-                    v2.4
-                  </span>
+            <div className="flex items-center gap-2 min-w-0 truncate">
+              <span className="font-mono font-bold text-xs uppercase tracking-wider text-slate-900 dark:text-slate-100 hidden sm:inline">
+                Diagnostics Console
+              </span>
+
+              {selectedMachine ? (
+                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono font-bold bg-indigo-500/10 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30 truncate min-w-0 max-w-[200px] sm:max-w-[260px]">
+                  <ManufacturerLogo name={selectedMachine.name} manufacturer={selectedMachine.manufacturer} size="xs" />
+                  <span className="truncate">{selectedMachine.name}</span>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedMachine(null)}
+                    className="hover:text-rose-500 transition-colors ml-1 font-bold text-xs cursor-pointer shrink-0"
+                    title="Clear machine filter"
+                  >
+                    ×
+                  </button>
                 </div>
-                {selectedMachine ? (
-                  <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-[10px] font-mono font-bold bg-indigo-500/10 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30 truncate min-w-0 max-w-[160px] sm:max-w-[240px]">
-                    <ManufacturerLogo name={selectedMachine.name} manufacturer={selectedMachine.manufacturer} size="xs" />
-                    <span className="truncate">{selectedMachine.name}</span>
-                    <button
-                      type="button"
-                      onClick={() => setSelectedMachine(null)}
-                      className="hover:text-rose-500 transition-colors ml-1 font-bold text-xs cursor-pointer shrink-0"
-                      title="Clear machine filter"
-                    >
-                      ×
-                    </button>
-                  </div>
-                ) : (
-                  <span className="px-2 py-0.5 rounded-lg text-[10px] font-mono font-bold bg-amber-500/10 dark:bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30 flex items-center gap-1 shrink-0">
-                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-amber-400 animate-pulse" />
-                    <span className="hidden sm:inline">{t("dashboard.fleetMode", "Fleet Wide Mode")}</span>
-                    <span className="sm:hidden">Fleet</span>
-                  </span>
-                )}
-              </div>
-              <p className="hidden md:flex text-[10px] font-mono text-emerald-600 dark:text-emerald-400 items-center gap-1 mt-0.5 font-semibold truncate">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse shrink-0" />
-                <span className="truncate">
-                  {selectedMachine
-                    ? `TARGET: ${selectedMachine.model} · ZERO-HALLUCINATION GROUNDED`
-                    : "FLEET DISAMBIGUATION · CROSS-MACHINE ANN ACTIVE"}
+              ) : (
+                <span className="px-2.5 py-1 rounded-full text-[11px] font-mono font-bold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/25 flex items-center gap-1.5 shrink-0">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                  <span>Fleet Wide Intake</span>
                 </span>
-              </p>
+              )}
             </div>
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            {/* View Mode Switcher: Desktop | Mobile | Both */}
-            <div className="flex items-center gap-0.5 sm:gap-1 p-0.5 sm:p-1 rounded-xl bg-slate-100 dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 text-xs font-mono">
+            {/* View Mode Switcher: Desktop | Mobile | Split */}
+            <div className="flex items-center gap-0.5 p-0.5 rounded-xl bg-slate-100 dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.08] text-xs font-mono">
               <button
                 type="button"
                 onClick={() => setViewMode("desktop")}
-                className={`px-2 sm:px-3 py-1 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                   viewMode === "desktop"
-                    ? "bg-gradient-to-r from-cyan-500 to-indigo-600 text-white shadow-[0_0_12px_rgba(6,182,212,0.4)]"
-                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                    ? "bg-white dark:bg-white/20 text-slate-900 dark:text-white shadow-xs"
+                    : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 }`}
                 title="Desktop Console View"
               >
                 <Monitor className="w-3.5 h-3.5" />
-                <span className="hidden xl:inline">{t("dashboard.desktop", "Desktop")}</span>
+                <span className="hidden xl:inline">Desktop</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setViewMode("mobile")}
-                className={`px-2 sm:px-3 py-1 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                   viewMode === "mobile"
-                    ? "bg-gradient-to-r from-cyan-500 to-indigo-600 text-white shadow-[0_0_12px_rgba(6,182,212,0.4)]"
-                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                    ? "bg-white dark:bg-white/20 text-slate-900 dark:text-white shadow-xs"
+                    : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 }`}
                 title="Mobile Field Device Simulator"
               >
                 <Smartphone className="w-3.5 h-3.5" />
-                <span className="hidden xl:inline">{t("dashboard.fieldMobile", "Field Mobile")}</span>
+                <span className="hidden xl:inline">Mobile</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setViewMode("split")}
-                className={`px-2 sm:px-3 py-1 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                   viewMode === "split"
-                    ? "bg-gradient-to-r from-cyan-500 to-indigo-600 text-white shadow-[0_0_12px_rgba(6,182,212,0.4)]"
-                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                    ? "bg-white dark:bg-white/20 text-slate-900 dark:text-white shadow-xs"
+                    : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 }`}
                 title="Split View: Desktop Console + Mobile Device"
               >
                 <Columns className="w-3.5 h-3.5" />
-                <span className="hidden xl:inline">{t("dashboard.dualSplit", "Dual Split")}</span>
+                <span className="hidden xl:inline">Dual Split</span>
               </button>
             </div>
 
@@ -536,28 +516,28 @@ export default function DashboardPage() {
                   "Activating Nord, Forge & Apex high-dimensional reasoning domain…"
                 )
               }
-              className="px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-mono font-bold text-white bg-gradient-to-r from-sky-500 via-indigo-600 to-rose-500 hover:from-sky-400 hover:to-rose-400 shadow-[0_0_20px_rgba(56,189,248,0.35)] border border-sky-400/40 transition-all flex items-center gap-1.5 sm:gap-2 cursor-pointer hover:scale-[1.03] active:scale-95 shrink-0"
-              title="Traverse into the dedicated Tri-Model Space Page (Nord · Forge · Apex)"
+              className="px-3 py-1 rounded-xl text-xs font-mono font-bold text-white bg-gradient-to-r from-sky-500 via-indigo-600 to-rose-500 hover:from-sky-400 hover:to-rose-400 shadow-sm border border-sky-400/40 transition-all flex items-center gap-1.5 cursor-pointer hover:scale-[1.02] active:scale-95 shrink-0"
+              title="Traverse into dedicated Tri-Model Space (Nord · Forge · Apex)"
             >
               <Sparkles className="w-3.5 h-3.5 text-sky-200 animate-pulse shrink-0" />
               <span className="hidden sm:inline">Tri-Model Space</span>
               <span className="sm:hidden">Space</span>
-              <span className="text-[10px] font-mono px-1 rounded bg-white/20">3</span>
             </button>
 
-            <div className="hidden 2xl:flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-[11px] font-mono text-emerald-600 dark:text-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.15)] font-semibold">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_6px_rgba(16,185,129,0.8)]" />
-              <span className="font-bold">MODBUS TCP 502 · CANopen ACTIVE</span>
+            {/* Modbus live indicator */}
+            <div className="hidden 2xl:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-mono text-emerald-600 dark:text-emerald-400 font-semibold">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Modbus 502 Live</span>
             </div>
 
             {user?.role === "admin" && (
               <Link
                 href="/admin"
-                className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-xs font-mono font-bold text-indigo-300 hover:text-white transition-all shadow-sm"
+                className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/25 text-xs font-mono font-bold text-indigo-600 dark:text-indigo-300 transition-all"
                 title="Switch to Administrative Management Console"
               >
                 <Settings className="w-3.5 h-3.5" />
-                <span>{t("nav.adminConsole", "Admin Console")}</span>
+                <span>Admin</span>
               </Link>
             )}
 

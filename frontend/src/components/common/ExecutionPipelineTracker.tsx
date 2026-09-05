@@ -96,21 +96,21 @@ export const PIPELINE_STAGES: PipelineStage[] = [
     shortLabel: "Context",
     subtitle: "Rerank & Deduplication",
     icon: Search,
-    color: "#f59e0b",
-    bgGlow: "rgba(245,158,11,0.15)",
-    borderColor: "rgba(245,158,11,0.4)",
+    color: "#38bdf8",
+    bgGlow: "rgba(56,189,248,0.12)",
+    borderColor: "rgba(56,189,248,0.35)",
     taskDescription: "Cross-encoder scoring, threshold cutoff filtering (>0.45 cosine), deduplication & prompt packing...",
     techDetails: "Filters noise, preserves highest confidence procedure steps, builds grounded prompt context.",
   },
   {
     id: 7,
     label: "LLM Response",
-    shortLabel: "LLM Response",
+    shortLabel: "Reasoning",
     subtitle: "Adaptive Model Reasoning",
     icon: Zap,
-    color: "#ec4899",
-    bgGlow: "rgba(236,72,153,0.15)",
-    borderColor: "rgba(236,72,153,0.4)",
+    color: "#818cf8",
+    bgGlow: "rgba(129,140,248,0.12)",
+    borderColor: "rgba(129,140,248,0.35)",
     taskDescription: "Dispatching to active Ollama Cloud engine (Qwen 3.5 9B / Local Fallback)...",
     techDetails: "Strict zero-hallucination directive, temperature 0.1, mandatory citation grounding tokens.",
   },
@@ -120,9 +120,9 @@ export const PIPELINE_STAGES: PipelineStage[] = [
     shortLabel: "Solution",
     subtitle: "Verified Repair Protocol",
     icon: CheckCircle2,
-    color: "#14b8a6",
-    bgGlow: "rgba(20,184,166,0.15)",
-    borderColor: "rgba(20,184,166,0.4)",
+    color: "#10b981",
+    bgGlow: "rgba(16,185,129,0.12)",
+    borderColor: "rgba(16,185,129,0.35)",
     taskDescription: "Validating citation references against source manual pages. 100% deterministic protocol ready.",
     techDetails: "Formatted corrective steps, component callouts, verified page citations [C1], [C2].",
   },
@@ -204,36 +204,44 @@ export default function ExecutionPipelineTracker({
   if (variant === "compact") {
     return (
       <div
-        className={`w-full rounded-2xl bg-white/95 dark:bg-[#0c1017]/95 border border-slate-200 dark:border-white/10 shadow-lg p-4 space-y-3.5 transition-all ${className}`}
+        className={`w-full rounded-2xl bg-slate-900/90 dark:bg-[#0b0f19]/90 border border-slate-700/50 dark:border-white/10 shadow-xl backdrop-blur-xl p-4 space-y-3.5 transition-all text-slate-200 ${className}`}
       >
-        {/* Top Header & Status Bar */}
-        <div className="flex items-center justify-between gap-2 border-b border-slate-100 dark:border-white/[0.06] pb-2.5">
-          <div className="flex items-center gap-2">
-            <span className="relative flex h-2 w-2">
-              <span
-                className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
-                style={{ backgroundColor: currentStage.color }}
-              />
-              <span
-                className="relative inline-flex rounded-full h-2 w-2"
-                style={{ backgroundColor: currentStage.color }}
-              />
-            </span>
-            <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-              Live Background Pipeline Trace
-            </span>
-            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/[0.05] text-slate-500 border border-slate-200 dark:border-white/[0.06]">
-              Stage 0{activeStageId}/08
-            </span>
+        {/* Top Header & Smooth Glowing Progress Bar */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2.5">
+              <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
+              <span className="font-mono text-xs font-bold uppercase tracking-wider text-slate-200">
+                Grounding Pipeline Trace
+              </span>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/25">
+                Stage {activeStageId} of 8
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-mono text-slate-400">
+                {isExecuting ? "Executing Live..." : "Complete"}
+              </span>
+              <span className="text-xs font-mono font-bold text-cyan-400">
+                {progressPercent}%
+              </span>
+            </div>
           </div>
 
-          <div className="text-[10px] font-mono font-bold text-slate-500">
-            {progressPercent}% Complete
+          {/* Slim progress bar */}
+          <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden relative">
+            <div
+              className="h-full bg-gradient-to-r from-cyan-500 via-indigo-500 to-emerald-400 transition-all duration-300 relative"
+              style={{ width: `${progressPercent}%` }}
+            >
+              <div className="absolute right-0 top-0 bottom-0 w-2 bg-white shadow-[0_0_8px_#ffffff] animate-pulse" />
+            </div>
           </div>
         </div>
 
         {/* 8-Stage Horizontal Mini-Stepper */}
-        <div className="grid grid-cols-8 gap-1 items-center">
+        <div className="grid grid-cols-8 gap-1.5 items-center">
           {PIPELINE_STAGES.map((s) => {
             const Icon = s.icon;
             const isDone = completedStageIds.includes(s.id);
@@ -243,26 +251,22 @@ export default function ExecutionPipelineTracker({
               <div
                 key={s.id}
                 title={`Stage ${s.id}: ${s.label} — ${s.subtitle}`}
-                className={`relative flex flex-col items-center justify-center p-1.5 rounded-lg border text-center transition-all ${
+                className={`relative flex flex-col items-center justify-center py-2 px-1 rounded-xl border text-center transition-all ${
                   isActive
-                    ? "border-current shadow-md scale-105"
+                    ? "border-cyan-500/70 bg-cyan-500/15 shadow-sm scale-105"
                     : isDone
-                    ? "border-emerald-500/40 bg-emerald-500/5 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                    : "border-slate-200 dark:border-white/[0.06] bg-slate-50 dark:bg-white/[0.02] text-slate-400 opacity-60"
+                    ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400"
+                    : "border-white/[0.06] bg-white/[0.02] text-slate-500 opacity-50"
                 }`}
-                style={{
-                  borderColor: isActive ? s.color : undefined,
-                  backgroundColor: isActive ? s.bgGlow : undefined,
-                }}
               >
                 <Icon
-                  className="w-3.5 h-3.5 shrink-0 mb-0.5"
-                  style={{ color: isActive ? s.color : undefined }}
+                  className="w-3.5 h-3.5 shrink-0 mb-1"
+                  style={{ color: isActive ? s.color : isDone ? "#10b981" : undefined }}
                 />
-                <span className="text-[8px] font-mono font-bold leading-none truncate max-w-full">
+                <span className="text-[9px] font-mono font-bold leading-none truncate max-w-full">
                   0{s.id}
                 </span>
-                <span className="text-[8px] font-medium leading-none truncate max-w-full mt-0.5 hidden sm:inline">
+                <span className="text-[8px] font-medium leading-none truncate max-w-full mt-0.5 hidden md:inline text-slate-400">
                   {s.shortLabel}
                 </span>
               </div>
@@ -271,19 +275,9 @@ export default function ExecutionPipelineTracker({
         </div>
 
         {/* Active Stage Callout Box */}
-        <div
-          className="p-3 rounded-xl border flex items-start gap-3 transition-all"
-          style={{
-            borderColor: currentStage.borderColor,
-            backgroundColor: currentStage.bgGlow,
-          }}
-        >
+        <div className="p-3 rounded-xl bg-white/[0.03] border border-white/10 flex items-start gap-3 transition-all">
           <div
-            className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 border"
-            style={{
-              backgroundColor: "rgba(0,0,0,0.2)",
-              borderColor: currentStage.borderColor,
-            }}
+            className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border border-white/10 bg-black/40 text-cyan-400"
           >
             <CurrentIcon className="w-4 h-4" style={{ color: currentStage.color }} />
           </div>
@@ -291,43 +285,48 @@ export default function ExecutionPipelineTracker({
           <div className="space-y-0.5 flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <span
-                className="font-mono text-[10px] font-black uppercase tracking-wider"
+                className="font-mono text-[11px] font-bold uppercase tracking-wider"
                 style={{ color: currentStage.color }}
               >
                 STAGE 0{currentStage.id}: {currentStage.label}
               </span>
-              <span className="text-[10px] text-slate-400 font-mono truncate">
+              <span className="text-[10px] text-slate-400 font-mono truncate hidden sm:inline">
                 ({currentStage.subtitle})
               </span>
             </div>
-            <p className="text-xs text-slate-700 dark:text-slate-200 leading-snug">
+            <p className="text-xs text-slate-300 leading-snug">
               {currentStage.taskDescription}
             </p>
           </div>
         </div>
 
         {/* Mini Background Terminal Stream */}
-        <div className="p-2.5 rounded-xl bg-slate-950 border border-white/10 font-mono text-[10px] text-slate-300 space-y-1">
-          <div className="flex items-center justify-between text-slate-400 pb-1 border-b border-white/10">
-            <div className="flex items-center gap-1.5">
-              <Terminal className="w-3 h-3 text-teal-400" />
-              <span className="text-[9px] font-bold text-slate-300">Background Worker Stream</span>
-            </div>
-            <span className="text-[8px] text-teal-400 animate-pulse font-mono">EXECUTING LIVE</span>
-          </div>
-
-          <div
-            ref={terminalContainerRef}
-            className="max-h-20 overflow-y-auto space-y-0.5 pt-1 pr-1 chat-scroll"
-          >
-            {logs.slice(-3).map((log, idx) => (
-              <div key={idx} className="flex items-start gap-1.5 truncate">
-                <span className="text-teal-400 shrink-0">&gt;</span>
-                <span className="truncate">{log}</span>
+        {logs.length > 0 && (
+          <div className="p-2.5 rounded-xl bg-black/60 border border-white/[0.08] font-mono text-[10px] text-slate-400 space-y-1">
+            <div className="flex items-center justify-between pb-1 border-b border-white/[0.06]">
+              <div className="flex items-center gap-1.5 text-slate-400">
+                <Terminal className="w-3 h-3 text-cyan-400" />
+                <span className="text-[9px] font-bold text-slate-300">Telemetry Stream</span>
               </div>
-            ))}
+              <span className="text-[8px] text-cyan-400 font-mono flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                SYNCED
+              </span>
+            </div>
+
+            <div
+              ref={terminalContainerRef}
+              className="max-h-16 overflow-y-auto space-y-0.5 pt-1 chat-scroll font-mono text-slate-300"
+            >
+              {logs.slice(-2).map((log, idx) => (
+                <div key={idx} className="flex items-start gap-1.5 truncate text-[10px]">
+                  <span className="text-cyan-400 shrink-0">&gt;</span>
+                  <span className="truncate">{log}</span>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     );
   }

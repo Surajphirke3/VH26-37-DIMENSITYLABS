@@ -23,11 +23,11 @@ export interface ModelOption {
 }
 
 const DEFAULT_MODELS: ModelOption[] = [
-  { id: "auto", name: "⚡ Auto Router (Nord ⚡ → Forge ⚙️ → Apex 🛡️)", provider: "router" },
-  { id: "nord", name: "🔵 Nord (Edge · Sub-350ms)", provider: "nord" },
-  { id: "forge", name: "🟠 Forge (Workshop · 8B Reasoning)", provider: "forge" },
-  { id: "apex", name: "🔴 Apex (Cloud · 70B Safety Critical)", provider: "apex" },
-  { id: "openai/gpt-oss-120b", name: "Apex / GPT-OSS 120B (Groq)", provider: "groq" },
+  { id: "auto", name: "⚡ Auto Router (Nord 1B ⚡ → Forge 2B ⚙️ → Apex 4B 🛡️)", provider: "router" },
+  { id: "nord", name: "🔵 Nord (Edge · 1B Sub-100ms)", provider: "nord" },
+  { id: "forge", name: "🟠 Forge (Workshop · 2B Diagnostic)", provider: "forge" },
+  { id: "apex", name: "🔴 Apex (Trained · 4B Domain-Trained)", provider: "apex" },
+  { id: "openai/gpt-oss-120b", name: "Apex (4B Domain-Trained Groq)", provider: "groq" },
   { id: "qwen3.5:9b", name: "Qwen 3.5 9B (Ollama Cloud & Local)", provider: "ollama" },
   { id: "gemini-2.5-flash", name: "Gemini 2.5 Flash", provider: "gemini" },
 ];
@@ -250,187 +250,218 @@ export default function MessageInput({ onSend, isLoading, variant = "v2", active
   const isV2 = variant === "v2";
 
   return (
-    <div
-      className={`shrink-0 px-3 sm:px-6 py-2 sm:py-2.5 border-t transition-colors ${
-        isV2
-          ? "border-slate-200 dark:border-white/10 bg-white/95 dark:bg-slate-950/90 backdrop-blur-md"
-          : "border-slate-200 dark:border-white/[0.08] bg-slate-50/95 dark:bg-black/80 backdrop-blur-xl"
-      }`}
-    >
-      <div className={isV2 ? "max-w-3xl mx-auto" : ""}>
-      {/* ── Top Bar: Error Code Detector & Model Selector ── */}
-      <div className="flex items-center justify-between gap-2 mb-1.5 px-1 min-w-0">
-        <div className="flex items-center gap-2 min-w-0 truncate">
+    <div className="shrink-0 px-3 sm:px-6 py-2.5 sm:py-3 border-t border-slate-200/80 dark:border-white/[0.08] bg-white/95 dark:bg-[#070b14]/90 backdrop-blur-xl transition-colors z-20">
+      <div className="max-w-3xl mx-auto space-y-2">
+        {/* ── Top Bar: Active Error Code Detector & Model Tier Pills ── */}
+        <div className="flex items-center justify-between gap-2 min-w-0">
           {hasErrorCode ? (
-            <div className="animate-fade-in flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-400 truncate">
+            <div className="animate-fade-in flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 truncate">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse shrink-0" />
-              <span className="truncate">{t("chat.faultPatternDetected", "Fault Pattern Detected → OEM Manual Search Active")}</span>
+              <span className="truncate">Fault Code Pattern Recognized → OEM Manual Search</span>
             </div>
           ) : (
-            <div className="hidden sm:flex items-center gap-1.5 text-[10px] font-mono text-slate-500 dark:text-slate-400 truncate">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-              <span className="truncate">{t("chat.terminalReady", "Ready · Type symptom, alarm code, or attach photo")}</span>
+            <div className="flex items-center gap-1 p-0.5 rounded-xl bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.08] text-[10px] font-mono">
+              <button
+                type="button"
+                onClick={() => setSelectedModel("auto")}
+                className={`px-2 py-0.5 rounded-lg font-bold transition-all cursor-pointer ${
+                  selectedModel === "auto"
+                    ? "bg-white dark:bg-white/20 text-slate-900 dark:text-white shadow-sm"
+                    : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                }`}
+                title="Automatically route queries based on error complexity"
+              >
+                ⚡ Auto
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedModel("nord")}
+                className={`px-2 py-0.5 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                  selectedModel === "nord"
+                    ? "bg-sky-500/20 text-sky-700 dark:text-sky-300 border border-sky-500/30 shadow-sm"
+                    : "text-slate-500 dark:text-slate-400 hover:text-sky-400"
+                }`}
+                title="Nord: Fast sub-350ms lookup"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-sky-400 shrink-0" />
+                <span>Nord</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedModel("forge")}
+                className={`px-2 py-0.5 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                  selectedModel === "forge"
+                    ? "bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30 shadow-sm"
+                    : "text-slate-500 dark:text-slate-400 hover:text-amber-400"
+                }`}
+                title="Forge: Multi-step reasoning"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
+                <span>Forge</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedModel("apex")}
+                className={`px-2 py-0.5 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                  selectedModel === "apex" || selectedModel.includes("120b")
+                    ? "bg-rose-500/20 text-rose-700 dark:text-rose-300 border border-rose-500/30 shadow-sm"
+                    : "text-slate-500 dark:text-slate-400 hover:text-rose-400"
+                }`}
+                title="Apex: Safety-critical disambiguation"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-400 shrink-0" />
+                <span>Apex</span>
+              </button>
             </div>
           )}
-        </div>
 
-        {/* Model routing selector pill */}
-        <div className="flex items-center gap-1.5 ml-auto text-xs shrink-0">
-          {/* ── Language Selector ── */}
-          <LanguageSelector variant="header-pill" showLabel={true} direction="up" />
-
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 shadow-sm">
-            <span
-              className={`w-2 h-2 rounded-full shrink-0 ${
-                selectedModel.includes("apex") || selectedModel.includes("120b")
-                  ? "bg-rose-500"
-                  : selectedModel.includes("forge")
-                  ? "bg-amber-500"
-                  : selectedModel.includes("nord")
-                  ? "bg-sky-500"
-                  : "bg-indigo-500"
-              }`}
-            />
-            <select
-              value={selectedModel}
-              onChange={(e) => setSelectedModel(e.target.value)}
-              className="bg-transparent border-0 text-[11px] font-mono font-semibold text-slate-800 dark:text-slate-200 focus:outline-none cursor-pointer max-w-[210px] truncate"
-              title="Select AI Diagnostic Tier"
-            >
-              {availableModels.map((m) => (
-                <option key={m.id} value={m.id} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200">
-                  {m.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </div>
-
-      {/* Attached Image Preview */}
-      {selectedImage && (
-        <div className="mb-2.5 flex items-center gap-3 p-2 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl animate-fade-in shadow-sm">
-          <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-slate-300 dark:border-white/20 shrink-0">
-            <img
-              src={selectedImage}
-              alt="Attached inspection"
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-mono font-bold text-slate-900 dark:text-white truncate">{imageName || "Equipment Attachment"}</p>
-            <div className="flex items-center gap-1.5 text-[10px] font-mono text-emerald-600 dark:text-emerald-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              <span>{t("chat.ocrActive", "Optical OCR Active · Extracts Error Codes & Text")}</span>
+          {/* Model selector dropdown (expanded for advanced models) */}
+          <div className="flex items-center gap-1.5 text-xs shrink-0">
+            <div className="flex items-center gap-1.5 px-2 py-1 rounded-xl bg-slate-100 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/[0.08] text-slate-700 dark:text-slate-300">
+              <span
+                className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                  selectedModel.includes("apex") || selectedModel.includes("120b")
+                    ? "bg-rose-500"
+                    : selectedModel.includes("forge")
+                    ? "bg-amber-500"
+                    : selectedModel.includes("nord")
+                    ? "bg-sky-500"
+                    : "bg-emerald-500"
+                }`}
+              />
+              <select
+                value={selectedModel}
+                onChange={(e) => setSelectedModel(e.target.value)}
+                className="bg-transparent border-0 text-[11px] font-mono font-semibold text-slate-700 dark:text-slate-300 focus:outline-none cursor-pointer max-w-[140px] sm:max-w-[190px] truncate"
+                title="Select AI Engine Tier"
+              >
+                {availableModels.map((m) => (
+                  <option key={m.id} value={m.id} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200">
+                    {m.name}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
+        </div>
+
+        {/* Attached Image Preview */}
+        {selectedImage && (
+          <div className="flex items-center gap-3 p-2 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl animate-fade-in shadow-sm">
+            <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-slate-300 dark:border-white/20 shrink-0">
+              <img
+                src={selectedImage}
+                alt="Attached inspection"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-mono font-bold text-slate-900 dark:text-white truncate">{imageName || "Equipment Attachment"}</p>
+              <div className="flex items-center gap-1.5 text-[10px] font-mono text-emerald-600 dark:text-emerald-400">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                <span>Optical OCR Active · Extracts Error Codes & Text</span>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={removeImage}
+              className="p-1.5 hover:bg-slate-200 dark:hover:bg-white/10 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white transition-colors cursor-pointer"
+              title="Remove attachment"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
+        {/* ── Input Container (Sleek Floating Command Box) ── */}
+        <div className="flex items-end gap-2 p-1.5 rounded-2xl bg-slate-50 dark:bg-[#0e1320] border border-slate-200/90 dark:border-white/10 focus-within:border-indigo-500/50 dark:focus-within:border-sky-400/50 focus-within:ring-2 focus-within:ring-indigo-500/10 dark:focus-within:ring-sky-400/10 transition-all shadow-md">
+          {/* Hidden File Input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleImageSelect}
+            className="hidden"
+            id="chat-image-upload"
+          />
+
+          {/* Image upload button */}
           <button
             type="button"
-            onClick={removeImage}
-            className="p-1.5 hover:bg-slate-200 dark:hover:bg-white/10 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white transition-colors cursor-pointer"
-            title="Remove attachment"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isLoading}
+            className="shrink-0 w-9 h-9 flex items-center justify-center rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-white/[0.04] hover:bg-slate-100 dark:hover:bg-white/[0.08] text-slate-600 dark:text-slate-300 transition-all cursor-pointer shadow-sm active:scale-95"
+            title={t("chat.attachImage", "Attach equipment photo / nameplate")}
           >
-            <X className="w-4 h-4" />
+            <ImageIcon className="w-4 h-4" />
+          </button>
+
+          {/* Live Camera Snapshot Button */}
+          <button
+            type="button"
+            onClick={handleCameraClick}
+            disabled={isLoading}
+            className="shrink-0 w-9 h-9 flex items-center justify-center rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-white/[0.04] hover:bg-slate-100 dark:hover:bg-white/[0.08] text-slate-600 dark:text-slate-300 transition-all cursor-pointer shadow-sm active:scale-95"
+            title={t("chat.capturePhoto", "Open camera & optical scanner")}
+          >
+            <Camera className="w-4 h-4" />
+          </button>
+
+          <div className="flex-1 relative">
+            <textarea
+              ref={textareaRef}
+              id="chat-input"
+              value={value}
+              onChange={handleChange}
+              onKeyDown={handleKey}
+              disabled={isLoading}
+              rows={1}
+              placeholder={t("chat.placeholder", "Enter fault code (e.g. Alarm 102, F01043), symptom, or attach photo…")}
+              className="w-full px-2.5 py-1.5 text-xs sm:text-sm font-sans rounded-xl leading-relaxed bg-transparent border-0 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none"
+              style={{
+                minHeight: "38px",
+                maxHeight: "120px",
+                resize: "none",
+              }}
+            />
+            {isLoading && (
+              <div className="absolute right-2 bottom-2 flex items-center gap-1.5 text-[10px] font-mono text-slate-400">
+                <div
+                  className="w-3 h-3 rounded-full border-2 border-slate-400/20 border-t-indigo-500 dark:border-t-sky-400"
+                  style={{ animation: "spin 0.8s linear infinite" }}
+                />
+                <span className="hidden sm:inline font-medium">Grounding OEM manuals...</span>
+              </div>
+            )}
+          </div>
+
+          {/* Execute Button */}
+          <button
+            id="send-btn"
+            onClick={submit}
+            disabled={isLoading || (!value.trim() && !selectedImage)}
+            className={`shrink-0 h-9 px-4 flex items-center justify-center gap-1.5 rounded-xl font-mono text-xs font-bold transition-all ${
+              isLoading || (!value.trim() && !selectedImage)
+                ? "bg-slate-200 dark:bg-white/[0.05] border border-transparent text-slate-400 dark:text-slate-500 cursor-not-allowed"
+                : "bg-gradient-to-r from-teal-600 via-indigo-600 to-indigo-700 hover:from-teal-500 hover:to-indigo-600 text-white shadow-md shadow-indigo-500/20 cursor-pointer active:scale-95"
+            }`}
+            aria-label={t("chat.send", "Send")}
+          >
+            <span>{t("chat.send", "SEND")}</span>
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+            </svg>
           </button>
         </div>
-      )}
 
-      {/* ── Input Container ── */}
-      <div
-        className={`flex items-end gap-2 p-1.5 rounded-2xl transition-all shadow-sm ${
-          isV2
-            ? "bg-slate-50 dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 focus-within:border-slate-400 dark:focus-within:border-white/25 focus-within:bg-white dark:focus-within:bg-slate-900"
-            : "bg-white dark:bg-black/60 border border-slate-200 dark:border-cyan-500/25 focus-within:border-cyan-500 dark:focus-within:border-cyan-400 focus-within:shadow-[0_0_20px_rgba(6,182,212,0.15)]"
-        }`}
-      >
-        {/* Hidden File Input */}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          onChange={handleImageSelect}
-          className="hidden"
-          id="chat-image-upload"
-        />
-
-        {/* Image upload button */}
-        <button
-          type="button"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={isLoading}
-          className="shrink-0 w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 dark:border-white/10 bg-white hover:bg-slate-100 dark:bg-slate-800/80 dark:hover:bg-slate-700/80 text-slate-600 dark:text-slate-300 transition-all cursor-pointer shadow-sm active:scale-95"
-          title={t("chat.attachImage", "Attach equipment photo / nameplate")}
-        >
-          <ImageIcon className="w-4 h-4" />
-        </button>
-
-        {/* Live Camera Snapshot Button */}
-        <button
-          type="button"
-          onClick={handleCameraClick}
-          disabled={isLoading}
-          className="shrink-0 w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 dark:border-white/10 bg-white hover:bg-slate-100 dark:bg-slate-800/80 dark:hover:bg-slate-700/80 text-slate-600 dark:text-slate-300 transition-all cursor-pointer shadow-sm active:scale-95"
-          title={t("chat.capturePhoto", "Open camera & optical scanner")}
-        >
-          <Camera className="w-4 h-4" />
-        </button>
-
-        <div className="flex-1 relative">
-          <textarea
-            ref={textareaRef}
-            id="chat-input"
-            value={value}
-            onChange={handleChange}
-            onKeyDown={handleKey}
-            disabled={isLoading}
-            rows={1}
-            placeholder={t("chat.placeholder", "Enter fault code, symptom description, or attach photo…")}
-            className="w-full px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-sans rounded-xl leading-relaxed bg-transparent border-0 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none"
-            style={{
-              minHeight: "40px",
-              maxHeight: "100px",
-              resize: "none",
-            }}
-          />
-          {isLoading && (
-            <div className="absolute right-2 bottom-2 flex items-center gap-1 text-[10px] font-mono text-slate-500 dark:text-slate-400">
-              <div
-                className="w-3.5 h-3.5 rounded-full border-2 border-slate-400/20 border-t-slate-600 dark:border-t-slate-200"
-                style={{ animation: "spin 0.8s linear infinite" }}
-              />
-              <span className="hidden sm:inline font-medium">{t("chat.grounding", "Analyzing...")}</span>
-            </div>
-          )}
+        {/* Subtle keyboard hint */}
+        <div className="flex items-center justify-between px-1 text-[10px] font-mono text-slate-400 dark:text-slate-500">
+          <span>↵ Enter to send · Shift+↵ for new line</span>
+          <span className="text-emerald-500/90 flex items-center gap-1 font-semibold">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            Zero-Hallucination Grounded
+          </span>
         </div>
-
-        {/* Execute Button */}
-        <button
-          id="send-btn"
-          onClick={submit}
-          disabled={isLoading || (!value.trim() && !selectedImage)}
-          className={`shrink-0 h-10 px-4 flex items-center justify-center gap-2 rounded-xl font-mono text-xs font-bold transition-all ${
-            isLoading || (!value.trim() && !selectedImage)
-              ? "bg-slate-200 dark:bg-slate-800/60 border border-slate-300/60 dark:border-white/5 text-slate-400 dark:text-slate-500 cursor-not-allowed"
-              : isV2
-              ? "bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 shadow-sm cursor-pointer active:scale-95"
-              : "bg-gradient-to-r from-cyan-500 via-indigo-600 to-indigo-700 text-white shadow-[0_0_20px_rgba(6,182,212,0.4)] cursor-pointer active:scale-95"
-          }`}
-          aria-label={t("chat.send", "Send")}
-        >
-          <span>{t("chat.send", "SEND")}</span>
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-          </svg>
-        </button>
-      </div>
-
-      <div className="mt-2 flex items-center justify-between px-1 text-[10px] font-mono text-slate-500 dark:text-slate-400 flex-wrap gap-1">
-        <span>{t("chat.keyboardHints", "↵ Enter to send · Shift+↵ for new line · Multilingual")}</span>
-        <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-          MODBUS / CANopen CONNECTED
-        </span>
-      </div>
       </div>
 
       {/* Hidden Canvas for Frame Capture */}
