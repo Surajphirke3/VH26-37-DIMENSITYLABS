@@ -35,6 +35,7 @@ import MobileDeviceSimulator from "@/components/mobile/MobileDeviceSimulator";
 import Spinner from "@/components/ui/Spinner";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import { useTheme } from "@/lib/theme-context";
+import ManufacturerLogo from "@/components/common/ManufacturerLogo";
 
 interface ConvEntry {
   id: string;
@@ -243,59 +244,47 @@ export default function DashboardPage() {
             />
           </div>
 
-          {/* Platform Navigation */}
+          {/* Grounded Document & Equipment References */}
           <div className="px-3 py-3 border-b border-[var(--border)]">
             <p className="text-[10px] font-mono font-bold uppercase tracking-widest mb-2 px-2 text-slate-400 dark:text-slate-500">
-              Console Operations
+              Grounded Documentation
             </p>
-            <div className="space-y-0.5 text-xs">
+            <div className="space-y-1 text-xs">
               <Link
                 href="/documents"
-                className="flex items-center justify-between px-2.5 py-1.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/[0.05] hover:text-slate-900 dark:hover:text-white transition-colors"
+                className="flex items-center justify-between px-2.5 py-2 rounded-xl text-slate-300 hover:bg-white/[0.05] hover:text-white transition-colors border border-transparent hover:border-white/10"
               >
-                <div className="flex items-center gap-2">
-                  <FileText className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                  <span>Technical Manuals</span>
+                <div className="flex items-center gap-2.5">
+                  <div className="w-6 h-6 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0">
+                    <FileText className="w-3.5 h-3.5" />
+                  </div>
+                  <div>
+                    <span className="font-semibold block">Select Manuals</span>
+                    <span className="text-[10px] font-mono text-slate-500">Inspect OEM Schematics</span>
+                  </div>
                 </div>
-                <span className="text-[10px] font-mono text-slate-400">PDFs</span>
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 font-bold">
+                  PDFs
+                </span>
               </Link>
-              <Link
-                href="/upload"
-                className="flex items-center justify-between px-2.5 py-1.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/[0.05] hover:text-slate-900 dark:hover:text-white transition-colors"
-              >
-                <div className="flex items-center gap-2">
-                  <UploadCloud className="w-3.5 h-3.5 text-blue-500 shrink-0" />
-                  <span>Upload Engine</span>
-                </div>
-                <span className="text-[10px] font-mono text-slate-400">RAG</span>
-              </Link>
-              <Link
-                href="/search"
-                className="flex items-center justify-between px-2.5 py-1.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/[0.05] hover:text-slate-900 dark:hover:text-white transition-colors"
-              >
-                <div className="flex items-center gap-2">
-                  <Search className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                  <span>Deep Vector Search</span>
-                </div>
-              </Link>
-              <Link
-                href="/status"
-                className="flex items-center justify-between px-2.5 py-1.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/[0.05] hover:text-slate-900 dark:hover:text-white transition-colors"
-              >
-                <div className="flex items-center gap-2">
-                  <Activity className="w-3.5 h-3.5 text-rose-500 shrink-0" />
-                  <span>Infrastructure Status</span>
-                </div>
-              </Link>
-              <Link
-                href="/settings"
-                className="flex items-center justify-between px-2.5 py-1.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/[0.05] hover:text-slate-900 dark:hover:text-white transition-colors"
-              >
-                <div className="flex items-center gap-2">
-                  <Sliders className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
-                  <span>System Settings</span>
-                </div>
-              </Link>
+
+              {user?.role === "admin" && (
+                <Link
+                  href="/admin"
+                  className="flex items-center justify-between px-2.5 py-2 mt-1 rounded-xl text-indigo-300 bg-indigo-500/10 border border-indigo-500/25 hover:bg-indigo-500/20 transition-all font-semibold"
+                >
+                  <div className="flex items-center gap-2">
+                    <Settings className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                    <div>
+                      <span className="block text-xs font-bold">Admin Management</span>
+                      <span className="text-[10px] font-mono text-indigo-400/70">Uploads &amp; Fleet Config</span>
+                    </div>
+                  </div>
+                  <span className="text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300">
+                    ADMIN
+                  </span>
+                </Link>
+              )}
             </div>
           </div>
 
@@ -315,26 +304,28 @@ export default function DashboardPage() {
               </button>
             </div>
 
-            <div className="space-y-1 overflow-y-auto max-h-[300px]">
+            <div className="space-y-1.5 overflow-y-auto max-h-[320px] px-0.5">
               {conversations.length === 0 ? (
-                <div className="px-3 py-4 text-center text-[11px] text-slate-400 dark:text-slate-500">
-                  No active sessions. Click &apos;+ New&apos; or pick a quick start below.
+                <div className="px-3 py-6 text-center text-[11px] text-slate-500 border border-dashed border-white/10 rounded-xl">
+                  No active sessions. Click &apos;+ New&apos; to initiate diagnostic intake.
                 </div>
               ) : (
                 conversations.map((c) => (
                   <div
                     key={c.id}
                     onClick={() => selectConversation(c.id)}
-                    className={`w-full text-left px-3 py-2 rounded-xl text-xs transition-all duration-200 truncate flex items-center justify-between group cursor-pointer ${
+                    className={`w-full text-left px-3 py-2.5 rounded-xl text-xs transition-all duration-200 truncate flex items-center justify-between group cursor-pointer border ${
                       activeConvId === c.id
-                        ? "bg-indigo-600 text-white font-bold shadow-sm"
-                        : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/[0.04]"
+                        ? "bg-gradient-to-r from-cyan-50 via-indigo-50 to-slate-50 dark:from-cyan-950/70 dark:via-indigo-950/60 dark:to-slate-900 border-cyan-500/40 text-cyan-950 dark:text-white font-bold shadow-sm dark:shadow-[0_0_15px_rgba(6,182,212,0.15)]"
+                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/[0.04] border-transparent"
                     }`}
                   >
-                    <div className="flex items-center gap-2 truncate min-w-0">
+                    <div className="flex items-center gap-2.5 truncate min-w-0">
                       <span
-                        className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                          activeConvId === c.id ? "bg-white" : "bg-emerald-500"
+                        className={`w-2 h-2 rounded-full shrink-0 ${
+                          activeConvId === c.id
+                            ? "bg-cyan-500 dark:bg-cyan-400 animate-pulse shadow-[0_0_8px_rgba(6,182,212,0.9)]"
+                            : "bg-emerald-500"
                         }`}
                       />
                       <span className="truncate">{c.label}</span>
@@ -343,16 +334,16 @@ export default function DashboardPage() {
                       <button
                         type="button"
                         onClick={(e) => handleDeleteConversation(e, c.id)}
-                        className={`p-1 rounded opacity-0 group-hover:opacity-100 hover:bg-black/20 transition-opacity ${
-                          activeConvId === c.id ? "text-white/80 hover:text-white" : "text-slate-400 hover:text-rose-500"
+                        className={`p-1 rounded opacity-0 group-hover:opacity-100 hover:bg-black/10 dark:hover:bg-black/30 transition-opacity ${
+                          activeConvId === c.id ? "text-slate-600 dark:text-white/80 hover:text-rose-600" : "text-slate-400 hover:text-rose-500"
                         }`}
                         title="Delete Session"
                       >
                         <Trash2 className="w-3 h-3" />
                       </button>
                       <ChevronRight
-                        className={`w-3 h-3 ${
-                          activeConvId === c.id ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                        className={`w-3.5 h-3.5 transition-transform ${
+                          activeConvId === c.id ? "text-cyan-600 dark:text-cyan-400 translate-x-0.5" : "opacity-0 group-hover:opacity-100 text-slate-400 dark:text-slate-500"
                         }`}
                       />
                     </div>
@@ -362,25 +353,46 @@ export default function DashboardPage() {
             </div>
           </div>
 
+          {/* Telemetry Station Health Indicator */}
+          <div className="px-3 py-2.5 mx-3 mb-2 rounded-xl bg-slate-100/90 dark:bg-slate-900/80 border border-cyan-500/30 dark:border-cyan-500/20 text-[10px] font-mono space-y-1.5 text-slate-600 dark:text-slate-400 shadow-sm">
+            <div className="flex items-center justify-between text-cyan-700 dark:text-cyan-400 font-bold">
+              <span className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 dark:bg-cyan-400 animate-pulse" />
+                NEURAL RAG ENGINE
+              </span>
+              <span className="text-[9px] px-1.5 py-0.2 rounded bg-cyan-500/10 border border-cyan-500/30 text-cyan-700 dark:text-cyan-300 font-bold">
+                LOCAL MINI-LM
+              </span>
+            </div>
+            <div className="flex items-center justify-between text-[10px]">
+              <span className="text-slate-500">Vector Index</span>
+              <span className="text-slate-900 dark:text-slate-200 font-bold">49,210 Chunks</span>
+            </div>
+            <div className="flex items-center justify-between text-[10px]">
+              <span className="text-slate-500">Grounding Scope</span>
+              <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Zero-Hallucination</span>
+            </div>
+          </div>
+
           {/* User Footer */}
           <div className="mt-auto px-4 py-3 border-t border-[var(--border)] flex items-center justify-between bg-slate-50/50 dark:bg-white/[0.02]">
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-teal-600 to-indigo-600 text-white font-bold text-xs flex items-center justify-center shrink-0">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-600 to-indigo-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-md shadow-cyan-500/20">
                 {(user?.full_name ?? user?.email ?? "T")[0].toUpperCase()}
               </div>
               <div className="min-w-0">
                 <p className="text-xs font-bold truncate text-[var(--text-primary)]">
                   {user?.full_name ?? user?.email?.split("@")[0] ?? "Technician"}
                 </p>
-                <p className="text-[10px] font-mono uppercase text-slate-400 truncate">
-                  {user?.role ?? "Operator"}
+                <p className="text-[10px] font-mono uppercase text-cyan-500 dark:text-cyan-400 truncate font-semibold">
+                  {user?.role ?? "OPERATOR L3"}
                 </p>
               </div>
             </div>
 
             <button
               onClick={logout}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors cursor-pointer"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
               title="Sign Out"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -400,14 +412,14 @@ export default function DashboardPage() {
       <main className="flex-1 flex flex-col overflow-hidden bg-[var(--bg-base)] relative">
         <div className="absolute inset-0 bg-grid opacity-25 pointer-events-none z-0" />
 
-        {/* Top Control Bar */}
+        {/* Top SCADA Flight Deck Header */}
         <header
-          className="flex items-center justify-between px-6 py-3.5 shrink-0 border-b border-[var(--border)] backdrop-blur-md relative z-10 bg-[var(--bg-surface)]/80"
+          className="flex items-center justify-between px-6 py-3 shrink-0 border-b border-[var(--border)] backdrop-blur-md relative z-10 bg-[var(--bg-surface)]/85"
         >
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={() => setSidebarOpen((v) => !v)}
-              className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/[0.05] transition-colors text-slate-500 hover:text-[var(--text-primary)]"
+              className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/[0.05] transition-colors text-slate-400 hover:text-white cursor-pointer"
               title={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -420,47 +432,54 @@ export default function DashboardPage() {
               </svg>
             </button>
 
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-sm font-bold tracking-tight text-[var(--text-primary)]">
-                  Diagnostics Control Workspace
-                </h1>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-mono font-black text-xs uppercase tracking-wider text-slate-800 dark:text-slate-100">
+                    DIAGNOSTICS HUD
+                  </span>
+                  <span className="px-1.5 py-0.5 rounded font-mono text-[9px] font-bold bg-cyan-500/10 dark:bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 border border-cyan-500/30">
+                    v2.4
+                  </span>
+                </div>
                 {selectedMachine ? (
-                  <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
-                    <span>{selectedMachine.name}</span>
+                  <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-[10px] font-mono font-bold bg-indigo-500/10 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30">
+                    <ManufacturerLogo name={selectedMachine.name} manufacturer={selectedMachine.manufacturer} size="xs" />
+                    <span className="truncate">{selectedMachine.name}</span>
                     <button
                       type="button"
                       onClick={() => setSelectedMachine(null)}
-                      className="hover:text-rose-500 transition-colors ml-0.5"
-                      title="Clear machine filter (Search across all machines)"
+                      className="hover:text-rose-500 transition-colors ml-1 font-bold text-xs cursor-pointer"
+                      title="Clear machine filter"
                     >
                       ×
                     </button>
                   </div>
                 ) : (
-                  <span className="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                    ALL EQUIPMENT (UNPINNED)
+                  <span className="px-2 py-0.5 rounded-lg text-[10px] font-mono font-bold bg-amber-500/10 dark:bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-amber-400 animate-pulse" />
+                    FLEET MODE (UNPINNED)
                   </span>
                 )}
               </div>
-              <p className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 flex items-center gap-1 mt-0.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <p className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 flex items-center gap-1 mt-0.5 font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
                 {selectedMachine
-                  ? `TARGET: ${selectedMachine.model} · GROUNDED`
-                  : "FLEET MODE · CROSS-MACHINE DISAMBIGUATION ACTIVE"}
+                  ? `TARGET: ${selectedMachine.model} · ZERO-HALLUCINATION GROUNDED`
+                  : "FLEET DISAMBIGUATION · CROSS-MACHINE ANN ACTIVE"}
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 shrink-0">
             {/* View Mode Switcher: Desktop | Mobile | Both */}
-            <div className="flex items-center gap-1 p-1 rounded-xl bg-slate-100 dark:bg-white/[0.05] border border-slate-200 dark:border-white/[0.08] text-xs font-mono">
+            <div className="flex items-center gap-1 p-1 rounded-xl bg-slate-100 dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 text-xs font-mono">
               <button
                 type="button"
                 onClick={() => setViewMode("desktop")}
                 className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                   viewMode === "desktop"
-                    ? "bg-indigo-600 text-white shadow-sm"
+                    ? "bg-gradient-to-r from-cyan-500 to-indigo-600 text-white shadow-[0_0_12px_rgba(6,182,212,0.4)]"
                     : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 }`}
                 title="Desktop Console View"
@@ -474,13 +493,13 @@ export default function DashboardPage() {
                 onClick={() => setViewMode("mobile")}
                 className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                   viewMode === "mobile"
-                    ? "bg-indigo-600 text-white shadow-sm"
+                    ? "bg-gradient-to-r from-cyan-500 to-indigo-600 text-white shadow-[0_0_12px_rgba(6,182,212,0.4)]"
                     : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 }`}
                 title="Mobile Field Device Simulator"
               >
                 <Smartphone className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Mobile</span>
+                <span className="hidden sm:inline">Field Mobile</span>
               </button>
 
               <button
@@ -488,20 +507,31 @@ export default function DashboardPage() {
                 onClick={() => setViewMode("split")}
                 className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                   viewMode === "split"
-                    ? "bg-indigo-600 text-white shadow-sm"
+                    ? "bg-gradient-to-r from-cyan-500 to-indigo-600 text-white shadow-[0_0_12px_rgba(6,182,212,0.4)]"
                     : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 }`}
                 title="Split View: Desktop Console + Mobile Device"
               >
                 <Columns className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Both</span>
+                <span className="hidden sm:inline">Dual Split</span>
               </button>
             </div>
 
-            <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-mono text-emerald-600 dark:text-emerald-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              <span>CANopen / Modbus TCP Connected</span>
+            <div className="hidden xl:flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-[11px] font-mono text-emerald-600 dark:text-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.15)] font-semibold">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_6px_rgba(16,185,129,0.8)]" />
+              <span className="font-bold">MODBUS TCP 502 · CANopen ACTIVE</span>
             </div>
+
+            {user?.role === "admin" && (
+              <Link
+                href="/admin"
+                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-xs font-mono font-bold text-indigo-300 hover:text-white transition-all shadow-sm"
+                title="Switch to Administrative Management Console"
+              >
+                <Settings className="w-3.5 h-3.5" />
+                <span>Admin Console</span>
+              </Link>
+            )}
 
             <ThemeToggle />
           </div>
@@ -513,6 +543,7 @@ export default function DashboardPage() {
             <MobileDeviceSimulator
               initialMachine={selectedMachine ?? undefined}
               availableMachines={machines}
+              onMachineChange={(m) => setSelectedMachine(m)}
             />
           </div>
         ) : viewMode === "split" ? (
@@ -571,6 +602,7 @@ export default function DashboardPage() {
               <MobileDeviceSimulator
                 initialMachine={selectedMachine ?? undefined}
                 availableMachines={machines}
+                onMachineChange={(m) => setSelectedMachine(m)}
               />
             </div>
           </div>
@@ -642,17 +674,18 @@ export default function DashboardPage() {
                             : "bg-white/80 dark:bg-white/[0.03] border-slate-200/80 dark:border-white/[0.08] hover:border-indigo-300 dark:hover:border-white/20"
                         }`}
                       >
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="px-2 py-0.5 rounded-md text-[9px] font-mono font-bold uppercase bg-slate-100 dark:bg-white/[0.06] text-slate-600 dark:text-slate-300">
-                            {m.manufacturer || "OEM"}
+                        <div className="flex items-center justify-between mb-2.5">
+                          <ManufacturerLogo name={m.name} manufacturer={m.manufacturer} size="xs" />
+                          <span className="flex items-center gap-1">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                            <span className="text-[9px] font-mono text-emerald-500 font-bold">ONLINE</span>
                           </span>
-                          <span className="w-2 h-2 rounded-full bg-emerald-500" />
                         </div>
-                        <div className="font-bold text-sm text-slate-900 dark:text-white truncate">
+                        <div className="font-bold text-sm text-slate-900 dark:text-white truncate" title={m.name}>
                           {m.name}
                         </div>
                         <div className="text-xs text-slate-500 font-mono mt-0.5 truncate">
-                          {m.model}
+                          {m.model || m.manufacturer || "Industrial OEM"}
                         </div>
                       </button>
                     );

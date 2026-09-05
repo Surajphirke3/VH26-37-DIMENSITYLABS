@@ -220,72 +220,75 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
   };
 
   return (
-    <div
-      className="shrink-0 px-4 py-4 border-t border-[var(--border)] transition-colors"
-      style={{
-        background: "var(--bg-surface)",
-        backdropFilter: "blur(20px)",
-      }}
-    >
-      {/* Error Code Badge & Controls Bar */}
-      <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
-        <div>
-          {hasErrorCode && (
-            <div className="animate-fade-in">
-              <span
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-500/15 border border-indigo-200 dark:border-indigo-500/35 text-indigo-700 dark:text-[#a5b4fc]"
-              >
-                <span
-                  className="w-2 h-2 rounded-full bg-indigo-600 dark:bg-indigo-400"
-                  style={{ boxShadow: "0 0 6px rgba(99,102,241,0.8)", animation: "statusBlink 1.5s ease infinite" }}
-                />
-                Error Code Detected — RAG search will activate
-              </span>
+    <div className="shrink-0 px-4 sm:px-6 py-3.5 border-t border-slate-200 dark:border-white/[0.08] bg-slate-50/95 dark:bg-black/80 backdrop-blur-xl transition-colors">
+      {/* ── Top Bar: Error Code Detector & Model Selector ── */}
+      <div className="flex items-center justify-between flex-wrap gap-2 mb-2 px-1">
+        <div className="flex items-center gap-2">
+          {hasErrorCode ? (
+            <div className="animate-fade-in flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-amber-500/15 border border-amber-500/35 text-amber-600 dark:text-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.15)]">
+              <span className="w-2 h-2 rounded-full bg-amber-500 dark:bg-amber-400 animate-ping" />
+              <span>FAULT PATTERN DETECTED → DIRECT OEM MANUAL SEARCH ACTIVATED</span>
+            </div>
+          ) : (
+            <div className="hidden sm:flex items-center gap-1.5 text-[10px] font-mono text-slate-500 dark:text-slate-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
+              <span>TERMINAL READY</span>
+              <span className="text-slate-400 dark:text-slate-600">·</span>
+              <span>TYPE SYMPTOM OR ERROR CODE</span>
             </div>
           )}
         </div>
 
-        {/* Model selector pill */}
+        {/* Model routing selector pill */}
         <div className="flex items-center gap-1.5 ml-auto text-xs">
-          <Cpu className="w-3.5 h-3.5 text-amber-500" />
-          <select
-            value={selectedModel}
-            onChange={(e) => setSelectedModel(e.target.value)}
-            className="bg-slate-100 dark:bg-white/[0.06] border border-slate-200 dark:border-white/[0.08] rounded-md px-2 py-1 text-[11px] font-mono text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-amber-500 max-w-[210px] truncate"
-            title="Select AI Diagnostic Engine"
-          >
-            {availableModels.map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.name}
-              </option>
-            ))}
-          </select>
+          <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 shadow-sm">
+            <Cpu className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
+            <select
+              value={selectedModel}
+              onChange={(e) => setSelectedModel(e.target.value)}
+              className="bg-transparent border-0 text-[11px] font-mono font-semibold text-slate-800 dark:text-slate-200 focus:outline-none cursor-pointer max-w-[210px] truncate"
+              title="Select AI Diagnostic Engine"
+            >
+              {availableModels.map((m) => (
+                <option key={m.id} value={m.id} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200">
+                  {m.name}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 
       {/* Attached Image Preview */}
       {selectedImage && (
-        <div className="mb-2.5 flex items-center gap-2 p-1.5 bg-slate-100 dark:bg-white/[0.05] border border-slate-200 dark:border-white/[0.08] rounded-lg animate-fade-in">
-          <img
-            src={selectedImage}
-            alt="Attached inspection"
-            className="w-10 h-10 object-cover rounded border border-border"
-          />
+        <div className="mb-2.5 flex items-center gap-3 p-2 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-500/30 rounded-xl animate-fade-in shadow-md">
+          <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-indigo-400/40 shrink-0">
+            <img
+              src={selectedImage}
+              alt="Attached inspection"
+              className="w-full h-full object-cover"
+            />
+          </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium text-foreground truncate">{imageName || "Equipment Image"}</p>
-            <span className="text-[10px] text-amber-500 font-medium">Vision Model Active</span>
+            <p className="text-xs font-mono font-bold text-slate-900 dark:text-white truncate">{imageName || "Equipment Attachment"}</p>
+            <div className="flex items-center gap-1.5 text-[10px] font-mono text-cyan-600 dark:text-cyan-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 dark:bg-cyan-400 animate-pulse" />
+              <span>Vision OCR Neural Model Armed</span>
+            </div>
           </div>
           <button
             type="button"
             onClick={removeImage}
-            className="p-1 hover:bg-slate-200 dark:hover:bg-white/10 rounded-full text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+            className="p-1.5 hover:bg-slate-200 dark:hover:bg-white/10 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white transition-colors cursor-pointer"
+            title="Remove attachment"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
       )}
 
-      <div className="flex items-end gap-3">
+      {/* ── High-Tech Input Console ── */}
+      <div className="flex items-end gap-2.5 p-1.5 rounded-2xl bg-white dark:bg-black/60 border border-slate-200 dark:border-cyan-500/25 focus-within:border-cyan-500 dark:focus-within:border-cyan-400 focus-within:shadow-[0_0_20px_rgba(6,182,212,0.15)] shadow-sm transition-all">
         {/* Hidden File Input */}
         <input
           ref={fileInputRef}
@@ -301,10 +304,10 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
           type="button"
           onClick={() => fileInputRef.current?.click()}
           disabled={isLoading}
-          className="shrink-0 w-11 h-11 flex items-center justify-center rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] text-slate-600 dark:text-slate-300 transition-colors cursor-pointer"
-          title="Attach equipment photo from files"
+          className="shrink-0 w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-700/80 text-amber-600 dark:text-amber-400 transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95"
+          title="Attach equipment photo / nameplate"
         >
-          <ImageIcon className="w-5 h-5 text-amber-500" />
+          <ImageIcon className="w-4 h-4" />
         </button>
 
         {/* Live Camera Snapshot Button */}
@@ -312,10 +315,10 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
           type="button"
           onClick={handleCameraClick}
           disabled={isLoading}
-          className="shrink-0 w-11 h-11 flex items-center justify-center rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] text-indigo-600 dark:text-indigo-400 transition-colors cursor-pointer"
-          title="Open camera & optical scanner"
+          className="shrink-0 w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-700/80 text-cyan-600 dark:text-cyan-400 transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95"
+          title="Open camera & optical OCR scanner"
         >
-          <Camera className="w-5 h-5" />
+          <Camera className="w-4 h-4" />
         </button>
 
         <div className="flex-1 relative">
@@ -327,57 +330,51 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
             onKeyDown={handleKey}
             disabled={isLoading}
             rows={2}
-            placeholder="Enter error code (E101), symptom, or attach a photo…"
-            className="input-glow w-full px-4 py-3 text-sm rounded-xl leading-relaxed bg-slate-50 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08] text-slate-900 dark:text-[#f1f5f9] placeholder:text-slate-400 dark:placeholder:text-slate-500"
+            placeholder="Enter fault code (e.g. Alarm 102, F01043), symptom description, or attach photo…"
+            className="w-full px-3 py-2 text-xs sm:text-sm font-sans rounded-xl leading-relaxed bg-transparent border-0 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none"
             style={{
-              minHeight: "52px",
+              minHeight: "48px",
               maxHeight: "120px",
               resize: "none",
             }}
           />
           {isLoading && (
-            <div className="absolute right-3 bottom-3">
+            <div className="absolute right-2 bottom-2 flex items-center gap-1 text-[10px] font-mono text-cyan-600 dark:text-cyan-400">
               <div
-                className="w-4 h-4 rounded-full border-2"
-                style={{
-                  borderColor: "rgba(99,102,241,0.2)",
-                  borderTopColor: "#6366f1",
-                  animation: "spin 0.8s linear infinite",
-                }}
+                className="w-3.5 h-3.5 rounded-full border-2 border-cyan-400/20 border-t-cyan-500"
+                style={{ animation: "spin 0.8s linear infinite" }}
               />
+              <span className="hidden sm:inline font-semibold">Grounding...</span>
             </div>
           )}
         </div>
 
+        {/* High-Tech Execute Button */}
         <button
           id="send-btn"
           onClick={submit}
           disabled={isLoading || (!value.trim() && !selectedImage)}
-          className={`shrink-0 w-12 h-12 flex items-center justify-center rounded-xl font-bold transition-all ${
+          className={`shrink-0 h-10 px-4 flex items-center justify-center gap-2 rounded-xl font-mono text-xs font-bold transition-all ${
             isLoading || (!value.trim() && !selectedImage)
-              ? "bg-slate-100 dark:bg-white/[0.05] border border-slate-200 dark:border-white/[0.08] text-slate-400 dark:text-[#334155] cursor-not-allowed"
-              : "text-white hover:scale-105 shadow-md shadow-indigo-500/25"
+              ? "bg-slate-200 dark:bg-slate-800/60 border border-slate-300/60 dark:border-white/5 text-slate-400 dark:text-slate-500 cursor-not-allowed"
+              : "bg-gradient-to-r from-cyan-500 via-indigo-600 to-indigo-700 text-white shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
           }`}
-          style={
-            isLoading || (!value.trim() && !selectedImage)
-              ? undefined
-              : {
-                  background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
-                  boxShadow: "0 0 20px rgba(99,102,241,0.4)",
-                }
-          }
           aria-label="Send query"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-              d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+          <span>SEND</span>
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
           </svg>
         </button>
       </div>
 
-      <p className="mt-2 text-[10px] text-slate-500 dark:text-[#64748b]">
-        ↵ Enter to send &nbsp;·&nbsp; Shift+↵ for new line &nbsp;·&nbsp; Multilingual & Multimodal Enabled
-      </p>
+      <div className="mt-2 flex items-center justify-between px-1 text-[10px] font-mono text-slate-500 dark:text-slate-400 flex-wrap gap-1">
+        <span>↵ Enter to transmit · Shift+↵ for new line · Multilingual & Multimodal</span>
+        <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400" />
+          MODBUS / CANopen CONNECTED
+        </span>
+      </div>
 
       {/* Hidden Canvas for Frame Capture */}
       <canvas ref={canvasRef} className="hidden" />

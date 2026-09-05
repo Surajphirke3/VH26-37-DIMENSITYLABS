@@ -10,6 +10,20 @@ jobs:
   backend-tests:
     name: Backend Tests (Python 3.11)
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: mechind
+          POSTGRES_PASSWORD: mechind_dev
+          POSTGRES_DB: mechind_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - uses: actions/checkout@v4
@@ -28,6 +42,7 @@ jobs:
       - name: Run tests
         working-directory: backend
         env:
+          PYTHONPATH: .
           GEMINI_API_KEY: "ci-placeholder"
           JWT_SECRET_KEY: "ci-placeholder-secret-key-for-testing-only"
           POSTGRES_HOST: localhost

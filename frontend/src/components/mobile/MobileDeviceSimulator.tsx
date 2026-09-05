@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
+import Image from "next/image";
 import {
   Wifi,
   Battery,
@@ -16,6 +17,7 @@ import {
   Clock,
   ShieldCheck,
   ChevronRight,
+  ChevronDown,
   Sliders,
   CheckSquare,
   Square,
@@ -27,11 +29,17 @@ import {
   VideoOff,
   Crosshair,
   ShieldAlert,
+  Check,
+  Search,
+  BookOpen,
+  Layers,
+  Globe,
 } from "lucide-react";
-import { singleQuery } from "@/lib/api";
-import type { TroubleshootingResponse, Machine } from "@/lib/types";
+import { singleQuery, getManuals } from "@/lib/api";
+import type { TroubleshootingResponse, Machine, Manual } from "@/lib/types";
 import ExecutionPipelineTracker from "@/components/common/ExecutionPipelineTracker";
 import Spinner from "@/components/ui/Spinner";
+import ManufacturerLogo from "@/components/common/ManufacturerLogo";
 
 export interface MobileSimulatorProps {
   initialMachine?: Machine;
@@ -39,6 +47,7 @@ export interface MobileSimulatorProps {
   initialQuery?: string;
   defaultModel?: string;
   className?: string;
+  onMachineChange?: (m: Machine | null) => void;
 }
 
 interface ChatBubble {
@@ -51,6 +60,12 @@ interface ChatBubble {
 }
 
 const MOBILE_QUICK_PRESETS = [
+  {
+    label: "🇨🇳 GSK990M 报警 101",
+    query: "GSK990M 铣床系统 报警 101 如何排除故障？(How to clear alarm 101 on GSK990M)",
+    model: "openai/gpt-oss-120b",
+    machineName: "GSK990M",
+  },
   {
     label: "Haas Spindle Overheat (Alarm 102)",
     query: "Haas VF-4 Alarm 102 spindle motor overheat during roughing pass. What is the check procedure?",
@@ -69,12 +84,6 @@ const MOBILE_QUICK_PRESETS = [
     model: "openai/gpt-oss-120b",
     machineName: "KUKA KR210",
   },
-  {
-    label: "Refusal Filter Test",
-    query: "Can you write a poem about chocolate chip cookies and how to bake them in an oven?",
-    model: "openai/gpt-oss-20b",
-    machineName: "Global",
-  },
 ];
 
 export default function MobileDeviceSimulator({
@@ -83,6 +92,7 @@ export default function MobileDeviceSimulator({
   initialQuery = "Haas VF-4 Alarm 102 spindle motor overheat during roughing pass. What is the check procedure?",
   defaultModel = "auto",
   className = "",
+  onMachineChange,
 }: MobileSimulatorProps) {
   const [deviceSkin, setDeviceSkin] = useState<"iphone" | "rugged">("iphone");
   const [scale, setScale] = useState<number>(1);
@@ -93,6 +103,40 @@ export default function MobileDeviceSimulator({
   const [attachedImage, setAttachedImage] = useState<string | null>(null);
   const [checkedSteps, setCheckedSteps] = useState<Record<string, boolean>>({});
   const [liveTime, setLiveTime] = useState<string>("");
+
+  // ── Manuals & Active Equipment Inspection State ──
+  const [manuals, setManuals] = useState<Manual[]>([]);
+  const [isLoadingManuals, setIsLoadingManuals] = useState(false);
+  const [showManualsSheet, setShowManualsSheet] = useState(false);
+  const [showMachineSheet, setShowMachineSheet] = useState(false);
+  const [machineSearchQuery, setMachineSearchQuery] = useState("");
+  const [showFullTrace, setShowFullTrace] = useState(false);
+
+  // Sync selectedMachineId when initialMachine updates from parent
+  useEffect(() => {
+    if (initialMachine?.id) {
+      setSelectedMachineId(initialMachine.id);
+    }
+  }, [initialMachine?.id]);
+
+  // Load all system manuals for grounding identification
+  useEffect(() => {
+    let isMounted = true;
+    setIsLoadingManuals(true);
+    getManuals()
+      .then((data) => {
+        if (isMounted) setManuals(data || []);
+      })
+      .catch((err) => {
+        console.error("Failed to load manuals for mobile simulator:", err);
+      })
+      .finally(() => {
+        if (isMounted) setIsLoadingManuals(false);
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // ── Camera & Permissions State ──
   const [isCameraOpen, setIsCameraOpen] = useState(false);
@@ -496,64 +540,101 @@ export default function MobileDeviceSimulator({
               </div>
             </div>
 
-            {/* 2. Mobile Field Agent Header */}
-            <div className="px-4 py-2.5 bg-[#0f121a] border-b border-white/10 flex items-center justify-between shrink-0">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-teal-500 to-indigo-600 flex items-center justify-center text-white font-black text-xs shadow-md">
-                  M
-                </div>
-                <div>
-                  <div className="flex items-center gap-1.5 leading-none">
-                    <span className="font-bold text-xs text-white">MEND-X Field</span>
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            {/* 2. Mobile Field Agent Header & Grounding Deck */}
+            {(() => {
+              const activeMachine = availableMachines.find((m) => m.id === selectedMachineId) || initialMachine;
+              const directManuals = activeMachine
+                ? manuals.filter((man) => man.machine_id === activeMachine.id)
+                : manuals;
+              const matchedManuals = directManuals.length > 0
+                ? directManuals
+                : activeMachine
+                ? manuals.filter((man) => {
+                    const mName = activeMachine.name.toLowerCase();
+                    const mModel = (activeMachine.model || "").toLowerCase();
+                    const t = man.title.toLowerCase();
+                    return (mModel && t.includes(mModel)) || (mName.length > 3 && t.includes(mName.slice(0, 5)));
+                  })
+                : manuals;
+
+              return (
+                <div className="px-3 py-2 bg-[#0c0f17]/95 backdrop-blur-md border-b border-white/10 flex items-center justify-between gap-2 shrink-0 z-30">
+                  {/* Left: App Logo + Equipment Selector Trigger */}
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <div className="w-7 h-7 rounded-xl p-1 bg-white/[0.08] border border-white/15 flex items-center justify-center shadow-md shrink-0">
+                      <Image
+                        src="/brand-icon-dark.png"
+                        alt="MEND-X"
+                        width={22}
+                        height={22}
+                        className="w-full h-full object-contain"
+                        priority
+                      />
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setShowMachineSheet(true)}
+                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 min-w-0 flex-1 max-w-[170px] text-left transition-all cursor-pointer"
+                      title="Tap to switch equipment"
+                    >
+                      <ManufacturerLogo
+                        name={activeMachine?.name || "Equipment"}
+                        manufacturer={activeMachine?.manufacturer || ""}
+                        size="xs"
+                        className="shrink-0"
+                      />
+                      <span
+                        className="font-bold text-[11px] text-white truncate"
+                        title={activeMachine?.name || "All Fleet / Global"}
+                      >
+                        {activeMachine?.name || "All Fleet / Global"}
+                      </span>
+                      <ChevronDown className="w-3 h-3 text-slate-400 shrink-0 ml-auto" />
+                    </button>
                   </div>
-                  <span className="text-[10px] font-mono text-teal-400">
-                    {availableMachines.find((m) => m.id === selectedMachineId)?.name || "Connected (BLE Line 1)"}
-                  </span>
+
+                  {/* Right: Manuals Pill + Model Selector + Camera */}
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => setShowManualsSheet(true)}
+                      className="px-2 py-1 rounded-xl bg-teal-950/50 hover:bg-teal-900/70 border border-teal-500/30 hover:border-teal-400/50 flex items-center gap-1 text-teal-300 transition-all cursor-pointer shadow-sm"
+                      title="Tap to view grounded manuals"
+                    >
+                      <FileText className="w-3 h-3 text-teal-400" />
+                      <span className="font-mono text-[10px] font-bold">
+                        {matchedManuals.length}
+                      </span>
+                    </button>
+
+                    <select
+                      value={selectedModel}
+                      onChange={(e) => setSelectedModel(e.target.value)}
+                      className="px-1.5 py-1 rounded-xl bg-black/50 border border-white/15 text-[9px] font-mono text-slate-200 outline-none max-w-[85px] cursor-pointer"
+                    >
+                      <option value="auto">Auto</option>
+                      <option value="openai/gpt-oss-120b">120B</option>
+                      <option value="openai/gpt-oss-20b">20B</option>
+                      <option value="groq/compound-mini">Mini</option>
+                    </select>
+
+                    <button
+                      type="button"
+                      onClick={handleCameraIconClick}
+                      title="Open Camera Scanner"
+                      className={`p-1.5 rounded-xl border transition-all cursor-pointer ${
+                        isCameraOpen || attachedImage
+                          ? "bg-indigo-600 text-white border-indigo-400 shadow-[0_0_10px_rgba(99,102,241,0.5)]"
+                          : "bg-white/5 border-white/10 text-slate-300 hover:bg-white/10"
+                      }`}
+                    >
+                      <Camera className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
-              </div>
-
-              {/* Model Chip & Quick Camera Scanner */}
-              <div className="flex items-center gap-1.5">
-                <select
-                  value={selectedModel}
-                  onChange={(e) => setSelectedModel(e.target.value)}
-                  className="px-2 py-0.5 rounded-lg bg-black/40 border border-white/15 text-[10px] font-mono text-slate-300 outline-none"
-                >
-                  <option value="auto">Auto Router</option>
-                  <option value="openai/gpt-oss-120b">GPT-OSS 120B (Groq)</option>
-                  <option value="openai/gpt-oss-20b">GPT-OSS 20B (Groq Fast)</option>
-                  <option value="groq/compound-mini">Groq Compound Mini</option>
-                </select>
-
-                <button
-                  type="button"
-                  onClick={handleCameraIconClick}
-                  title="Open Camera & Optical Scanner"
-                  className={`p-1.5 rounded-lg border transition-all cursor-pointer ${
-                    isCameraOpen || attachedImage
-                      ? "bg-indigo-600 text-white border-indigo-400"
-                      : "bg-white/5 border-white/10 text-slate-300 hover:bg-white/10"
-                  }`}
-                >
-                  <Camera className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
-
-            {/* 3. Quick 1-Tap Field Presets Bar */}
-            <div className="px-3 py-2 bg-[#0a0c13] border-b border-white/5 flex gap-1.5 overflow-x-auto no-scrollbar shrink-0">
-              {MOBILE_QUICK_PRESETS.map((preset, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => handleQuickPreset(preset)}
-                  className="px-2.5 py-1 rounded-lg bg-white/[0.04] hover:bg-indigo-500/20 border border-white/[0.08] hover:border-indigo-500/40 text-[10px] font-mono text-slate-300 whitespace-nowrap transition-all shrink-0 cursor-pointer"
-                >
-                  {preset.label}
-                </button>
-              ))}
-            </div>
+              );
+            })()}
 
             {/* 4. Scrollable Chat & Diagnostic Feed */}
             <div
@@ -566,8 +647,17 @@ export default function MobileDeviceSimulator({
                   className={`flex flex-col ${msg.sender === "user" ? "items-end" : "items-start"} space-y-1`}
                 >
                   {/* Sender & Timestamp */}
-                  <span className="text-[9px] font-mono text-slate-500 px-1">
-                    {msg.sender === "user" ? "Technician" : "MEND-X AI Grounded"} · {msg.timestamp}
+                  <span className="text-[9px] font-mono text-slate-500 px-1 flex items-center gap-1.5">
+                    {msg.sender === "ai" && (
+                      <Image
+                        src="/brand-icon-dark.png"
+                        alt="MEND-X"
+                        width={12}
+                        height={12}
+                        className="w-3 h-3 object-contain inline-block shrink-0"
+                      />
+                    )}
+                    <span>{msg.sender === "user" ? "Technician" : "MEND-X AI Grounded"} · {msg.timestamp}</span>
                   </span>
 
                   {/* Bubble Content */}
@@ -590,6 +680,28 @@ export default function MobileDeviceSimulator({
                     )}
 
                     <p className="whitespace-pre-wrap">{msg.text}</p>
+
+                    {/* If this is the welcome greeting, display quick diagnostic suggestion buttons cleanly inside the bubble */}
+                    {msg.id === "init-1" && (
+                      <div className="pt-2.5 mt-2 border-t border-white/10 space-y-1.5">
+                        <span className="text-[9px] font-mono uppercase tracking-wider text-slate-400 font-bold block">
+                          Suggested Quick Diagnostics:
+                        </span>
+                        <div className="grid grid-cols-1 gap-1.5">
+                          {MOBILE_QUICK_PRESETS.map((preset, idx) => (
+                            <button
+                              key={idx}
+                              type="button"
+                              onClick={() => handleQuickPreset(preset)}
+                              className="w-full text-left p-2 rounded-xl bg-white/[0.03] hover:bg-indigo-600/20 border border-white/[0.08] hover:border-indigo-500/40 text-[11px] text-slate-200 transition-all flex items-center justify-between group cursor-pointer"
+                            >
+                              <span className="truncate">{preset.label}</span>
+                              <ChevronRight className="w-3 h-3 text-slate-500 group-hover:text-indigo-400 shrink-0 ml-1" />
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
                     {/* AI Structured Solution Checklist inside Phone */}
                     {msg.response && (
@@ -665,14 +777,48 @@ export default function MobileDeviceSimulator({
                 </div>
               ))}
 
-              {/* ── While Executing: Mobile Background Pipeline Tracer ── */}
+              {/* ── While Executing: Lightweight Mobile Progress (Decongested) ── */}
               {isLoading && (
-                <div className="w-full animate-fade-in">
-                  <ExecutionPipelineTracker
-                    isExecuting={isLoading}
-                    query={messages[messages.length - 1]?.text}
-                    variant="compact"
-                  />
+                <div className="w-full p-2.5 rounded-2xl bg-[#0f1322] border border-teal-500/30 text-xs shadow-lg space-y-2 animate-fade-in">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="w-6 h-6 rounded-lg bg-teal-500/20 text-teal-400 flex items-center justify-center shrink-0 border border-teal-500/30">
+                        <Zap className="w-3.5 h-3.5 animate-pulse" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5 leading-none">
+                          <span className="font-bold text-[11px] text-white">Diagnostic Synthesis</span>
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                        </div>
+                        <span className="text-[9px] font-mono text-teal-400 mt-0.5 block truncate">
+                          Retrieving OEM Citations · Groq LPU
+                        </span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowFullTrace((prev) => !prev)}
+                      className="px-2 py-0.5 rounded-md bg-white/5 hover:bg-white/10 text-[9px] font-mono text-slate-300 border border-white/10 transition-colors cursor-pointer"
+                    >
+                      {showFullTrace ? "Hide Trace" : "Trace ▾"}
+                    </button>
+                  </div>
+
+                  {/* Slim Neon Progress Bar */}
+                  <div className="w-full h-1 rounded-full bg-white/10 overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-teal-400 via-indigo-500 to-teal-400 rounded-full animate-pulse w-4/5" />
+                  </div>
+
+                  {/* Optional expanded detail view if requested */}
+                  {showFullTrace && (
+                    <div className="pt-2 border-t border-white/10 animate-fade-in">
+                      <ExecutionPipelineTracker
+                        isExecuting={isLoading}
+                        query={messages[messages.length - 1]?.text}
+                        variant="compact"
+                      />
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -762,8 +908,14 @@ export default function MobileDeviceSimulator({
                 {deviceSkin === "iphone" ? (
                   /* Authentic iOS Camera Permission Alert */
                   <div className="w-full max-w-[290px] rounded-[26px] bg-[#1a1e29]/95 border border-white/20 text-center shadow-[0_20px_60px_rgba(0,0,0,0.8)] p-5 space-y-4 backdrop-blur-2xl">
-                    <div className="w-13 h-13 mx-auto rounded-2xl bg-gradient-to-tr from-indigo-500 to-teal-400 flex items-center justify-center text-white shadow-lg">
-                      <Camera className="w-6 h-6 text-white" />
+                    <div className="w-12 h-12 mx-auto rounded-2xl bg-[#10131d] border border-white/15 flex items-center justify-center text-white shadow-lg p-2.5">
+                      <Image
+                        src="/brand-icon-dark.png"
+                        alt="MEND-X Field"
+                        width={36}
+                        height={36}
+                        className="w-full h-full object-contain"
+                      />
                     </div>
                     <div className="space-y-1.5">
                       <h3 className="text-sm font-bold text-white tracking-tight leading-snug">
@@ -1000,6 +1152,278 @@ export default function MobileDeviceSimulator({
                   <span className="text-[9px] font-mono text-slate-400">
                     Tap white shutter disc to capture & attach
                   </span>
+                </div>
+              </div>
+            )}
+
+            {/* ── Slide-up Active Grounding Manuals Sheet ── */}
+            {showManualsSheet && (() => {
+              const activeMachine = availableMachines.find((m) => m.id === selectedMachineId) || initialMachine;
+              const directManuals = activeMachine
+                ? manuals.filter((man) => man.machine_id === activeMachine.id)
+                : manuals;
+              const matchedManuals = directManuals.length > 0
+                ? directManuals
+                : activeMachine
+                ? manuals.filter((man) => {
+                    const mName = activeMachine.name.toLowerCase();
+                    const mModel = (activeMachine.model || "").toLowerCase();
+                    const t = man.title.toLowerCase();
+                    return (mModel && t.includes(mModel)) || (mName.length > 3 && t.includes(mName.slice(0, 5)));
+                  })
+                : manuals;
+
+              return (
+                <div
+                  className="absolute inset-0 bg-black/75 backdrop-blur-sm z-50 flex flex-col justify-end animate-fade-in"
+                  onClick={() => setShowManualsSheet(false)}
+                >
+                  <div
+                    className="bg-[#11141e] border-t border-white/15 rounded-t-3xl max-h-[82%] flex flex-col shadow-2xl animate-slide-up"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {/* Header */}
+                    <div className="p-4 border-b border-white/10 flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-xl p-1.5 bg-teal-500/10 border border-teal-500/30 flex items-center justify-center shrink-0">
+                          <Image
+                            src="/brand-icon-dark.png"
+                            alt="MEND-X"
+                            width={22}
+                            height={22}
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-xs text-white">Grounded OEM Manuals</h4>
+                          <span className="text-[10px] font-mono text-slate-400">
+                            Knowledge base for {activeMachine?.name || "Active Equipment"}
+                          </span>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setShowManualsSheet(false)}
+                        className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    {/* Manuals List */}
+                    <div className="p-3.5 overflow-y-auto space-y-2.5 flex-1 max-h-[340px]">
+                      {isLoadingManuals ? (
+                        <div className="py-8 flex flex-col items-center justify-center gap-2 text-slate-400">
+                          <Spinner size="sm" />
+                          <span className="text-[10px] font-mono">Querying indexed vector manuals...</span>
+                        </div>
+                      ) : matchedManuals.length === 0 ? (
+                        <div className="py-8 px-4 text-center space-y-2">
+                          <AlertTriangle className="w-7 h-7 text-amber-400 mx-auto" />
+                          <p className="font-bold text-xs text-slate-200">No Specific Manuals Linked</p>
+                          <p className="text-[10px] text-slate-400 max-w-xs mx-auto leading-relaxed">
+                            No dedicated OEM PDF is linked to this specific unit. General factory RAG indices will be referenced during troubleshooting.
+                          </p>
+                        </div>
+                      ) : (
+                        matchedManuals.map((man) => {
+                          const isChinese =
+                            (man.language && man.language.toLowerCase().includes("zh")) ||
+                            /[\u4e00-\u9fa5]/.test(man.title);
+                          return (
+                            <div
+                              key={man.id}
+                              className="p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 transition-all space-y-2"
+                            >
+                              <div className="flex items-start justify-between gap-2">
+                                <div className="flex items-start gap-2 min-w-0">
+                                  <span className="text-base mt-0.5 shrink-0">
+                                    {isChinese ? "🇨🇳" : "🇺🇸"}
+                                  </span>
+                                  <div className="min-w-0">
+                                    <h5
+                                      className="font-bold text-xs text-slate-100 leading-snug line-clamp-2"
+                                      title={man.title}
+                                    >
+                                      {man.title}
+                                    </h5>
+                                    <span className="text-[9px] font-mono text-slate-400 block mt-0.5 truncate">
+                                      {man.original_filename}
+                                    </span>
+                                  </div>
+                                </div>
+                                <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 shrink-0">
+                                  {man.processing_status === "completed" ? "Active Grounding" : man.processing_status}
+                                </span>
+                              </div>
+
+                              <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-white/5 text-[9px] font-mono text-slate-400">
+                                <span className="px-1.5 py-0.5 rounded bg-white/5 text-slate-300">
+                                  📄 {man.page_count ?? "N/A"} Pages
+                                </span>
+                                <span className="px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">
+                                  🧩 {man.chunk_count ?? 0} Vector Chunks
+                                </span>
+                                <span className="px-1.5 py-0.5 rounded bg-white/5 text-slate-300">
+                                  🌐 {isChinese ? "Chinese (ZH)" : "English (EN)"}
+                                </span>
+                              </div>
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+
+                    {/* Footer */}
+                    <div className="p-3 bg-[#0d0f17] border-t border-white/10 flex items-center justify-between text-[10px] font-mono text-slate-400">
+                      <span>Vector Space: 768-dim Local</span>
+                      <button
+                        type="button"
+                        onClick={() => setShowManualsSheet(false)}
+                        className="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition-colors cursor-pointer"
+                      >
+                        Done
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* ── Slide-up Equipment Switcher Sheet ── */}
+            {showMachineSheet && (
+              <div
+                className="absolute inset-0 bg-black/75 backdrop-blur-sm z-50 flex flex-col justify-end animate-fade-in"
+                onClick={() => setShowMachineSheet(false)}
+              >
+                <div
+                  className="bg-[#11141e] border-t border-white/15 rounded-t-3xl max-h-[82%] flex flex-col shadow-2xl animate-slide-up"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {/* Header */}
+                  <div className="p-4 border-b border-white/10 flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl p-1.5 bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center shrink-0">
+                        <Image
+                          src="/brand-icon-dark.png"
+                          alt="MEND-X"
+                          width={22}
+                          height={22}
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-xs text-white">Select Industrial Equipment</h4>
+                        <span className="text-[10px] font-mono text-slate-400">
+                          Switch target machine for diagnostic queries & manual RAG
+                        </span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowMachineSheet(false)}
+                      className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  {/* Search Input */}
+                  <div className="p-3 border-b border-white/5">
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={machineSearchQuery}
+                        onChange={(e) => setMachineSearchQuery(e.target.value)}
+                        placeholder="Search equipment, model, manufacturer..."
+                        className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs text-white placeholder:text-slate-500 outline-none focus:border-indigo-500"
+                      />
+                      <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                    </div>
+                  </div>
+
+                  {/* Machines List */}
+                  <div className="p-3 overflow-y-auto space-y-2 flex-1 max-h-[320px]">
+                    {/* All Fleet / Global Option */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedMachineId("");
+                        onMachineChange?.(null);
+                        setShowMachineSheet(false);
+                      }}
+                      className={`w-full p-2.5 rounded-2xl border text-left transition-all flex items-center justify-between cursor-pointer ${
+                        !selectedMachineId
+                          ? "bg-indigo-600/20 border-indigo-500 text-white"
+                          : "bg-white/[0.02] border-white/10 hover:bg-white/[0.05] text-slate-300"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <ManufacturerLogo name="Global" manufacturer="Global" size="xs" />
+                        <div>
+                          <div className="font-bold text-xs text-white">All Fleet / Global Fleet</div>
+                          <span className="text-[9px] font-mono text-slate-400">Cross-equipment factory queries</span>
+                        </div>
+                      </div>
+                      {!selectedMachineId && <Check className="w-4 h-4 text-indigo-400" />}
+                    </button>
+
+                    {availableMachines
+                      .filter(
+                        (m) =>
+                          m.name.toLowerCase().includes(machineSearchQuery.toLowerCase()) ||
+                          (m.model || "").toLowerCase().includes(machineSearchQuery.toLowerCase()) ||
+                          (m.manufacturer || "").toLowerCase().includes(machineSearchQuery.toLowerCase())
+                      )
+                      .map((m) => {
+                        const isSelected = selectedMachineId === m.id;
+                        const attachedCount = manuals.filter((man) => man.machine_id === m.id).length;
+                        return (
+                          <button
+                            key={m.id}
+                            type="button"
+                            onClick={() => {
+                              setSelectedMachineId(m.id);
+                              onMachineChange?.(m);
+                              setShowMachineSheet(false);
+                            }}
+                            className={`w-full p-2.5 rounded-2xl border text-left transition-all flex items-center justify-between cursor-pointer ${
+                              isSelected
+                                ? "bg-indigo-600/20 border-indigo-500 text-white"
+                                : "bg-white/[0.02] border-white/10 hover:bg-white/[0.05] text-slate-300"
+                            }`}
+                          >
+                            <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                              <ManufacturerLogo name={m.name} manufacturer={m.manufacturer} size="xs" />
+                              <div className="min-w-0 flex-1">
+                                <div className="font-bold text-xs text-white truncate" title={m.name}>
+                                  {m.name}
+                                </div>
+                                <div className="flex items-center gap-2 text-[9px] font-mono text-slate-400 mt-0.5">
+                                  {m.model && <span className="text-slate-300 font-semibold">{m.model}</span>}
+                                  {m.manufacturer && <span>• {m.manufacturer}</span>}
+                                  <span className="text-teal-400">
+                                    • {attachedCount} manual{attachedCount === 1 ? "" : "s"}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            {isSelected && <Check className="w-4 h-4 text-indigo-400 shrink-0 ml-2" />}
+                          </button>
+                        );
+                      })}
+                  </div>
+
+                  {/* Footer */}
+                  <div className="p-3 bg-[#0d0f17] border-t border-white/10 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => setShowMachineSheet(false)}
+                      className="px-4 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-slate-300 text-xs font-bold transition-colors cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </div>
               </div>
             )}

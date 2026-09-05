@@ -129,7 +129,7 @@ async def seed_to_database(manuals: list[dict], target_dir: str):
 def main():
     parser = argparse.ArgumentParser(description="Auto metadata extractor for MEND - X manuals")
     parser.add_argument("--dir", default="../TestManuals", help="Directory containing PDF manuals")
-    parser.add_argument("--out", default=None, help="Output metadata.json path")
+    parser.add_argument("--out", "--output", default=None, help="Output metadata.json path")
     parser.add_argument("--seed-db", action="store_true", help="Auto-register extracted machines in database")
     args = parser.parse_args()
 

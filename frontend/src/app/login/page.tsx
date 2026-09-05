@@ -1,12 +1,15 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/lib/auth-context";
 import { useTheme } from "@/lib/theme-context";
 import ThemeToggle from "@/components/ui/ThemeToggle";
+import { Wrench, Shield, Briefcase, Sparkles, ArrowRight, CheckCircle2, Cpu } from "lucide-react";
+
+type LoginMode = "technician" | "admin";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -14,11 +17,48 @@ export default function LoginPage() {
   const isLight = theme === "light";
   const router = useRouter();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [loginMode, setLoginMode] = useState<LoginMode>("technician");
+  const [email, setEmail] = useState("tech@mechmind.io");
+  const [password, setPassword] = useState("Tech123!");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPass, setShowPass] = useState(false);
+
+  // Check URL query parameters for initial role preference
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const role = params.get("role") || params.get("mode");
+      if (role === "admin") {
+        setLoginMode("admin");
+        setEmail("admin@mechmind.io");
+        setPassword("Admin123!");
+      } else if (role === "technician" || role === "user" || role === "tech") {
+        setLoginMode("technician");
+        setEmail("tech@mechmind.io");
+        setPassword("Tech123!");
+      }
+    }
+  }, []);
+
+  const handleModeSwitch = (mode: LoginMode) => {
+    setLoginMode(mode);
+    setError("");
+    if (mode === "admin") {
+      setEmail("admin@mechmind.io");
+      setPassword("Admin123!");
+    } else {
+      setEmail("tech@mechmind.io");
+      setPassword("Tech123!");
+    }
+  };
+
+  const setRolePreset = (roleEmail: string, rolePass: string, mode: LoginMode) => {
+    setLoginMode(mode);
+    setEmail(roleEmail);
+    setPassword(rolePass);
+    setError("");
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -26,26 +66,31 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       await login(email, password);
-      router.push("/dashboard");
+      // Route admin directly to admin page if logging in via admin mode, else to dashboard
+      if (loginMode === "admin" && email === "admin@mechmind.io") {
+        router.push("/dashboard");
+      } else {
+        router.push("/dashboard");
+      }
     } catch (err: unknown) {
       setError(
-        err instanceof Error ? err.message : "Authentication failed. Check credentials."
+        err instanceof Error ? err.message : "Authentication failed. Please verify credentials."
       );
     } finally {
       setIsLoading(false);
     }
   };
 
-  const fillDemoCredentials = () => {
-    setEmail("admin@mechmind.io");
-    setPassword("Admin123!");
-    setError("");
-  };
-
   return (
     <div className="min-h-screen w-full bg-[var(--bg-base)] text-[var(--text-primary)] transition-colors duration-300 flex flex-col justify-between relative overflow-hidden">
       {/* ── Top Ambient Glow Line ── */}
-      <div className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-teal-500 to-indigo-500 opacity-70 z-50 pointer-events-none" />
+      <div
+        className={`fixed top-0 left-0 right-0 h-1 transition-all duration-500 z-50 pointer-events-none ${
+          loginMode === "technician"
+            ? "bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-500"
+            : "bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-400"
+        }`}
+      />
 
       {/* ── Top Header Navigation ── */}
       <header className="relative z-30 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex items-center justify-between">
@@ -62,7 +107,7 @@ export default function LoginPage() {
         <div className="flex items-center gap-3">
           <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            CORE v3.0.0 · SYSTEM OPERATIONAL
+            <span>ENTERPRISE GATEWAY ONLINE</span>
           </div>
           <ThemeToggle />
         </div>
@@ -72,11 +117,10 @@ export default function LoginPage() {
       <main className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 flex-1 flex items-center justify-center">
         <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
-          {/* ── Left Column: Enterprise Industrial Capability Showcase (Desktop Only) ── */}
+          {/* ── Left Column: System & Role Overview ── */}
           <div className="hidden lg:flex lg:col-span-7 flex-col justify-center space-y-8 pr-4">
-            {/* Brand Header */}
             <div className="space-y-3">
-              <div className="inline-flex items-center gap-3 px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08] shadow-sm">
+              <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08] shadow-sm">
                 <Image
                   src={isLight ? "/brand-icon-light.png" : "/brand-icon-dark.png"}
                   alt="MEND-X"
@@ -86,131 +130,189 @@ export default function LoginPage() {
                   priority
                 />
                 <span className="font-mono text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
-                  MEND-X DIAGNOSTIC CONSOLE
+                  MEND-X DUAL-PORTAL AUTHENTICATION
                 </span>
               </div>
 
               <h1 className="text-3xl xl:text-4xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
-                Industrial Intelligence for <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 via-indigo-600 to-violet-600 dark:from-teal-400 dark:via-cyan-400 dark:to-indigo-400">
-                  Zero-Downtime Operations.
-                </span>
+                {loginMode === "technician" ? (
+                  <>
+                    Field Operator Diagnostics &amp; <br />
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-500">
+                      Zero-Downtime Troubleshooting.
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    Administrative Operations &amp; <br />
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-400 to-cyan-400">
+                      Knowledge Ingestion Control.
+                    </span>
+                  </>
+                )}
               </h1>
               <p className="text-sm text-slate-600 dark:text-slate-400 max-w-lg leading-relaxed">
-                Connect line technicians directly to OEM schematics, live fault trees, and AI-grounded repair protocols in under 8 seconds.
+                {loginMode === "technician"
+                  ? "Ground line technicians and maintenance crews directly with OEM manuals, error code isolation, optical camera scanning, and step-by-step LOTO safety procedures."
+                  : "Empower knowledge engineers and system administrators to manage vector database ingestion, configure AI models, inspect fleet telemetry, and provision team access."}
               </p>
             </div>
 
-            {/* Visual Industrial Telemetry Card Preview */}
-            <div className="relative rounded-2xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-2xl bg-slate-900">
-              <div className="relative h-44 w-full">
-                <Image
-                  src="/industrial-hero.jpg"
-                  alt="Industrial Plant Automated Line"
-                  fill
-                  sizes="50vw"
-                  className="object-cover opacity-60 filter contrast-125 brightness-90"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent" />
-                <div className="absolute top-3 left-4 flex items-center gap-2">
-                  <span className="px-2.5 py-0.5 rounded-md text-[10px] font-mono font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30 backdrop-blur-md">
-                    PLANT SENSORS CONNECTED
+            {/* Industrial Capability Badge Box */}
+            <div className="p-5 rounded-2xl bg-slate-900/90 border border-white/10 shadow-2xl backdrop-blur-md space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse" />
+                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-slate-200">
+                    Active Environment Capabilities
                   </span>
-                  <span className="text-[10px] font-mono text-slate-400">CANopen · Modbus TCP</span>
                 </div>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/10 text-slate-300">
+                  Dual Role Architecture
+                </span>
               </div>
 
-              {/* Real-Time Telemetry Stats Row */}
-              <div className="p-4 bg-slate-950/90 backdrop-blur-md grid grid-cols-3 gap-4 border-t border-white/10 text-xs font-mono">
-                <div>
-                  <div className="text-slate-400 text-[10px] uppercase">RAG Grounding</div>
-                  <div className="text-emerald-400 font-bold mt-0.5">100% Citations</div>
+              <div className="grid grid-cols-2 gap-3 text-xs font-mono">
+                <div className="p-3 rounded-xl bg-black/40 border border-emerald-500/20 space-y-1">
+                  <div className="flex items-center gap-1.5 text-emerald-400 font-bold">
+                    <Wrench className="w-3.5 h-3.5" />
+                    <span>USER / TECHNICIAN SIDE</span>
+                  </div>
+                  <p className="text-[11px] text-slate-400">
+                    Mobile OCR scanner, targeted machine grounding, live citations, step-by-step isolation.
+                  </p>
                 </div>
-                <div>
-                  <div className="text-slate-400 text-[10px] uppercase">Model Latency</div>
-                  <div className="text-cyan-400 font-bold mt-0.5">&lt;100ms (Groq LPU)</div>
-                </div>
-                <div>
-                  <div className="text-slate-400 text-[10px] uppercase">Supported OEMs</div>
-                  <div className="text-slate-200 font-bold mt-0.5">Siemens · KUKA · Fanuc</div>
+
+                <div className="p-3 rounded-xl bg-black/40 border border-indigo-500/20 space-y-1">
+                  <div className="flex items-center gap-1.5 text-indigo-400 font-bold">
+                    <Shield className="w-3.5 h-3.5" />
+                    <span>ADMINISTRATOR SIDE</span>
+                  </div>
+                  <p className="text-[11px] text-slate-400">
+                    PDF manual ingestion, machine registry, team roster &amp; role governance.
+                  </p>
                 </div>
               </div>
             </div>
 
-            {/* Industrial Compliance Badges */}
+            {/* Compliance badges */}
             <div className="flex items-center gap-4 text-[11px] font-mono text-slate-500 dark:text-slate-400">
               <span className="flex items-center gap-1.5">
-                <svg className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
+                <CheckCircle2 className="w-3.5 h-3.5 text-teal-400" />
                 Air-Gap Compatible
               </span>
               <span>•</span>
-              <span>Deterministic Protocols</span>
+              <span>768-Dim Vector Store</span>
               <span>•</span>
-              <span>Strict Role-Based Access</span>
+              <span>Role-Based Access Control</span>
             </div>
           </div>
 
-          {/* ── Right Column: Sleek High-Contrast Login Card ── */}
+          {/* ── Right Column: Two-Mode Login Card ── */}
           <div className="lg:col-span-5 w-full max-w-md mx-auto">
             <div className="rounded-3xl p-6 sm:p-8 bg-white/95 dark:bg-[#0c1017]/95 border border-slate-200/90 dark:border-white/10 shadow-2xl backdrop-blur-xl transition-all relative overflow-hidden">
               
               {/* Card Accent Top Line */}
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-500 via-indigo-500 to-violet-500" />
+              <div
+                className={`absolute top-0 left-0 right-0 h-1 transition-all duration-300 ${
+                  loginMode === "technician"
+                    ? "bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-500"
+                    : "bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-400"
+                }`}
+              />
 
-              {/* Logo & Headline */}
-              <div className="flex flex-col items-center text-center mb-6">
-                <div className="relative mb-3.5 p-3 rounded-2xl bg-slate-100/90 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08] shadow-sm">
-                  <Image
-                    src={isLight ? "/brand-icon-light.png" : "/brand-icon-dark.png"}
-                    alt="MEND-X Brand Emblem"
-                    width={48}
-                    height={48}
-                    className="w-12 h-12 object-contain"
-                    priority
-                  />
-                </div>
+              {/* ── User Side vs Admin Side Switcher Tabs ── */}
+              <div className="mb-6 p-1 rounded-2xl bg-slate-100 dark:bg-white/[0.05] border border-slate-200 dark:border-white/[0.08] grid grid-cols-2 gap-1 text-xs font-mono select-none">
+                <button
+                  type="button"
+                  onClick={() => handleModeSwitch("technician")}
+                  className={`py-2 px-3 rounded-xl font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                    loginMode === "technician"
+                      ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-600/30"
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                  }`}
+                >
+                  <Wrench className="w-3.5 h-3.5" />
+                  <span>User / Tech</span>
+                </button>
 
-                <div className="flex items-center gap-1.5 text-2xl font-black tracking-tight text-slate-900 dark:text-white">
-                  MEND<span className="text-teal-600 dark:text-teal-400">-X</span>
+                <button
+                  type="button"
+                  onClick={() => handleModeSwitch("admin")}
+                  className={`py-2 px-3 rounded-xl font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                    loginMode === "admin"
+                      ? "bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-600/30"
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                  }`}
+                >
+                  <Shield className="w-3.5 h-3.5" />
+                  <span>Admin Side</span>
+                </button>
+              </div>
+
+              {/* Headline */}
+              <div className="text-center mb-5">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold mb-2 uppercase border ${
+                  loginMode === 'technician'
+                    ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
+                    : 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20'
+                }">
+                  {loginMode === "technician" ? "🔧 FIELD OPERATOR PORTAL" : "🛡️ ENTERPRISE ADMIN PORTAL"}
                 </div>
-                <div className="font-mono text-[10px] uppercase tracking-widest text-slate-500 dark:text-slate-400 mt-0.5 font-bold">
-                  Troubleshooting Portal
-                </div>
-                <p className="text-xs text-slate-600 dark:text-slate-400 mt-2">
-                  Authenticate to inspect live machine telemetry and error logs.
+                <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                  {loginMode === "technician" ? "Technician Sign In" : "Administrator Sign In"}
+                </h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  {loginMode === "technician"
+                    ? "Log in to launch live equipment troubleshooting."
+                    : "Log in to manage manuals, fleet assets, and team roles."}
                 </p>
               </div>
 
-              {/* Quick-Fill Demo Pill */}
-              <div className="mb-6 p-3 rounded-2xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200/80 dark:border-white/[0.08] flex items-center justify-between gap-3">
-                <div className="text-left">
-                  <div className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                    Evaluation Access
-                  </div>
-                  <div className="text-[10px] font-mono text-slate-500 dark:text-slate-400">
-                    admin@mechmind.io
-                  </div>
+              {/* One-Click Quick Fill Credentials Pills */}
+              <div className="mb-5 space-y-2">
+                <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
+                  Quick Demo Accounts:
                 </div>
-                <button
-                  type="button"
-                  onClick={fillDemoCredentials}
-                  className="px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 active:scale-95 transition-all shadow-sm flex items-center gap-1.5 shrink-0"
-                >
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                  Auto-Fill
-                </button>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setRolePreset("tech@mechmind.io", "Tech123!", "technician")}
+                    className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                      email === "tech@mechmind.io"
+                        ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-300 shadow-sm"
+                        : "bg-slate-50 dark:bg-white/[0.03] border-slate-200 dark:border-white/[0.06] text-slate-400 hover:text-white hover:bg-white/[0.06]"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-0.5">
+                      <span className="font-mono text-[10px] font-bold uppercase">Tech User</span>
+                      <Wrench className="w-3 h-3 text-emerald-400" />
+                    </div>
+                    <div className="text-[10px] font-mono truncate text-slate-300">tech@mechmind.io</div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setRolePreset("admin@mechmind.io", "Admin123!", "admin")}
+                    className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                      email === "admin@mechmind.io"
+                        ? "bg-indigo-500/15 border-indigo-500/40 text-indigo-300 shadow-sm"
+                        : "bg-slate-50 dark:bg-white/[0.03] border-slate-200 dark:border-white/[0.06] text-slate-400 hover:text-white hover:bg-white/[0.06]"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-0.5">
+                      <span className="font-mono text-[10px] font-bold uppercase">Admin User</span>
+                      <Shield className="w-3 h-3 text-indigo-400" />
+                    </div>
+                    <div className="text-[10px] font-mono truncate text-slate-300">admin@mechmind.io</div>
+                  </button>
+                </div>
               </div>
 
               {/* Error Message */}
               {error && (
-                <div className="mb-5 p-3.5 rounded-2xl text-xs flex items-center gap-2.5 bg-rose-500/10 border border-rose-500/25 text-rose-600 dark:text-rose-300">
-                  <svg className="w-4 h-4 shrink-0 text-rose-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
+                <div className="mb-4 p-3 rounded-xl text-xs flex items-center gap-2 bg-rose-500/10 border border-rose-500/25 text-rose-400 animate-fade-in">
+                  <span className="font-bold">⚠</span>
                   <span className="font-medium">{error}</span>
                 </div>
               )}
@@ -221,44 +323,30 @@ export default function LoginPage() {
                 <div>
                   <label
                     htmlFor="login-email"
-                    className="block text-[11px] font-mono font-bold uppercase tracking-wider mb-1.5 text-slate-700 dark:text-slate-300"
+                    className="block text-[10px] font-mono font-bold uppercase tracking-wider mb-1.5 text-slate-700 dark:text-slate-300"
                   >
-                    Technician Email
+                    {loginMode === "technician" ? "Operator Email" : "Admin Email"}
                   </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.206" />
-                      </svg>
-                    </div>
-                    <input
-                      id="login-email"
-                      type="email"
-                      required
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="technician@plant.com"
-                      className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl transition-all duration-200 bg-slate-50 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.1] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 outline-none"
-                    />
-                  </div>
+                  <input
+                    id="login-email"
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="user@plant.com"
+                    className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl transition-all duration-200 bg-slate-50 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.1] text-slate-900 dark:text-white placeholder:text-slate-500 focus:border-cyan-500 focus:shadow-[0_0_15px_rgba(6,182,212,0.2)] outline-none"
+                  />
                 </div>
 
                 {/* Password Field */}
                 <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label
-                      htmlFor="login-password"
-                      className="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300"
-                    >
-                      Console Password
-                    </label>
-                  </div>
+                  <label
+                    htmlFor="login-password"
+                    className="block text-[10px] font-mono font-bold uppercase tracking-wider mb-1.5 text-slate-700 dark:text-slate-300"
+                  >
+                    Password
+                  </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                      </svg>
-                    </div>
                     <input
                       id="login-password"
                       type={showPass ? "text" : "password"}
@@ -266,25 +354,16 @@ export default function LoginPage() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••••••"
-                      className="w-full pl-10 pr-11 py-2.5 text-sm rounded-xl transition-all duration-200 bg-slate-50 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.1] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 outline-none"
+                      className="w-full px-3.5 pr-10 py-2.5 text-xs sm:text-sm rounded-xl transition-all duration-200 bg-slate-50 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.1] text-slate-900 dark:text-white placeholder:text-slate-500 focus:border-cyan-500 focus:shadow-[0_0_15px_rgba(6,182,212,0.2)] outline-none"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPass((v) => !v)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-200 transition-colors p-1"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors p-1 cursor-pointer"
                       tabIndex={-1}
                       aria-label={showPass ? "Hide password" : "Show password"}
                     >
-                      {showPass ? (
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                        </svg>
-                      ) : (
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                        </svg>
-                      )}
+                      {showPass ? "✕" : "👁"}
                     </button>
                   </div>
                 </div>
@@ -294,22 +373,18 @@ export default function LoginPage() {
                   id="login-submit"
                   type="submit"
                   disabled={isLoading}
-                  className="w-full py-3 px-4 mt-3 rounded-xl font-bold text-sm text-white transition-all duration-200 flex items-center justify-center gap-2 bg-gradient-to-r from-teal-600 via-indigo-600 to-indigo-700 hover:from-teal-500 hover:via-indigo-500 hover:to-indigo-600 shadow-lg shadow-indigo-500/20 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  className={`w-full py-3 px-4 mt-2 rounded-xl font-bold text-xs sm:text-sm text-white transition-all duration-200 flex items-center justify-center gap-2 shadow-lg active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer ${
+                    loginMode === "technician"
+                      ? "bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 shadow-emerald-600/25"
+                      : "bg-gradient-to-r from-indigo-600 via-purple-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 shadow-indigo-600/25"
+                  }`}
                 >
                   {isLoading ? (
-                    <span className="flex items-center gap-2">
-                      <svg className="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24" fill="none">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                      </svg>
-                      Authenticating...
-                    </span>
+                    <span>Authenticating Credentials...</span>
                   ) : (
                     <span className="flex items-center gap-2">
-                      Enter Diagnostic Console
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                      </svg>
+                      {loginMode === "technician" ? "Launch Technician Workspace" : "Access Administrative Console"}
+                      <ArrowRight className="w-4 h-4" />
                     </span>
                   )}
                 </button>
@@ -318,10 +393,10 @@ export default function LoginPage() {
               {/* Security Footnote */}
               <div className="mt-6 pt-4 border-t border-slate-200/80 dark:border-white/[0.08] flex items-center justify-between text-[10px] font-mono text-slate-500 dark:text-slate-400">
                 <span className="flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                  TLS 1.3 Encrypted
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                  TLS 1.3 Air-Gapped Authentication
                 </span>
-                <span>Dimensity Labs [VH26-37]</span>
+                <span>MEND-X v1.2.1</span>
               </div>
             </div>
           </div>
