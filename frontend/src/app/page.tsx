@@ -38,7 +38,7 @@ const MODEL_TIERS = [
     colorBg: "rgba(59,130,246,0.08)",
     colorBorder: "rgba(59,130,246,0.25)",
     desc: "Lightweight Groq LPU model for rapid-fire queries: error code lookups, symptom triage, and binary yes/no diagnostics. Optimized for PLCs and line controllers.",
-    specs: ["Groq Compound Mini LPU", "Sub-100ms latency", "LPU acceleration", "Error code matching"],
+    specs: ["Nord 1B Edge (Groq)", "Sub-100ms latency", "4k context window", "Error code matching"],
     logoDark: "/nord-dark.png",
     logoLight: "/nord-light.png",
   },
@@ -49,7 +49,7 @@ const MODEL_TIERS = [
     colorBg: "rgba(245,158,11,0.08)",
     colorBorder: "rgba(245,158,11,0.25)",
     desc: "The production diagnostic workhorse. Handles multi-step repair procedures, component cross-references, and mid-complexity fault trees for maintenance technicians.",
-    specs: ["GPT-OSS 20B (Groq Fast)", "1–2s latency", "Multi-step procedures", "128k context window"],
+    specs: ["Forge 2B (Groq LPU)", "1–2s latency", "Multi-step procedures", "8k context window"],
     logoDark: "/forge-dark.png",
     logoLight: "/forge-light.png",
   },
@@ -60,7 +60,7 @@ const MODEL_TIERS = [
     colorBg: "rgba(139,92,246,0.08)",
     colorBorder: "rgba(139,92,246,0.25)",
     desc: "Maximum reasoning tier for critical failures, root cause analysis, cross-manual ambiguity, and safety-critical industrial drives.",
-    specs: ["GPT-OSS 120B (Groq)", "2–4s latency", "Root cause analysis", "Deep reasoning chain"],
+    specs: ["Apex 4B Trained (Groq)", "2–4s latency", "Root cause analysis", "16k context window"],
     logoDark: "/apex-dark.png",
     logoLight: "/apex-light.png",
   }
@@ -69,7 +69,7 @@ const MODEL_TIERS = [
 const FEATURES = [
   { title: "Zero-Hallucination RAG", desc: "Deterministic chunking (512 tokens) with 0.72 cosine similarity threshold. Every response cites its source page.", icon: "🎯" },
   { title: "Multi-Tenant Isolation", desc: "pgvector ANN search scoped by machine_id. Air-gapped deployments supported on restricted networks.", icon: "🔒" },
-  { title: "Sub-8s Response Time", desc: "Tri-tier LLM cascade (Mini <100ms, 20B 1-2s, 120B 2-4s) auto-routes by severity on Groq LPU.", icon: "⚡" },
+  { title: "Sub-8s Response Time", desc: "Tri-tier LLM cascade (Nord 1B <100ms, Forge 2B 1-2s, Apex 4B 2-4s) auto-routes by severity on Groq LPU.", icon: "⚡" },
   { title: "OEM Manual Ingestion", desc: "PyMuPDF pipeline extracts 1.2M+ vendor manuals. Automatic schema inference and cross-reference mapping.", icon: "📚" },
   { title: "Compliance-Ready", desc: "DO-254 (Aerospace), IEC-61508 (Functional Safety), GDPR data residency, air-gap deployment options.", icon: "✅" },
   { title: "Field Technician UX", desc: "Mobile-first error code entry. Speaks technician language: bolt torque specs, component part numbers, tool requirements.", icon: "📱" }

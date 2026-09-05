@@ -301,9 +301,9 @@ export default function SettingsPage() {
                   ))}
                   {models.length === 0 && (
                     <>
-                      <option value="openai/gpt-oss-120b">Apex — GPT-OSS 120B (Groq)</option>
-                      <option value="openai/gpt-oss-20b">Forge — GPT-OSS 20B (Groq Fast)</option>
-                      <option value="groq/compound-mini">Nord — Groq Compound Mini (Fast Edge)</option>
+                      <option value="openai/gpt-oss-120b">Apex — 4B Trained (Groq LPU)</option>
+                      <option value="openai/gpt-oss-20b">Forge — 2B Diagnostics (Groq Fast)</option>
+                      <option value="groq/compound-mini">Nord — 1B Fast Edge (Groq)</option>
                     </>
                   )}
                 </select>

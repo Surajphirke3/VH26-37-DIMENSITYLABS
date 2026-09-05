@@ -379,150 +379,94 @@ export default function ChatInterface({
         </div>
       )}
 
-      {/* ── Tri-Model Atmospheric Space Background (Active in v2) ── */}
-      {chatVersion === "v2" && (
-        <div className="absolute inset-0 pointer-events-none overflow-hidden z-0 transition-opacity duration-700 animate-fade-in">
-          <div className="absolute -top-24 -left-24 w-[480px] h-[480px] rounded-full bg-sky-500/10 dark:bg-sky-500/[0.08] filter blur-[100px] celestial-aura-nord" />
-          <div className="absolute top-1/4 -right-20 w-[440px] h-[440px] rounded-full bg-amber-500/10 dark:bg-amber-500/[0.07] filter blur-[110px] celestial-aura-forge" />
-          <div className="absolute -bottom-24 left-1/3 w-[520px] h-[520px] rounded-full bg-rose-500/10 dark:bg-rose-500/[0.07] filter blur-[120px] celestial-aura-apex" />
-          <div className="absolute inset-0 bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:36px_36px] opacity-[0.03] dark:opacity-[0.06]" />
-        </div>
-      )}
+      {/* ── Atmospheric Ambient Glow ── */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden z-0 transition-opacity duration-700">
+        <div className="absolute -top-32 -left-32 w-[520px] h-[520px] rounded-full bg-sky-500/[0.05] filter blur-[120px]" />
+        <div className="absolute top-1/3 -right-32 w-[480px] h-[480px] rounded-full bg-indigo-500/[0.04] filter blur-[120px]" />
+      </div>
 
-      {/* ── High-Tech Grounded Equipment Context HUD ── */}
-      <div className="px-3 sm:px-6 py-2 bg-slate-100/90 dark:bg-black/60 border-b border-slate-200 dark:border-white/[0.08] backdrop-blur-md flex items-center justify-between shrink-0 z-20 gap-2 min-w-0">
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0 truncate">
+      {/* ── Single Minimal Equipment & Telemetry Strip (Replaces 2 Redundant Subheaders) ── */}
+      <div className="px-3 sm:px-6 py-2 bg-slate-50/90 dark:bg-[#080d17]/90 border-b border-slate-200/80 dark:border-white/[0.06] backdrop-blur-md flex items-center justify-between shrink-0 z-20 gap-2 min-w-0">
+        <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 truncate">
           {currentMachine ? (
             <div className="flex items-center gap-2 min-w-0 truncate">
               <ManufacturerLogo
                 name={currentMachine.name}
                 manufacturer={currentMachine.manufacturer}
-                size="sm"
+                size="xs"
               />
-              <div className="min-w-0 truncate">
-                <div className="flex items-center gap-1.5 sm:gap-2 truncate">
-                  <span className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
-                    {currentMachine.name}
-                  </span>
-                  <span className="px-1.5 py-0.2 rounded font-mono text-[9px] font-bold bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30 shrink-0">
-                    {currentMachine.model}
-                  </span>
-                </div>
-                <div className="hidden sm:flex items-center gap-2 text-[10px] font-mono text-emerald-600 dark:text-emerald-400 truncate">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse shrink-0" />
-                  <span>{t("dashboard.groundedRagActive", "GROUNDED RAG ACTIVE")}</span>
-                  <span className="text-slate-400 dark:text-slate-500">·</span>
-                  <span className="text-slate-500 dark:text-slate-400 truncate">{t("dashboard.airGappedStore", "Air-gapped Vector Store")}</span>
-                </div>
-              </div>
+              <span className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">
+                {currentMachine.name}
+              </span>
+              <span className="px-1.5 py-0.2 rounded font-mono text-[9px] font-bold bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border border-indigo-500/25 shrink-0">
+                {currentMachine.model}
+              </span>
+              <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-mono text-emerald-600 dark:text-emerald-400 font-semibold ml-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                Air-Gapped Vector Grounded
+              </span>
             </div>
           ) : (
             <div className="flex items-center gap-2 min-w-0 truncate">
-              <div className="w-6 h-6 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-600 dark:text-amber-400 font-mono text-[10px] font-bold shrink-0">
-                ALL
-              </div>
-              <div className="min-w-0 truncate">
-                <div className="flex items-center gap-1.5 truncate">
-                  <span className="text-xs font-bold text-amber-600 dark:text-amber-400 truncate">{t("dashboard.fleetMode", "Fleet Wide Mode")}</span>
-                  <span className="px-1.5 py-0.2 rounded font-mono text-[9px] font-bold bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20 shrink-0">
-                    {t("dashboard.crossMachine", "CROSS-MACHINE")}
-                  </span>
-                </div>
-                <p className="hidden sm:block text-[10px] font-mono text-slate-500 dark:text-slate-400 truncate">
-                  {t("dashboard.autoDisambiguating", "Auto-disambiguating across all indexed OEM manuals")}
-                </p>
-              </div>
+              <span className="px-1.5 py-0.2 rounded font-mono text-[9px] font-bold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/25 shrink-0">
+                FLEET MODE
+              </span>
+              <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 truncate">
+                Cross-Machine Fleet Disambiguation
+              </span>
+              <span className="hidden md:inline text-[10px] font-mono text-slate-400">
+                · All indexed OEM manuals active
+              </span>
             </div>
           )}
         </div>
 
-        {/* Right HUD Controls: Tri-Model Space Portal, Text Size Switcher, Target Switcher */}
-        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-          {/* Dedicated Tri-Model Space Portal Button */}
-          <button
-            type="button"
-            onClick={() =>
-              triggerWarp(
-                "/space",
-                "Entering Tri-Model Space",
-                "Activating Nord, Forge & Apex high-dimensional reasoning domain…"
-              )
-            }
-            className="px-2.5 sm:px-3.5 py-1.5 rounded-xl font-mono text-xs font-bold text-white bg-gradient-to-r from-sky-500 via-indigo-600 to-rose-500 hover:from-sky-400 hover:to-rose-400 shadow-[0_0_20px_rgba(56,189,248,0.35)] border border-sky-400/40 transition-all flex items-center gap-1.5 sm:gap-2 cursor-pointer hover:scale-[1.03] active:scale-95"
-            title="Traverse warp into the dedicated Tri-Model Space Page (Nord · Forge · Apex)"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-sky-200 animate-pulse shrink-0" />
-            <span className="hidden sm:inline bg-gradient-to-r from-sky-200 via-white to-rose-200 bg-clip-text text-transparent font-black">
-              Tri-Model Space (Nord · Forge · Apex)
-            </span>
-            <span className="sm:hidden font-black">Space</span>
-            <span className="text-[10px] font-mono px-1 rounded bg-white/20">3</span>
-          </button>
-
-          {/* Text Size Slider (Enlarge / Unlarge) */}
-          <div className="hidden xs:flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 rounded-xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-white/10 text-[11px] font-mono shadow-sm shrink-0">
+        {/* Right Utility: Text Size & Target Quick Switch */}
+        <div className="flex items-center gap-2 shrink-0">
+          {/* Text Size Stepper */}
+          <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-white dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.08] text-[10px] font-mono shadow-xs">
             <button
               type="button"
               onClick={() => handleSetFontSizePx(fontSizePx - 1)}
               disabled={fontSizePx <= 12}
-              className={`text-xs font-bold px-0.5 sm:px-1 transition-colors ${
-                fontSizePx <= 12
-                  ? "text-slate-300 dark:text-slate-600 cursor-not-allowed"
-                  : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer"
+              className={`font-bold px-1 transition-colors ${
+                fontSizePx <= 12 ? "text-slate-300 dark:text-slate-600" : "text-slate-500 hover:text-slate-900 dark:hover:text-white cursor-pointer"
               }`}
-              title="Unlarge / Decrease text size (A-)"
-              aria-label="Decrease text size"
+              title="Decrease text size (A-)"
             >
               A-
             </button>
-
-            <input
-              type="range"
-              min={12}
-              max={22}
-              step={1}
-              value={fontSizePx}
-              onChange={(e) => handleSetFontSizePx(Number(e.target.value))}
-              className="w-10 sm:w-16 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-sky-500 dark:accent-sky-400"
-              title={`Text Size: ${fontSizePx}px`}
-              aria-label="Text size slider"
-            />
-
+            <span className="text-[10px] font-mono font-bold text-sky-600 dark:text-sky-400 px-1 border-x border-slate-200 dark:border-white/10">
+              {fontSizePx}px
+            </span>
             <button
               type="button"
               onClick={() => handleSetFontSizePx(fontSizePx + 1)}
               disabled={fontSizePx >= 22}
-              className={`text-xs font-bold px-0.5 sm:px-1 transition-colors ${
-                fontSizePx >= 22
-                  ? "text-slate-300 dark:text-slate-600 cursor-not-allowed"
-                  : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer"
+              className={`font-bold px-1 transition-colors ${
+                fontSizePx >= 22 ? "text-slate-300 dark:text-slate-600" : "text-slate-500 hover:text-slate-900 dark:hover:text-white cursor-pointer"
               }`}
-              title="Enlarge / Increase text size (A+)"
-              aria-label="Increase text size"
+              title="Increase text size (A+)"
             >
               A+
             </button>
-
-            <span className="text-[10px] font-mono font-bold text-sky-600 dark:text-sky-400 w-5 sm:w-6 text-right">
-              {fontSizePx}
-            </span>
           </div>
 
-          {/* Quick Target Switcher Pill */}
+          {/* Quick Target Switcher */}
           <div className="relative shrink-0" ref={machineDropdownRef}>
             <button
               type="button"
               onClick={() => setShowMachineDropdown((v) => !v)}
-              className="px-2 sm:px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-white/10 text-[11px] font-mono text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all flex items-center gap-1 sm:gap-1.5 cursor-pointer shadow-sm max-w-[130px] sm:max-w-[180px] truncate"
+              className="px-2 py-0.5 rounded-lg bg-white dark:bg-white/[0.04] hover:bg-slate-50 dark:hover:bg-white/[0.08] border border-slate-200/80 dark:border-white/[0.08] text-[10px] font-mono text-slate-700 dark:text-slate-300 transition-all flex items-center gap-1 cursor-pointer shadow-xs"
             >
-              <span className="truncate">{t("dashboard.target", "Target")}: {currentMachine ? currentMachine.model : t("dashboard.allMachines", "All Fleet")}</span>
+              <span className="truncate max-w-[120px]">{currentMachine ? currentMachine.model : "All Fleet"}</span>
               <ChevronDown className="w-3 h-3 text-slate-400 shrink-0" />
             </button>
 
             {showMachineDropdown && (
-              <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/15 p-2 shadow-2xl z-50 animate-fade-in divide-y divide-slate-100 dark:divide-white/5">
-                <div className="px-2 py-1.5 text-[10px] font-mono font-bold uppercase text-slate-500 dark:text-slate-400">
-                  {t("dashboard.groundDiagnosticsOn", "Ground Diagnostics On:")}
+              <div className="absolute right-0 mt-1.5 w-60 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/15 p-1.5 shadow-2xl z-50 animate-fade-in divide-y divide-slate-100 dark:divide-white/5">
+                <div className="px-2 py-1 text-[9px] font-mono font-bold uppercase text-slate-400">
+                  Select Grounding Machine
                 </div>
                 <button
                   type="button"
@@ -530,13 +474,11 @@ export default function ChatInterface({
                     onMachineSelect?.("");
                     setShowMachineDropdown(false);
                   }}
-                  className={`w-full text-left px-2.5 py-2 rounded-xl text-xs flex items-center justify-between transition-colors cursor-pointer ${
-                    !machineId
-                      ? "bg-indigo-600 text-white font-bold"
-                      : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5"
+                  className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs flex items-center justify-between transition-colors cursor-pointer ${
+                    !machineId ? "bg-indigo-600 text-white font-bold" : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5"
                   }`}
                 >
-                  <span>{t("dashboard.allEquipment", "All Equipment (Fleet Mode)")}</span>
+                  <span>All Equipment (Fleet Mode)</span>
                   {!machineId && <span className="text-[10px]">✓</span>}
                 </button>
 
@@ -549,17 +491,15 @@ export default function ChatInterface({
                         onMachineSelect?.(m.id);
                         setShowMachineDropdown(false);
                       }}
-                      className={`w-full text-left px-2.5 py-2 rounded-xl text-xs flex items-center justify-between transition-colors cursor-pointer ${
-                        machineId === m.id
-                          ? "bg-indigo-600 text-white font-bold"
-                          : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5"
+                      className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs flex items-center justify-between transition-colors cursor-pointer ${
+                        machineId === m.id ? "bg-indigo-600 text-white font-bold" : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5"
                       }`}
                     >
                       <div className="flex items-center gap-2 truncate mr-2">
                         <ManufacturerLogo name={m.name} manufacturer={m.manufacturer} size="xs" />
                         <span className="truncate">{m.name}</span>
                       </div>
-                      <span className="text-[10px] font-mono opacity-70 shrink-0">{m.model}</span>
+                      <span className="text-[9px] font-mono opacity-70 shrink-0">{m.model}</span>
                     </button>
                   ))}
                 </div>
@@ -569,236 +509,167 @@ export default function ChatInterface({
         </div>
       </div>
 
-      {/* ── Tri-Model Neural Domain Space Bar (Active in v2) ── */}
-      {chatVersion === "v2" && (
-        <div className="px-3 sm:px-6 py-1.5 bg-slate-900/80 dark:bg-[#070b13]/85 border-b border-sky-500/20 backdrop-blur-xl flex items-center justify-between gap-2 text-xs z-10 animate-fade-in shadow-sm shrink-0 min-w-0 overflow-x-auto no-scrollbar">
-          <div className="flex items-center gap-2 shrink-0">
-            <span className="px-2 py-0.5 rounded-full font-mono text-[9px] font-extrabold uppercase tracking-wider bg-sky-500/15 text-sky-400 border border-sky-500/30 flex items-center gap-1.5 shadow-sm shrink-0">
-              <Sparkles className="w-3 h-3 text-sky-400 animate-spin shrink-0" style={{ animationDuration: "10s" }} />
-              <span>TRI-MODEL NEURAL SPACE</span>
-            </span>
-            <span className="hidden md:inline text-[11px] font-mono text-slate-400 truncate">
-              Active Dimensional Plane:
-            </span>
-          </div>
-
-          {/* Model Realm Selector */}
-          <div className="flex items-center gap-1 p-0.5 rounded-xl bg-black/40 border border-white/10 text-[10px] font-mono shrink-0">
-            <button
-              type="button"
-              onClick={() => setActiveModelTier("auto")}
-              className={`px-2 sm:px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer whitespace-nowrap ${
-                activeModelTier === "auto"
-                  ? "bg-white/20 text-white shadow-sm"
-                  : "text-slate-400 hover:text-white"
-              }`}
-              title="Automatically route queries based on error complexity"
-            >
-              ⚡ Auto Router
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveModelTier("nord")}
-              className={`px-2 sm:px-2.5 py-1 rounded-lg font-bold transition-all flex items-center gap-1 cursor-pointer whitespace-nowrap ${
-                activeModelTier === "nord"
-                  ? "bg-sky-500/25 text-sky-300 border border-sky-500/40 shadow-sm"
-                  : "text-slate-400 hover:text-sky-400"
-              }`}
-              title="Nord Space: Edge PC & sub-second error code lookup"
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-sky-400 shrink-0" />
-              <span>Nord Space</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveModelTier("forge")}
-              className={`px-2 sm:px-2.5 py-1 rounded-lg font-bold transition-all flex items-center gap-1 cursor-pointer whitespace-nowrap ${
-                activeModelTier === "forge"
-                  ? "bg-amber-500/25 text-amber-300 border border-amber-500/40 shadow-sm"
-                  : "text-slate-400 hover:text-amber-400"
-              }`}
-              title="Forge Space: Workshop multi-step reasoning"
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
-              <span>Forge Space</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveModelTier("apex")}
-              className={`px-2 sm:px-2.5 py-1 rounded-lg font-bold transition-all flex items-center gap-1 cursor-pointer whitespace-nowrap ${
-                activeModelTier === "apex"
-                  ? "bg-rose-500/25 text-rose-300 border border-rose-500/40 shadow-sm"
-                  : "text-slate-400 hover:text-rose-400"
-              }`}
-              title="Apex Space: Safety-critical cloud cross-verification"
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-rose-400 shrink-0" />
-              <span>Apex Space</span>
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* ── Main Message Feed ── */}
-      <div className="flex-1 min-h-0 overflow-y-auto chat-scroll px-3 sm:px-6 py-3 sm:py-6">
-        <div className={`w-full ${chatVersion === "v2" ? "max-w-3xl mx-auto space-y-6" : "space-y-6"}`}>
+      <div className="flex-1 min-h-0 overflow-y-auto chat-scroll px-3 sm:px-6 py-4 sm:py-6">
+        <div className="max-w-3xl mx-auto space-y-6">
         {/* Interactive Launchpad (When No Messages Yet) */}
         {messages.length === 0 && !isLoading && (
-          chatVersion === "v2" ? (
-            /* ── Minimalist v2 Launchpad (Nord · Forge · Apex Tiers) ── */
-            <div className="max-w-2xl mx-auto my-6 space-y-6 animate-fade-in text-center">
-              <div className="flex flex-col items-center justify-center space-y-2">
-                <div className="w-12 h-12 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 p-2 shadow-sm flex items-center justify-center">
-                  <img src="/brand-icon-dark.png" alt="MEND-X" className="w-full h-full object-contain hidden dark:block" />
-                  <img src="/brand-icon-light.png" alt="MEND-X" className="w-full h-full object-contain block dark:hidden" />
-                </div>
-                <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100">
-                  {t("chat.diagnosticEngine", "MEND-X Industrial Diagnostic Engine")}
-                </h2>
-                <p className="text-xs text-slate-500 dark:text-slate-400 max-w-lg mx-auto leading-relaxed">
-                  Three-tier grounded intelligence. Every diagnosis is strictly cited against OEM manuals, schematics, and lockout procedures.
-                </p>
+          <div className="my-6 space-y-8 animate-fade-in text-center">
+            {/* Clean Hero */}
+            <div className="space-y-3">
+              <div className="inline-flex items-center justify-center p-3 rounded-2xl bg-white dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/10 shadow-lg">
+                <Image
+                  src="/brand-icon-dark.png"
+                  alt="MEND-X"
+                  width={36}
+                  height={36}
+                  className="w-9 h-9 object-contain hidden dark:block"
+                />
+                <Image
+                  src="/brand-icon-light.png"
+                  alt="MEND-X"
+                  width={36}
+                  height={36}
+                  className="w-9 h-9 object-contain block dark:hidden"
+                />
               </div>
-
-              {/* Three Model Tier Cards (Nord, Forge, Apex) */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-left">
-                {/* 🔵 NORD Tier Card */}
-                <div className="p-3.5 rounded-2xl bg-white dark:bg-[#0c1017] border border-sky-500/20 hover:border-sky-500/40 transition-all shadow-sm flex flex-col justify-between space-y-3">
-                  <div className="space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <div className="h-6 flex items-center">
-                        <img src="/nord.png" alt="Nord Tier" className="h-5 w-auto object-contain" />
-                      </div>
-                      <span className="px-1.5 py-0.5 rounded font-mono text-[9px] font-bold bg-sky-500/10 text-sky-700 dark:text-sky-400 border border-sky-500/30">
-                        &lt; 350ms
-                      </span>
-                    </div>
-                    <h3 className="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
-                      Nord (Low Tier)
-                    </h3>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
-                      Fast field lookup & edge alarm code matching.
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => handleSend("What does alarm code E-101 mean on the CNC milling machine?", "nord")}
-                    className="w-full py-1.5 px-2 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 text-sky-700 dark:text-sky-300 font-mono text-[10px] font-bold text-center border border-sky-500/20 transition-colors cursor-pointer"
-                  >
-                    Test: Spindle E-101 →
-                  </button>
-                </div>
-
-                {/* 🟠 FORGE Tier Card */}
-                <div className="p-3.5 rounded-2xl bg-white dark:bg-[#0c1017] border border-amber-500/20 hover:border-amber-500/40 transition-all shadow-sm flex flex-col justify-between space-y-3">
-                  <div className="space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <div className="h-6 flex items-center">
-                        <img src="/forge.png" alt="Forge Tier" className="h-5 w-auto object-contain" />
-                      </div>
-                      <span className="px-1.5 py-0.5 rounded font-mono text-[9px] font-bold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/30">
-                        ~ 1.5s
-                      </span>
-                    </div>
-                    <h3 className="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                      Forge (Mid Tier)
-                    </h3>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
-                      Multi-step troubleshooting & root cause analysis.
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => handleSend("Hydraulic oil overheating and pressure dropping after 2 hours run time", "forge")}
-                    className="w-full py-1.5 px-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 font-mono text-[10px] font-bold text-center border border-amber-500/20 transition-colors cursor-pointer"
-                  >
-                    Test: Hydraulic Overheat →
-                  </button>
-                </div>
-
-                {/* 🔴 APEX Tier Card */}
-                <div className="p-3.5 rounded-2xl bg-white dark:bg-[#0c1017] border border-rose-500/20 hover:border-rose-500/40 transition-all shadow-sm flex flex-col justify-between space-y-3">
-                  <div className="space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <div className="h-6 flex items-center">
-                        <img src="/apex.png" alt="Apex Tier" className="h-5 w-auto object-contain" />
-                      </div>
-                      <span className="px-1.5 py-0.5 rounded font-mono text-[9px] font-bold bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-500/30">
-                        ~ 3.0s
-                      </span>
-                    </div>
-                    <h3 className="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-                      Apex (High Tier)
-                    </h3>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
-                      Safety-critical cross-document disambiguation.
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => handleSend("Cross-check ambiguous fault code 401 across Fanuc and Siemens controller manuals", "apex")}
-                    className="w-full py-1.5 px-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-700 dark:text-rose-300 font-mono text-[10px] font-bold text-center border border-rose-500/20 transition-colors cursor-pointer"
-                  >
-                    Test: Fanuc vs Siemens →
-                  </button>
-                </div>
-              </div>
-            </div>
-          ) : (
-            /* ── Original v1 Cyber Launchpad ── */
-            <div className="max-w-2xl mx-auto my-8 space-y-6 animate-fade-in text-center">
-              {/* Cyber graphic */}
-              <div className="relative inline-flex items-center justify-center p-4 rounded-3xl bg-gradient-to-b from-indigo-500/10 via-cyan-500/5 to-transparent border border-cyan-500/20 shadow-[0_0_40px_rgba(6,182,212,0.15)]">
-                <div className="w-16 h-16 rounded-2xl bg-cyan-50 dark:bg-black/60 border border-cyan-500/30 flex items-center justify-center text-cyan-600 dark:text-cyan-400">
-                  <Activity className="w-8 h-8 animate-pulse" />
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
+              <div className="space-y-1">
                 <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
                   {t("chat.diagnosticEngine", "MEND-X Industrial Diagnostic Engine")}
                 </h2>
-                <p className="text-xs text-slate-600 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
-                  {t("chat.diagnosticDesc", "Ground every troubleshooting response directly on verified OEM schematics, error fault tables, and field manuals.")}
+                <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-lg mx-auto leading-relaxed">
+                  Three-tier grounded intelligence. Every diagnosis is strictly cited against OEM manuals, schematics, and lockout procedures.
                 </p>
               </div>
+            </div>
 
-              {/* Quick Fault Launchers */}
-              <div className="pt-2 text-left space-y-2">
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block px-1">
-                  {t("chat.quickProbes", "Quick Test Fault Probes:")}
-                </span>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  {QUICK_DIAGNOSTIC_PRESETS.map((preset, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => handleSend(preset.query)}
-                      className="p-3 rounded-2xl bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 hover:border-cyan-500/40 text-left transition-all group cursor-pointer shadow-sm hover:shadow-[0_4px_20px_rgba(6,182,212,0.15)]"
-                    >
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="px-2 py-0.5 rounded font-mono text-[10px] font-bold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/30">
-                          {preset.code}
-                        </span>
-                        <span className="text-[10px] font-mono text-slate-400 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
-                          {t("chat.launchProbe", "Launch Probe")} →
-                        </span>
-                      </div>
-                      <p className="text-xs font-bold text-slate-900 dark:text-slate-200 group-hover:text-cyan-600 dark:group-hover:text-white transition-colors">
-                        {preset.title}
-                      </p>
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5 font-mono">
-                        {preset.brand}
-                      </p>
-                    </button>
-                  ))}
+            {/* Three Model Tier Cards (Nord, Forge, Apex) */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-left">
+              {/* 🔵 NORD Tier Card */}
+              <div className="p-4 rounded-2xl bg-white dark:bg-[#0c111c] border border-slate-200/90 dark:border-sky-500/20 hover:border-sky-500/40 transition-all shadow-sm flex flex-col justify-between space-y-3 group hover:shadow-md">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="h-6 flex items-center">
+                      <img src="/nord.png" alt="Nord Tier" className="h-5 w-auto object-contain" />
+                    </div>
+                    <span className="px-1.5 py-0.5 rounded font-mono text-[9px] font-bold bg-sky-500/10 text-sky-700 dark:text-sky-400 border border-sky-500/30">
+                      &lt; 350ms
+                    </span>
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
+                      Nord (Edge 1B)
+                    </h3>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug mt-0.5">
+                      Instant field lookup & error code matching.
+                    </p>
+                  </div>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => handleSend("What does alarm code E-101 mean on the CNC milling machine?", "nord")}
+                  className="w-full py-2 px-2.5 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 text-sky-700 dark:text-sky-300 font-mono text-[10px] font-bold text-center border border-sky-500/20 transition-colors cursor-pointer"
+                >
+                  Test: Spindle E-101 →
+                </button>
+              </div>
+
+              {/* 🟠 FORGE Tier Card */}
+              <div className="p-4 rounded-2xl bg-white dark:bg-[#0c111c] border border-slate-200/90 dark:border-amber-500/20 hover:border-amber-500/40 transition-all shadow-sm flex flex-col justify-between space-y-3 group hover:shadow-md">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="h-6 flex items-center">
+                      <img src="/forge.png" alt="Forge Tier" className="h-5 w-auto object-contain" />
+                    </div>
+                    <span className="px-1.5 py-0.5 rounded font-mono text-[9px] font-bold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/30">
+                      ~ 1.0s
+                    </span>
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                      Forge (Workshop 2B)
+                    </h3>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug mt-0.5">
+                      Multi-step diagnostic & root cause analysis.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleSend("Hydraulic oil overheating and pressure dropping after 2 hours run time", "forge")}
+                  className="w-full py-2 px-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 font-mono text-[10px] font-bold text-center border border-amber-500/20 transition-colors cursor-pointer"
+                >
+                  Test: Hydraulic Overheat →
+                </button>
+              </div>
+
+              {/* 🔴 APEX Tier Card */}
+              <div className="p-4 rounded-2xl bg-white dark:bg-[#0c111c] border border-slate-200/90 dark:border-rose-500/20 hover:border-rose-500/40 transition-all shadow-sm flex flex-col justify-between space-y-3 group hover:shadow-md">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="h-6 flex items-center">
+                      <img src="/apex.png" alt="Apex Tier" className="h-5 w-auto object-contain" />
+                    </div>
+                    <span className="px-1.5 py-0.5 rounded font-mono text-[9px] font-bold bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-500/30">
+                      ~ 1.8s
+                    </span>
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                      Apex (Trained 4B)
+                    </h3>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug mt-0.5">
+                      Safety-critical cross-OEM disambiguation.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleSend("Cross-check ambiguous fault code 401 across Fanuc and Siemens controller manuals", "apex")}
+                  className="w-full py-2 px-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-700 dark:text-rose-300 font-mono text-[10px] font-bold text-center border border-rose-500/20 transition-colors cursor-pointer"
+                >
+                  Test: Fanuc vs Siemens →
+                </button>
               </div>
             </div>
-          )
+
+            {/* Quick Diagnostic Probes */}
+            <div className="text-left space-y-2.5 pt-2">
+              <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-400 block px-1">
+                Curated OEM Diagnostic Presets:
+              </span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {QUICK_DIAGNOSTIC_PRESETS.map((preset, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => handleSend(preset.query)}
+                    className="p-3 rounded-xl bg-white dark:bg-[#0c111c] hover:bg-slate-50 dark:hover:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.08] hover:border-indigo-500/40 text-left transition-all group cursor-pointer shadow-xs flex items-center justify-between"
+                  >
+                    <div className="min-w-0 pr-2">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className="px-1.5 py-0.2 rounded font-mono text-[9px] font-bold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/25">
+                          {preset.code}
+                        </span>
+                        <span className="text-[10px] font-mono text-slate-400 truncate">
+                          {preset.brand}
+                        </span>
+                      </div>
+                      <p className="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-sky-300 transition-colors truncate">
+                        {preset.title}
+                      </p>
+                    </div>
+                    <span className="text-[10px] font-mono text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-sky-400 transition-colors shrink-0">
+                      Launch →
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
         )}
 
         {/* Message Thread */}

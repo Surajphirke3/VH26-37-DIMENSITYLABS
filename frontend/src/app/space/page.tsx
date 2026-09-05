@@ -57,14 +57,14 @@ const TRI_MODELS: Record<"nord" | "forge" | "apex", ModelCardInfo> = {
   nord: {
     id: "nord",
     name: "Nord",
-    codename: "NORD-TRIAGE-LPU",
+    codename: "NORD-1B-EDGE",
     tier: "TIER 01",
     badge: "Edge Sub-100ms",
     role: "Ultra-Fast Edge Triage & Safety Lockdown",
-    engine: "Groq LPU / Ollama Mini (Hardware Acceleration)",
+    engine: "Nord 1B (Edge Sub-100ms LPU)",
     latency: "<100ms",
     throughput: "450+ tok/sec",
-    contextWindow: "16,384 tokens",
+    contextWindow: "4,096 tokens",
     color: "#38bdf8",
     borderClass: "border-sky-500/40 hover:border-sky-400",
     bgGlowClass: "shadow-[0_0_30px_rgba(56,189,248,0.15)]",
@@ -82,14 +82,14 @@ const TRI_MODELS: Record<"nord" | "forge" | "apex", ModelCardInfo> = {
   forge: {
     id: "forge",
     name: "Forge",
-    codename: "FORGE-DIAG-8B",
+    codename: "FORGE-2B-DIAG",
     tier: "TIER 02",
     badge: "Diagnostic Engine",
     role: "Deterministic Repair Protocol & Schematics",
-    engine: "Qwen 3.5 9B / Ollama Cloud & Native",
-    latency: "800ms – 1.4s",
-    throughput: "140+ tok/sec",
-    contextWindow: "32,768 tokens",
+    engine: "Forge 2B (Workshop Diagnostic Engine)",
+    latency: "600ms – 1.2s",
+    throughput: "180+ tok/sec",
+    contextWindow: "8,192 tokens",
     color: "#f59e0b",
     borderClass: "border-amber-500/40 hover:border-amber-400",
     bgGlowClass: "shadow-[0_0_30px_rgba(245,158,11,0.15)]",
@@ -107,22 +107,22 @@ const TRI_MODELS: Record<"nord" | "forge" | "apex", ModelCardInfo> = {
   apex: {
     id: "apex",
     name: "Apex",
-    codename: "APEX-REASON-120B",
+    codename: "APEX-4B-TRAINED",
     tier: "TIER 03",
     badge: "Deep Kinematics",
     role: "Cross-Subsystem Multi-Assembly Synthesis",
-    engine: "GPT-OSS 120B / Hybrid Deep Cloud",
-    latency: "2.1s – 3.8s",
-    throughput: "90+ tok/sec",
-    contextWindow: "128,000 tokens",
+    engine: "Apex 4B (Domain-Trained Model)",
+    latency: "1.4s – 2.6s",
+    throughput: "120+ tok/sec",
+    contextWindow: "16,384 tokens",
     color: "#f43f5e",
     borderClass: "border-rose-500/40 hover:border-rose-400",
     bgGlowClass: "shadow-[0_0_30px_rgba(244,63,94,0.15)]",
     accentGradient: "from-rose-500 to-pink-400",
     summary:
-      "Our most powerful reasoning lattice. Designed for ambiguous cross-controller failures, harmonic drive wear, thermal expansion drift, and complex multi-assembly kinematics where individual subsystem sensors report contradictory diagnostics.",
+      "Our most powerful 4B parameter domain-trained model. Custom trained on OEM service engineering data for ambiguous cross-controller failures, harmonic drive wear, thermal drift, and complex multi-assembly kinematics.",
     capabilities: [
-      "128k context multi-manual synthesis",
+      "4B domain-trained multi-manual synthesis",
       "Kinematic linkage & resolver drift calculations",
       "Cross-controller bus timeout root cause",
       "Preventative lifecycle failure modeling",
@@ -306,7 +306,7 @@ export default function TriModelSpacePage() {
                 Each model fulfills a dedicated tier in the industrial automation lifecycle — from{" "}
                 <strong className="text-sky-400">Nord&apos;s sub-100ms edge triage</strong> to{" "}
                 <strong className="text-amber-400">Forge&apos;s deterministic schematics</strong> and{" "}
-                <strong className="text-rose-400">Apex&apos;s 120B kinematics reasoning</strong>.
+                <strong className="text-rose-400">Apex&apos;s 4B domain-trained kinematics reasoning</strong>.
               </p>
             </div>
 

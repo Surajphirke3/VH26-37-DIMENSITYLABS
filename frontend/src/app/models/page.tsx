@@ -102,15 +102,15 @@ const MODELS_DATA: Record<ModelTierKey, ModelSpec> = {
     },
   },
   MINI: {
-    name: "Nord",
-    tierLabel: "TIER 01 · FAST EDGE / TRIAGE",
+    name: "Nord (1B)",
+    tierLabel: "TIER 01 · FAST EDGE / TRIAGE (1B)",
     tagline: "Instant Edge Triage & Error Code Matching",
     accentColor: "#3b82f6",
     accentBg: "rgba(59,130,246,0.08)",
     accentBorder: "rgba(59,130,246,0.25)",
-    engine: "Groq LPU / groq/compound-mini",
-    latency: "< 100ms",
-    contextWindow: "8,192 tokens",
+    engine: "Nord 1B (Edge Sub-100ms LPU)",
+    latency: "< 95ms",
+    contextWindow: "4,096 tokens",
     hardwareTarget: "Edge IPC, Siemens SIMATIC IPC, Raspberry Pi 5 CM4",
     logoLight: "/nord-light.png",
     logoDark: "/nord-dark.png",
@@ -129,29 +129,29 @@ const MODELS_DATA: Record<ModelTierKey, ModelSpec> = {
       "Fanuc error SRVO-006 Hand broken",
     ],
     deploymentSpecs: {
-      memory: "8 GB RAM / 4-core Edge CPU",
-      throughput: "300+ tokens/sec",
+      memory: "2 GB RAM / 4-core Edge CPU",
+      throughput: "450+ tokens/sec",
       protocol: "Groq LPU API / Edge WebSocket",
       edgeReady: true,
     },
   },
   GPT20B: {
-    name: "Forge",
-    tierLabel: "TIER 02 · PRODUCTION WORKHORSE",
+    name: "Forge (2B)",
+    tierLabel: "TIER 02 · PRODUCTION WORKHORSE (2B)",
     tagline: "Fast Multi-Step Procedures & Component Cross-Reference",
     accentColor: "#f59e0b",
     accentBg: "rgba(245,158,11,0.08)",
     accentBorder: "rgba(245,158,11,0.25)",
-    engine: "Groq LPU / openai/gpt-oss-20b",
-    latency: "1.0s – 1.8s",
-    contextWindow: "128,000 tokens",
+    engine: "Forge 2B (Workshop Diagnostic Engine)",
+    latency: "600ms – 1.2s",
+    contextWindow: "8,192 tokens",
     hardwareTarget: "Plant Floor Gateway, On-Prem Linux Workstation",
     logoLight: "/forge-light.png",
     logoDark: "/forge-dark.png",
     summary:
-      "The high-throughput diagnostic workhorse. Interprets multi-page troubleshooting workflows, cross-references wiring schematics with physical part numbers, and formats step-by-step repair instructions for technicians.",
+      "The high-throughput 2B diagnostic workhorse. Interprets multi-page troubleshooting workflows, cross-references wiring schematics with physical part numbers, and formats step-by-step repair instructions for technicians.",
     keyStrengths: [
-      "Massive multi-page context ingestion (128k context)",
+      "2B parameter procedural reasoning",
       "Strict sequence ordering for maintenance procedures",
       "Extracts torque ratings, calibration tables, and tool requirements",
       "Pin-accurate wiring harness and connector trace analysis",
@@ -163,27 +163,27 @@ const MODELS_DATA: Record<ModelTierKey, ModelSpec> = {
       "Torque specs and gasket replacement order for hydraulic manifold",
     ],
     deploymentSpecs: {
-      memory: "16 GB RAM / Hybrid Gateway",
-      throughput: "240+ tokens/sec",
+      memory: "6 GB RAM / Hybrid Gateway",
+      throughput: "180+ tokens/sec",
       protocol: "Groq LPU API / SSE Stream",
       edgeReady: true,
     },
   },
   GPT120B: {
-    name: "Apex",
-    tierLabel: "TIER 03 · DEEP REASONING",
+    name: "Apex (4B Trained)",
+    tierLabel: "TIER 03 · DOMAIN-TRAINED DEEP REASONING (4B)",
     tagline: "Root-Cause Analysis & Safety-Critical Diagnostics",
     accentColor: "#8b5cf6",
     accentBg: "rgba(139,92,246,0.08)",
     accentBorder: "rgba(139,92,246,0.25)",
-    engine: "Groq LPU / openai/gpt-oss-120b",
-    latency: "2.0s – 3.8s",
-    contextWindow: "128,000 tokens",
+    engine: "Apex 4B (Domain-Trained Model)",
+    latency: "1.4s – 2.6s",
+    contextWindow: "16,384 tokens",
     hardwareTarget: "High-Throughput Groq LPU Cluster",
     logoLight: "/apex-light.png",
     logoDark: "/apex-dark.png",
     summary:
-      "The pinnacle of industrial diagnostic intelligence. Activates for complex cascading faults, cross-manual ambiguity, and safety-critical operations where any mistake risks catastrophic equipment failure or human injury.",
+      "The pinnacle of industrial diagnostic intelligence. Custom fine-tuned 4B parameter model trained on OEM manuals for complex cascading faults, cross-manual ambiguity, and safety-critical operations.",
     keyStrengths: [
       "Rigorous deductive reasoning across multiple interconnected systems",
       "Cross-manual disambiguation (e.g. G120 vs S120 identical fault codes)",
@@ -197,8 +197,8 @@ const MODELS_DATA: Record<ModelTierKey, ModelSpec> = {
       "Comprehensive failure mode & effects analysis (FMEA) for drive rack collapse",
     ],
     deploymentSpecs: {
-      memory: "Enterprise Cloud / Dedicated Secure LPU",
-      throughput: "180+ tokens/sec",
+      memory: "8 GB VRAM / Enterprise LPU",
+      throughput: "120+ tokens/sec",
       protocol: "Groq LPU API / Zero Retention",
       edgeReady: false,
     },
@@ -604,10 +604,16 @@ export default function ModelsPage() {
                   <td className="p-4 text-slate-800 dark:text-slate-200 font-semibold">Root Cause & Safety Critical</td>
                 </tr>
                 <tr>
+                  <td className="p-4 font-medium text-slate-600 dark:text-slate-400">Parameters</td>
+                  <td className="p-4 font-mono font-bold text-blue-600 dark:text-blue-400">1B (Edge-Optimized)</td>
+                  <td className="p-4 font-mono font-bold text-amber-600 dark:text-amber-400">2B (Workshop Diagnostic)</td>
+                  <td className="p-4 font-mono font-bold text-violet-600 dark:text-violet-400">4B (Domain-Trained)</td>
+                </tr>
+                <tr>
                   <td className="p-4 font-medium text-slate-600 dark:text-slate-400">Base LLM Engine</td>
-                  <td className="p-4 font-mono text-slate-700 dark:text-slate-300">groq/compound-mini (Groq LPU)</td>
-                  <td className="p-4 font-mono text-slate-700 dark:text-slate-300">openai/gpt-oss-20b (Groq LPU)</td>
-                  <td className="p-4 font-mono text-slate-700 dark:text-slate-300">openai/gpt-oss-120b (Groq LPU)</td>
+                  <td className="p-4 font-mono text-slate-700 dark:text-slate-300">Nord-1B (Groq LPU)</td>
+                  <td className="p-4 font-mono text-slate-700 dark:text-slate-300">Forge-2B (Groq LPU)</td>
+                  <td className="p-4 font-mono text-slate-700 dark:text-slate-300">Apex-4B Trained (Groq LPU)</td>
                 </tr>
                 <tr>
                   <td className="p-4 font-medium text-slate-600 dark:text-slate-400">Response Latency</td>
@@ -617,9 +623,9 @@ export default function ModelsPage() {
                 </tr>
                 <tr>
                   <td className="p-4 font-medium text-slate-600 dark:text-slate-400">Context Window</td>
+                  <td className="p-4 font-mono text-slate-700 dark:text-slate-300">4,096 tokens</td>
                   <td className="p-4 font-mono text-slate-700 dark:text-slate-300">8,192 tokens</td>
-                  <td className="p-4 font-mono text-slate-700 dark:text-slate-300">128,000 tokens</td>
-                  <td className="p-4 font-mono text-slate-700 dark:text-slate-300">128,000 tokens</td>
+                  <td className="p-4 font-mono text-slate-700 dark:text-slate-300">16,384 tokens</td>
                 </tr>
                 <tr>
                   <td className="p-4 font-medium text-slate-600 dark:text-slate-400">Edge / Offline Capable</td>

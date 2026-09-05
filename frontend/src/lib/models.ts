@@ -99,8 +99,8 @@ export const MODELS: AIModel[] = [
       { label: "P99 Latency", value: "142", unit: "ms" },
       { label: "Throughput", value: "14,900", unit: "q/s" },
       { label: "Accuracy", value: "99.2", unit: "%" },
-      { label: "Architecture", value: "Compound", unit: "MoE optimized" },
-      { label: "Context Window", value: "8,192", unit: "tokens" },
+      { label: "Parameters", value: "1B", unit: "Edge Active" },
+      { label: "Context Window", value: "4,096", unit: "tokens" },
     ],
     specs: [
       { label: "Base Model", value: "groq/compound-mini" },
@@ -108,7 +108,7 @@ export const MODELS: AIModel[] = [
       { label: "Vector DB", value: "pgvector + ChromaDB" },
       { label: "Embedding Model", value: "all-MiniLM-L6-v2 (Local)" },
       { label: "Embedding Dims", value: "384 (dense)" },
-      { label: "Max Context", value: "8,192 tokens" },
+      { label: "Max Context", value: "4,096 tokens" },
       { label: "Chunk Retrieval", value: "Top-k cosine similarity ≥ 0.70" },
       { label: "Deployment", value: "Groq Cloud / Edge Gateway" },
       { label: "Security", value: "Zero retention on inference" },
@@ -155,7 +155,7 @@ export const MODELS: AIModel[] = [
     latency: "1.0–1.8s",
     useCase: "Multi-step repair procedures, component cross-references, fault tree navigation",
     longDesc:
-      "Forge on Groq LPU is the industrial workhorse. Delivering multi-step, context-rich reasoning that mid-complexity troubleshooting demands. Built with 128k context support, it ingests detailed manual chapters, traces nested fault trees, and generates step-by-step repair procedures complete with tool requirements, torque specifications, and part cross-references.",
+      "Forge on Groq LPU is the industrial 2B diagnostic workhorse. Delivering multi-step, context-rich reasoning that mid-complexity troubleshooting demands. Built with 8k context support, it ingests detailed manual chapters, traces nested fault trees, and generates step-by-step repair procedures complete with tool requirements, torque specifications, and part cross-references.",
     features: [
       {
         title: "Multi-Step Procedures",
@@ -173,7 +173,7 @@ export const MODELS: AIModel[] = [
         icon: "🌲",
       },
       {
-        title: "128k Token Context",
+        title: "8k Token Context",
         desc: "Processes extensive manual chapters and engineering tables without chunk truncation.",
         icon: "📚",
       },
@@ -193,8 +193,8 @@ export const MODELS: AIModel[] = [
       { label: "P99 Latency", value: "2.1", unit: "s" },
       { label: "Throughput", value: "240", unit: "tokens/s" },
       { label: "Accuracy", value: "98.4", unit: "%" },
-      { label: "Context Window", value: "128K", unit: "tokens" },
-      { label: "Max Output", value: "4,096", unit: "tokens" },
+      { label: "Parameters", value: "2B", unit: "Workshop Active" },
+      { label: "Context Window", value: "8,192", unit: "tokens" },
     ],
     specs: [
       { label: "Base Model", value: "openai/gpt-oss-20b" },
@@ -202,7 +202,7 @@ export const MODELS: AIModel[] = [
       { label: "Vector Search", value: "pgvector (Postgres 16)" },
       { label: "Embedding Model", value: "all-MiniLM-L6-v2 (Local)" },
       { label: "Embedding Dims", value: "384" },
-      { label: "Max Context", value: "128,000 tokens" },
+      { label: "Max Context", value: "8,192 tokens" },
       { label: "Output Format", value: "Structured JSON + Citations" },
       { label: "RAG Strategy", value: "Dense retrieval + hybrid rank" },
       { label: "Compliance", value: "Zero retention inference" },
@@ -251,7 +251,7 @@ export const MODELS: AIModel[] = [
     latency: "2.0–3.8s",
     useCase: "Root cause analysis, safety-critical diagnostics, cross-manual disambiguation",
     longDesc:
-      "Apex on Groq LPU is MEND-X's maximum reasoning tier — purpose-engineered for scenarios where getting it wrong has real consequences. Delivering deep multi-hop reasoning, it handles cross-manual ambiguity (such as identical fault codes across SINAMICS G120 and S120), safety-critical diagnostics, and complex scenarios where surface symptoms mask deeper systemic issues.",
+      "Apex on Groq LPU is MEND-X's domain-trained 4B reasoning tier — purpose-engineered for scenarios where getting it wrong has real consequences. Delivering deep multi-hop reasoning, it handles cross-manual ambiguity (such as identical fault codes across SINAMICS G120 and S120), safety-critical diagnostics, and complex scenarios where surface symptoms mask deeper systemic issues.",
     features: [
       {
         title: "Multi-Hop Deductive Reasoning",
@@ -269,7 +269,7 @@ export const MODELS: AIModel[] = [
         icon: "⚠️",
       },
       {
-        title: "128k Deep Context",
+        title: "16k Deep Context",
         desc: "Processes complex technical schematics, wiring diagrams, and cross-chapter fault trees simultaneously.",
         icon: "📖",
       },
@@ -280,7 +280,7 @@ export const MODELS: AIModel[] = [
       },
       {
         title: "LPU Accelerated",
-        desc: "Full 120B parameter reasoning executed at LPU speeds without cloud server bottlenecks.",
+        desc: "Full 4B parameter domain-trained reasoning executed at LPU speeds without cloud server bottlenecks.",
         icon: "🚀",
       },
     ],
@@ -289,8 +289,8 @@ export const MODELS: AIModel[] = [
       { label: "P99 Latency", value: "4.2", unit: "s" },
       { label: "Throughput", value: "180", unit: "tokens/s" },
       { label: "Accuracy", value: "99.4", unit: "%" },
-      { label: "Context Window", value: "128K", unit: "tokens" },
-      { label: "Parameters", value: "120B", unit: "MoE dense active" },
+      { label: "Parameters", value: "4B", unit: "Domain-Trained Active" },
+      { label: "Context Window", value: "16,384", unit: "tokens" },
     ],
     specs: [
       { label: "Base Model", value: "openai/gpt-oss-120b" },
@@ -298,6 +298,7 @@ export const MODELS: AIModel[] = [
       { label: "Vector DB", value: "pgvector + ChromaDB" },
       { label: "Embedding Model", value: "all-MiniLM-L6-v2 (Local)" },
       { label: "Embedding Dims", value: "384" },
+      { label: "Max Context", value: "16,384 tokens" },
       { label: "Max Tokens", value: "4,096 output" },
       { label: "Output Format", value: "Structured JSON + Reasoning Trace" },
       { label: "RAG Guardrail", value: "Deterministic zero-hallucination mask" },
@@ -307,7 +308,7 @@ export const MODELS: AIModel[] = [
       {
         scenario: "SINAMICS G120 vs S120 cross-manual code ambiguity",
         response:
-          "GPT-OSS 120B identifies that F001 represents power unit overcurrent on G120 but vector module overcurrent on S120, isolating the right procedure.",
+          "Apex 4B Trained identifies that F001 represents power unit overcurrent on G120 but vector module overcurrent on S120, isolating the right procedure.",
       },
       {
         scenario: "Cascading bus fault with simultaneous motor encoder feedback loss",
