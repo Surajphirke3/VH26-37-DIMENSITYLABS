@@ -13,8 +13,11 @@ dist/
 *.env.local
 
 # Uploads
+uploads/
 backend/uploads/
 backend/demo_manuals/
+MainManuals/
+/*.pdf
 
 # Node
 frontend/node_modules/

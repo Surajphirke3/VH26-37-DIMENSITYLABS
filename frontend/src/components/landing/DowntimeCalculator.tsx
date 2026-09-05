@@ -16,7 +16,7 @@ export default function DowntimeCalculator() {
     new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(val);
 
   return (
-    <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-24 border-t border-[var(--border)]">
+    <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-28 border-t border-[var(--border)] scroll-mt-28">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         <div className="animate-slide-in-left">
           <span className="inline-block font-mono text-[10px] uppercase font-bold text-rose-500 tracking-widest bg-rose-500/10 px-3 py-1 rounded-full border border-rose-500/20 mb-4">

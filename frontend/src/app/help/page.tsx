@@ -78,7 +78,7 @@ export default function HelpPage() {
 
   return (
     <LandingLayout>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-amber-500 mb-1">

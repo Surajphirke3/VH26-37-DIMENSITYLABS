@@ -32,7 +32,7 @@ export default function StructuredAnswer({ response, onSuggestionClick }: Props)
       {/* Header row */}
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-2 flex-wrap">
-          <ConfidenceBadge level={response.confidence_level} />
+          <ConfidenceBadge level={response.confidence_level} score={response.evidence_score} />
           {modelUsed && (
             <span className="inline-flex items-center gap-1 text-[11px] font-mono px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-500 border border-amber-500/20 font-medium">
               <Cpu className="w-3 h-3" />

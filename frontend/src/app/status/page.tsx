@@ -16,7 +16,7 @@ import {
   Shield,
   Layers,
 } from "lucide-react";
-import LandingLayout from "@/components/landing/LandingLayout";
+import ConsoleLayout from "@/components/console/ConsoleLayout";
 import { getSystemStatus } from "@/lib/api";
 import { SystemStatusData } from "@/lib/types";
 
@@ -93,8 +93,8 @@ export default function SystemStatusPage() {
     (data.database?.status === "connected" || data.database?.status.includes("sqlite"));
 
   return (
-    <LandingLayout>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <ConsoleLayout>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Top Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
@@ -252,7 +252,7 @@ export default function SystemStatusPage() {
               <div className="flex justify-between py-1.5 border-b border-border/70">
                 <span className="text-muted-foreground">Default Model:</span>
                 <span className="font-mono font-bold text-amber-500">
-                  {data?.groq?.default_model || "llama-3.3-70b-versatile"}
+                  {data?.groq?.default_model || "openai/gpt-oss-120b"}
                 </span>
               </div>
               <div className="flex justify-between py-1.5 border-b border-border/70">
@@ -267,7 +267,7 @@ export default function SystemStatusPage() {
               </div>
               <div className="flex justify-between py-1.5">
                 <span className="text-muted-foreground">Vision Preview:</span>
-                <span className="font-mono text-foreground">Enabled (llama-3.2-11b)</span>
+                <span className="font-mono text-foreground">Multimodal (Text-Grounded)</span>
               </div>
             </div>
           </div>
@@ -374,6 +374,6 @@ export default function SystemStatusPage() {
           </div>
         </div>
       </div>
-    </LandingLayout>
+    </ConsoleLayout>
   );
 }

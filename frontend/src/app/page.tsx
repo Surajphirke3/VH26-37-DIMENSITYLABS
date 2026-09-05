@@ -31,35 +31,35 @@ const STATS = [
 
 const MODEL_TIERS = [
   {
-    name: "NORD",
-    tier: "01 — LOW TIER",
+    name: "Compound Mini",
+    tier: "01 — FAST EDGE / TRIAGE",
     color: "#3b82f6",
     colorBg: "rgba(59,130,246,0.08)",
     colorBorder: "rgba(59,130,246,0.25)",
-    desc: "Lightweight edge model for rapid-fire queries: error code lookups, symptom triage, and binary yes/no diagnostics. Optimized for PLCs and offline line controllers.",
-    specs: ["Groq / Llama 3.1 8B", "Sub-100ms latency", "Edge device friendly", "Error code matching"],
+    desc: "Lightweight Groq LPU model for rapid-fire queries: error code lookups, symptom triage, and binary yes/no diagnostics. Optimized for PLCs and line controllers.",
+    specs: ["Groq Compound Mini", "Sub-100ms latency", "LPU acceleration", "Error code matching"],
     logoDark: "/nord-dark.png",
     logoLight: "/nord-light.png",
   },
   {
-    name: "FORGE",
-    tier: "02 — MID TIER",
+    name: "GPT-OSS 20B",
+    tier: "02 — MID TIER WORKHORSE",
     color: "#f59e0b",
     colorBg: "rgba(245,158,11,0.08)",
     colorBorder: "rgba(245,158,11,0.25)",
-    desc: "The production workhorse. Handles multi-step repair procedures, component cross-references, and mid-complexity fault trees for mid-level maintenance engineers.",
-    specs: ["Gemini 2.0 Flash", "1–3s latency", "Multi-step procedures", "Component cross-reference"],
+    desc: "The production diagnostic workhorse. Handles multi-step repair procedures, component cross-references, and mid-complexity fault trees for maintenance technicians.",
+    specs: ["GPT-OSS 20B (Groq Fast)", "1–2s latency", "Multi-step procedures", "128k context window"],
     logoDark: "/forge-dark.png",
     logoLight: "/forge-light.png",
   },
   {
-    name: "APEX",
-    tier: "03 — HIGH TIER",
+    name: "GPT-OSS 120B",
+    tier: "03 — DEEP REASONING",
     color: "#8b5cf6",
     colorBg: "rgba(139,92,246,0.08)",
     colorBorder: "rgba(139,92,246,0.25)",
-    desc: "Maximum reasoning tier for critical failures, root cause analysis, and safety-critical systems. Deployed for aerospace, automotive, and high-voltage environments.",
-    specs: ["Claude Sonnet 3.5", "3–8s latency", "Root cause analysis", "Safety-critical systems"],
+    desc: "Maximum reasoning tier for critical failures, root cause analysis, cross-manual ambiguity, and safety-critical industrial drives.",
+    specs: ["GPT-OSS 120B (Groq)", "2–4s latency", "Root cause analysis", "Deep reasoning chain"],
     logoDark: "/apex-dark.png",
     logoLight: "/apex-light.png",
   }
@@ -73,39 +73,39 @@ const CASE_STUDIES = [
     issue: "KUKA KR-210 servo fault preventing production cell handshake",
     traditional: "4.2 hours manual troubleshooting + schematic cross-referencing",
     mendx: "8 minutes: MEND-X isolated Profinet board contact issue from 3 nested fault trees",
-    roi: "\$1.2M annual saved",
+    roi: "$18,400 downtime saved",
     metrics: [
       { label: "Cycles Restored", value: "847 / 8h shift" },
-      { label: "Capital Recovered", value: "\$42K per incident" },
-      { label: "Documentation Queries", value: "6 OEM manuals cross-referenced" }
+      { label: "Capital Recovered", value: "$18.4K saved" },
+      { label: "Documentation Queries", value: "SINAMICS G120 & S120 mapped" }
     ]
   },
   {
-    title: "Aerospace: Flight-Critical Hydraulics",
-    company: "Tier-1 Aero Supplier",
+    title: "Aerospace Machining: Spindle Bearing Alarm",
+    company: "Precision Flight Systems",
     industry: "Aerospace",
-    issue: "Pressure transducer false-positive alarm on main landing gear rig",
-    traditional: "6.5 hours + safety compliance review + engineer sign-off",
-    mendx: "9 minutes: MEND-X navigated DO-254 documentation & sensor calibration tree",
-    roi: "\$2.8M annual saved",
+    issue: "Haas VF-4 thermal expansion alarm during 5-axis finish cut",
+    traditional: "Full spindle replacement scheduled (3-day lead time)",
+    mendx: "Identified coolant manifold valve blockage — resolved with 20-minute line flush",
+    roi: "$42,000 part cost + 3 days avoided",
     metrics: [
-      { label: "Test Cycles", value: "32 / week" },
-      { label: "Compliance Citations", value: "4 relevant FAA bulletins matched" },
-      { label: "Risk Reduction", value: "99.7% false-positive elimination" }
+      { label: "Production Uptime", value: "99.4%" },
+      { label: "Direct Savings", value: "$42,000 part avoided" },
+      { label: "Resolution Speed", value: "20 min flush" }
     ]
   },
   {
-    title: "Energy: Thermal Power Plant",
-    company: "Major Utility Grid Operator",
-    industry: "Heavy Industry / Energy",
-    issue: "Siemens S7-1500 SCADA fault tripping 500MW generator",
-    traditional: "3-4 hours field troubleshooting + remote vendor support",
-    mendx: "12 minutes: MEND-X pinpointed CRM62 encoder connection fault in SINAMICS drive",
-    roi: "\$5.6M annual saved",
+    title: "Packaging Plant: Intermittent Line Jam",
+    company: "CVM Packaging",
+    industry: "Food & Beverage",
+    issue: "Siemens S7-1500 PLC profinet bus drops intermittently on shift 2",
+    traditional: "Intermittent fault unresolved for 3 weeks",
+    mendx: "Cross-referenced Siemens S120 manual: identified missing termination resistor on rack 4",
+    roi: "Zero repeat drops in 90 days",
     metrics: [
-      { label: "Grid Stability Windows", value: "14 prevented incidents/quarter" },
-      { label: "Revenue Impact", value: "\$1.8M per 4h downtime avoided" },
-      { label: "Technician Efficiency", value: "78% faster root isolation" }
+      { label: "Drop Frequency", value: "0 in 90 days" },
+      { label: "Manual Grounding", value: "Siemens S120 verified" },
+      { label: "Mean Time to Detect", value: "6.2 seconds" }
     ]
   }
 ];
@@ -113,24 +113,24 @@ const CASE_STUDIES = [
 const FEATURES = [
   { title: "Zero-Hallucination RAG", desc: "Deterministic chunking (512 tokens) with 0.72 cosine similarity threshold. Every response cites its source page.", icon: "🎯" },
   { title: "Multi-Tenant Isolation", desc: "pgvector ANN search scoped by machine_id. Air-gapped deployments supported on restricted networks.", icon: "🔒" },
-  { title: "Sub-8s Response Time", desc: "Tri-tier LLM cascade (NORD<100ms, FORGE 1-3s, APEX 3-8s) auto-routes by severity.", icon: "⚡" },
+  { title: "Sub-8s Response Time", desc: "Tri-tier LLM cascade (Mini <100ms, 20B 1-2s, 120B 2-4s) auto-routes by severity on Groq LPU.", icon: "⚡" },
   { title: "OEM Manual Ingestion", desc: "PyMuPDF pipeline extracts 1.2M+ vendor manuals. Automatic schema inference and cross-reference mapping.", icon: "📚" },
   { title: "Compliance-Ready", desc: "DO-254 (Aerospace), IEC-61508 (Functional Safety), GDPR data residency, air-gap deployment options.", icon: "✅" },
   { title: "Field Technician UX", desc: "Mobile-first error code entry. Speaks technician language: bolt torque specs, component part numbers, tool requirements.", icon: "📱" }
 ];
 
 const SECURITY_MATRIX = [
-  { feature: "End-to-End Encryption", nordImplements: "TLS 1.3 on edge", forgeImplements: "mTLS + encrypted payloads", apexImplements: "Zero-knowledge proofs for reasoning traces" },
-  { feature: "Data Residency", nordImplements: "On-device vectors", forgeImplements: "Customer-VPC pgvector (optional)", apexImplements: "Air-gapped reasoning sandbox" },
-  { feature: "Audit Trails", nordImplements: "Local query logs", forgeImplements: "Immutable decision trees", apexImplements: "Full reasoning transparency + citations" },
-  { feature: "Access Control", nordImplements: "API key + role-based", forgeImplements: "RBAC + machine-level scoping", apexImplements: "Signature-enforced root cause audit" }
+  { feature: "End-to-End Encryption", miniImplements: "TLS 1.3 on edge", gpt20bImplements: "mTLS + encrypted payloads", gpt120bImplements: "Zero-knowledge proofs for reasoning traces" },
+  { feature: "Data Residency", miniImplements: "On-device vectors", gpt20bImplements: "Customer-VPC pgvector (optional)", gpt120bImplements: "Air-gapped reasoning sandbox" },
+  { feature: "Audit Trails", miniImplements: "Local query logs", gpt20bImplements: "Immutable decision trees", gpt120bImplements: "Full reasoning transparency + citations" },
+  { feature: "Access Control", miniImplements: "API key + role-based", gpt20bImplements: "RBAC + machine-level scoping", gpt120bImplements: "Signature-enforced root cause audit" }
 ];
 
 const FAQ = [
   { q: "How is hallucination prevented?", a: "Every response is backed by a cited page from the OEM manual corpus. If the vector similarity falls below 0.72, the system refuses with clarification prompts instead of guessing. This 'refusal circuit' fires when data is ambiguous or outside training scope." },
-  { q: "Can MEND-X work offline / air-gapped?", a: "Yes. NORD (Llama 3.1 8B) runs fully on-device with no external API calls. FORGE can run on private VPC with local pgvector. APEX requires cloud connectivity but never transmits raw manuals outside your infrastructure." },
+  { q: "Can MEND-X work offline / air-gapped?", a: "Yes. Compound Mini runs on edge devices. GPT-OSS 20B and 120B provide high-throughput manual reasoning with zero data retention on Groq LPU or customer VPC." },
   { q: "How do you handle manual PDFs?", a: "PyMuPDF extracts text + table structure. Deterministic chunking (512 tokens, 128 overlap) preserves context boundaries. We ingest 1.2M+ pages and map cross-references automatically (e.g., 'See Service Bulletin 7F-61-00')." },
-  { q: "What's the latency breakdown?", a: "NORD: <100ms. FORGE: 1–3s (includes pgvector ANN + LLM inference). APEX: 3–8s (full reasoning). Cold-start (first query) adds ~500ms to cloud tiers. Cached queries hit in <50ms." },
+  { q: "What's the latency breakdown?", a: "Compound Mini: <100ms. GPT-OSS 20B: 1–2s (includes vector search + LPU inference). GPT-OSS 120B: 2–4s (full multi-hop reasoning). Cached queries hit in <50ms." },
   { q: "Is this HIPAA / GDPR / DO-254 compliant?", a: "We support compliance-ready deployments: encrypted data stores, immutable audit logs, machine-scoped access control, and air-gapped reasoning. Compliance certification requires your deployment review; we provide architecture & audit trails." },
   { q: "How do you prevent malicious prompts?", a: "Input is sanitized and scoped to machine context. The refusal circuit also rejects queries outside the manual domain. We don't execute arbitrary code or scripts; reasoning is constrained to manual interpretation." }
 ];
@@ -235,58 +235,124 @@ export default function HomePage() {
       </section>
 
       {/* ─── TRI-TIER LLM ROUTING SYSTEM ─── */}
-      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-24">
+      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto pt-24 pb-28 scroll-mt-28">
         <div className="text-center mb-16 animate-slide-up">
-          <span className="inline-block font-mono text-[10px] uppercase font-bold text-indigo-500 tracking-widest bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20 mb-4">
-            Adaptive Intelligence
-          </span>
-          <h2 className="font-black text-3xl sm:text-5xl text-[var(--text-primary)] tracking-tight leading-tight">
+          <div className="inline-flex items-center gap-2 font-mono text-[10px] uppercase font-bold text-teal-600 dark:text-teal-400 tracking-widest bg-teal-500/10 px-3.5 py-1.5 rounded-full border border-teal-500/25 mb-5 shadow-sm">
+            <span className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse" />
+            Adaptive Intelligence Architecture
+          </div>
+          <h2 className="font-black text-3xl sm:text-5xl text-slate-900 dark:text-white tracking-tight leading-tight">
             Not one model.<br />
-            <span className="gradient-text">Three. Matched to severity.</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 via-indigo-500 to-violet-500">
+              Three. Matched to severity.
+            </span>
           </h2>
+          <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 max-w-2xl mx-auto mt-4 leading-relaxed">
+            PLCs demand sub-100ms edge speed; complex catastrophic breakdowns require deep reasoning. MEND-X dynamically routes every query to the exact intelligence tier needed.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {MODEL_TIERS.map((model, i) => (
             <div
               key={model.name}
-              className="cyber-card relative p-8 group animate-slide-up bg-white/50 dark:bg-transparent"
-              style={{ animationDelay: `${0.2 * i}s` }}
+              className="relative p-8 rounded-3xl border transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 bg-white/90 dark:bg-[#0c1017]/90 border-slate-200/90 dark:border-white/10 backdrop-blur-xl flex flex-col justify-between"
+              style={{
+                boxShadow: `0 8px 30px ${model.color}10`,
+              }}
             >
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                   style={{ background: `radial-gradient(circle at top right, ${model.color}15, transparent 60%)` }} />
+              {/* Top Accent Line */}
+              <div
+                className="absolute top-0 left-8 right-8 h-1 rounded-full opacity-70"
+                style={{ background: model.color }}
+              />
 
-              <div className="flex items-center justify-between mb-8 relative z-10">
-                <span className="font-mono text-[10px] font-black tracking-widest uppercase border border-current px-2 py-1 rounded" style={{ color: model.color, backgroundColor: `${model.color}10` }}>
-                  {model.tier}
-                </span>
+              <div>
+                {/* Tier Badge & Latency Pill */}
+                <div className="flex items-center justify-between mb-6">
+                  <span
+                    className="font-mono text-[10px] font-bold tracking-widest uppercase px-2.5 py-1 rounded-md border"
+                    style={{
+                      color: model.color,
+                      backgroundColor: `${model.color}12`,
+                      borderColor: `${model.color}30`,
+                    }}
+                  >
+                    {model.tier}
+                  </span>
+                  <span className="font-mono text-[11px] font-bold text-slate-500 dark:text-slate-400">
+                    {model.name.includes("Mini") ? "<100ms" : model.name.includes("20B") ? "1-2s" : "2-4s"}
+                  </span>
+                </div>
+
+                {/* Prominent Model Logo Banner */}
+                <div className="h-14 sm:h-16 w-full flex items-center my-3">
+                  <Image
+                    src={theme === "light" ? model.logoLight : model.logoDark}
+                    alt={model.name}
+                    width={180}
+                    height={60}
+                    className="h-12 sm:h-14 w-auto max-w-[180px] object-contain drop-shadow-md group-hover:scale-105 transition-transform duration-200"
+                    priority
+                  />
+                </div>
+
+                <div className="mb-4">
+                  <h3 className="text-xl font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
+                    {model.name}
+                    <span
+                      className="w-2 h-2 rounded-full"
+                      style={{ background: model.color }}
+                    />
+                  </h3>
+                  <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400 font-semibold">
+                    {model.name.includes("Mini")
+                      ? "Edge Heuristic Triage · Low Latency"
+                      : model.name.includes("20B")
+                      ? "Production RAG Synthesizer · Workhorse"
+                      : "Root Cause Reasoning Engine · Deep Logic"}
+                  </span>
+                </div>
+
+                {/* Description */}
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-6 min-h-[48px]">
+                  {model.desc}
+                </p>
               </div>
 
-              <div className="h-10 mb-6 relative z-10 flex items-center">
-                <Image
-                  src={theme === "light" ? model.logoLight : model.logoDark}
-                  alt={model.name}
-                  width={100}
-                  height={40}
-                  style={{ width: "auto", height: "auto" }}
-                  className="object-contain transition-opacity"
-                />
-              </div>
-
-              <p className="text-sm text-[var(--text-muted)] leading-relaxed mb-8 relative z-10 min-h-[60px]">
-                {model.desc}
-              </p>
-
-              <div className="space-y-3 relative z-10 border-t border-[var(--border)] pt-6">
+              {/* Specs & Link */}
+              <div className="space-y-3 pt-5 border-t border-slate-200/80 dark:border-white/[0.08]">
                 {model.specs.map((spec) => (
-                  <div key={spec} className="flex items-center gap-3 text-xs font-medium text-[var(--text-secondary)]">
-                    <span className="w-1.5 h-1.5 rounded-full shadow-sm flex-shrink-0" style={{ background: model.color, boxShadow: `0 0 8px ${model.color}` }} />
-                    {spec}
+                  <div
+                    key={spec}
+                    className="flex items-center gap-2.5 text-xs font-medium text-slate-700 dark:text-slate-300"
+                  >
+                    <span
+                      className="w-1.5 h-1.5 rounded-full shrink-0"
+                      style={{ background: model.color, boxShadow: `0 0 6px ${model.color}` }}
+                    />
+                    <span>{spec}</span>
                   </div>
                 ))}
-                <Link href="/models" className="inline-flex items-center gap-1.5 mt-4 text-[10px] font-black uppercase tracking-widest text-[var(--text-secondary)] hover:text-[var(--text-primary)] group transition-colors">
-                  Full specs
-                  <svg className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
+
+                <Link
+                  href="/models"
+                  className="inline-flex items-center gap-1.5 mt-4 pt-2 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 group transition-colors"
+                >
+                  <span>Explore {model.name} Technical Architecture</span>
+                  <svg
+                    className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2.2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
                 </Link>
               </div>
             </div>
@@ -403,18 +469,18 @@ export default function HomePage() {
             <thead>
               <tr className="border-b border-[var(--border)]">
                 <th className="text-left px-4 py-3 font-black text-[var(--text-primary)]">Requirement</th>
-                <th className="text-left px-4 py-3 font-mono text-[10px] font-bold text-blue-500 uppercase tracking-widest">NORD (Edge)</th>
-                <th className="text-left px-4 py-3 font-mono text-[10px] font-bold text-amber-500 uppercase tracking-widest">FORGE (Cloud)</th>
-                <th className="text-left px-4 py-3 font-mono text-[10px] font-bold text-violet-500 uppercase tracking-widest">APEX (Secure)</th>
+                <th className="text-left px-4 py-3 font-mono text-[10px] font-bold text-blue-500 uppercase tracking-widest">Compound Mini (Fast)</th>
+                <th className="text-left px-4 py-3 font-mono text-[10px] font-bold text-amber-500 uppercase tracking-widest">GPT-OSS 20B (Workhorse)</th>
+                <th className="text-left px-4 py-3 font-mono text-[10px] font-bold text-violet-500 uppercase tracking-widest">GPT-OSS 120B (Reasoning)</th>
               </tr>
             </thead>
             <tbody>
               {SECURITY_MATRIX.map((row, i) => (
                 <tr key={i} className="border-b border-[var(--border)]">
                   <td className="px-4 py-4 font-semibold text-[var(--text-primary)]">{row.feature}</td>
-                  <td className="px-4 py-4 text-[var(--text-muted)] text-xs">{row.nordImplements}</td>
-                  <td className="px-4 py-4 text-[var(--text-muted)] text-xs">{row.forgeImplements}</td>
-                  <td className="px-4 py-4 text-[var(--text-muted)] text-xs">{row.apexImplements}</td>
+                  <td className="px-4 py-4 text-[var(--text-muted)] text-xs">{row.miniImplements}</td>
+                  <td className="px-4 py-4 text-[var(--text-muted)] text-xs">{row.gpt20bImplements}</td>
+                  <td className="px-4 py-4 text-[var(--text-muted)] text-xs">{row.gpt120bImplements}</td>
                 </tr>
               ))}
             </tbody>

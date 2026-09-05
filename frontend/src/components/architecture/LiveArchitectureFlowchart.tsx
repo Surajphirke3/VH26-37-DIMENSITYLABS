@@ -141,54 +141,54 @@ const ARCHITECTURE_NODES: Record<string, ArchitectureNode> = {
     name: "Adaptive Model Cascade Router",
     subsystem: "LLM Orchestration Hub",
     tech: "Complexity & Urgency Dispatcher",
-    fileSource: "backend/app/services/rag/generator.py",
+    fileSource: "backend/app/services/ai/model_router.py",
     description: "Dispatches query to optimal intelligence tier based on query complexity score, latency budget, and context window demands.",
     latencyBudget: "< 4ms",
     inputContract: `{\n  "query_type": "ERROR_CODE",\n  "evidence_score": 0.892,\n  "complexity_score": 0.32\n}`,
-    outputContract: `{\n  "selected_tier": "FORGE",\n  "model_id": "gemini-2.0-flash",\n  "max_tokens": 1024\n}`,
-    codeSnippet: `def route_model(query_type: QueryType, complexity: float) -> str:\n    if query_type == QueryType.ERROR_CODE and complexity < 0.25:\n        return "NORD"   # Edge Llama 3.1 (<100ms)\n    elif complexity < 0.70:\n        return "FORGE"  # Gemini 2.0 Flash (1-3s)\n    else:\n        return "APEX"   # Claude 3.5 Sonnet (3-8s)`,
+    outputContract: `{\n  "selected_tier": "GPT-OSS 120B",\n  "model_id": "openai/gpt-oss-120b",\n  "max_tokens": 4096\n}`,
+    codeSnippet: `def route_model(task: str, complexity: float) -> str:\n    if task == "error_code_triage":\n        return "openai/gpt-oss-20b"      # Fast triage (<100ms)\n    elif complexity < 0.70:\n        return "openai/gpt-oss-20b"      # Multi-step (1-2s)\n    else:\n        return "openai/gpt-oss-120b"     # Deep reasoning (2-3s)`,
     tier: "inference",
     statusColor: "#6366f1"
   },
   model_nord: {
     id: "model_nord",
-    name: "NORD Edge Triage (Tier 1)",
-    subsystem: "Sub-100ms Local Inference",
-    tech: "Llama 3.1 8B Instruct (vLLM / ONNX)",
-    fileSource: "backend/app/services/ai/nord_service.py",
+    name: "Groq Compound Mini (Fast Edge)",
+    subsystem: "Sub-100ms Groq LPU Inference",
+    tech: "groq/compound-mini (Groq LPU)",
+    fileSource: "backend/app/services/ai/groq.py",
     description: "Blazing fast edge inference for instant fault code lookups, sensor parameter ranges, and urgent safety instructions.",
     latencyBudget: "< 95ms",
-    inputContract: `{\n  "system": "OEM Grounded Assistanct",\n  "context": "Sec 4.2 Haas VF-2 Spindle E-402...",\n  "query": "E-402"\n}`,
+    inputContract: `{\n  "system": "OEM Grounded Assistant",\n  "context": "Sec 4.2 Haas VF-2 Spindle E-402...",\n  "query": "E-402"\n}`,
     outputContract: `{\n  "error_meaning": "Spindle VFD Overcurrent",\n  "step_1": "Inspect coolant pump fuse",\n  "confidence": "HIGH"\n}`,
-    codeSnippet: `async def generate_nord(prompt: str, context: str) -> dict:\n    return await edge_client.chat.completions.create(\n        model="llama-3.1-8b-instruct",\n        messages=[{"role": "system", "content": SYS_PROMPT}, {"role": "user", "content": prompt}],\n        temperature=0.0\n    )`,
+    codeSnippet: `async def generate_mini(prompt: str, context: str) -> dict:\n    return await groq_client.chat.completions.create(\n        model="groq/compound-mini",\n        messages=[{"role": "system", "content": SYS_PROMPT}, {"role": "user", "content": prompt}],\n        temperature=0.0\n    )`,
     tier: "inference",
     statusColor: "#3b82f6"
   },
   model_forge: {
     id: "model_forge",
-    name: "FORGE Procedural Engine (Tier 2)",
-    subsystem: "Balanced Multi-Step Specialist",
-    tech: "Gemini 2.0 Flash (Structured JSON)",
-    fileSource: "backend/app/services/ai/forge_service.py",
+    name: "GPT-OSS 20B (Diagnostic Engine)",
+    subsystem: "High-Throughput Procedural Specialist",
+    tech: "openai/gpt-oss-20b (Structured JSON)",
+    fileSource: "backend/app/services/ai/groq.py",
     description: "High-speed reasoning model capable of generating ordered assembly steps, torque sequences, and verified tooling requirements.",
-    latencyBudget: "1.2–2.4s",
+    latencyBudget: "1.0–1.8s",
     inputContract: `{\n  "schema": RepairProcedureSchema,\n  "context": [...],\n  "query": "E-402 corrective procedure"\n}`,
     outputContract: `{\n  "root_cause": "VFD Overcurrent Trip",\n  "steps": ["Step 1: Lockout tagout", "Step 2: Check inverter heatsink", "Step 3: Measure 480V line"],\n  "citations": [87, 88]\n}`,
-    codeSnippet: `async def generate_forge(prompt: str, chunks: list[Chunk]) -> dict:\n    return await gemini_client.models.generate_content(\n        model="gemini-2.0-flash",\n        contents=format_rag_prompt(prompt, chunks),\n        config={"response_mime_type": "application/json"}\n    )`,
+    codeSnippet: `async def generate_gpt20b(prompt: str, chunks: list[Chunk]) -> dict:\n    return await groq_client.chat.completions.create(\n        model="openai/gpt-oss-20b",\n        messages=[{"role": "user", "content": format_rag(prompt, chunks)}],\n        response_format={"type": "json_object"}\n    )`,
     tier: "inference",
     statusColor: "#f59e0b"
   },
   model_apex: {
     id: "model_apex",
-    name: "APEX Deep Reasoning (Tier 3)",
+    name: "GPT-OSS 120B (Deep Reasoning)",
     subsystem: "Multi-Source Diagnostic Sovereign",
-    tech: "Claude 3.5 Sonnet (Extended Reasoning)",
-    fileSource: "backend/app/services/ai/apex_service.py",
-    description: "Deep analytical synthesis for multi-system cascade failures, complex electrical schematics, and root cause disambiguation.",
-    latencyBudget: "3.5–7.2s",
+    tech: "openai/gpt-oss-120b (128k Deep Context)",
+    fileSource: "backend/app/services/ai/groq.py",
+    description: "Deep analytical synthesis for multi-system cascade failures, complex electrical schematics, and cross-manual disambiguation.",
+    latencyBudget: "2.0–3.8s",
     inputContract: `{\n  "multi_manual_context": 12000_tokens,\n  "cross_references": 8,\n  "schematics": true\n}`,
     outputContract: `{\n  "cascading_failure_analysis": "Primary failure at harmonic drive bearing...",\n  "corrective_workflow": [...],\n  "preventive_mtbf": "2400 hours"\n}`,
-    codeSnippet: `async def generate_apex(prompt: str, chunks: list[Chunk]) -> dict:\n    return await anthropic_client.messages.create(\n        model="claude-3-5-sonnet-20241022",\n        max_tokens=2048,\n        messages=[{"role": "user", "content": format_deep_rag(prompt, chunks)}]\n    )`,
+    codeSnippet: `async def generate_gpt120b(prompt: str, chunks: list[Chunk]) -> dict:\n    return await groq_client.chat.completions.create(\n        model="openai/gpt-oss-120b",\n        max_tokens=4096,\n        messages=[{"role": "user", "content": format_deep_rag(prompt, chunks)}],\n        response_format={"type": "json_object"}\n    )`,
     tier: "inference",
     statusColor: "#8b5cf6"
   },
@@ -244,13 +244,13 @@ const SCENARIOS: Scenario[] = [
       "citation_hydrator",
       "sse_streamer"
     ],
-    expectedModel: "FORGE",
+    expectedModel: "GPT-OSS 20B",
     expectedOutcome: "success",
     metrics: {
       totalLatency: "1,240 ms",
       evidenceScore: 0.89,
       citations: 3,
-      model: "FORGE (Gemini 2.0)"
+      model: "GPT-OSS 20B (Groq Fast)"
     }
   },
   {
@@ -303,10 +303,10 @@ const SCENARIOS: Scenario[] = [
   {
     id: "scenario_apex_root_cause",
     title: "4. Multi-Axis Thermal Drift (Deep Root Cause)",
-    badge: "APEX Deep Synthesis",
+    badge: "Deep Reasoning Synthesis",
     badgeColor: "bg-violet-500/10 text-violet-500 border-violet-500/20",
     query: "Simultaneous thermal elongation on X/Y ball screws with hydraulic back-pressure spike",
-    description: "High-complexity diagnostic inquiry across multiple sub-assemblies. Routed directly to APEX for cross-chapter causal graph generation.",
+    description: "High-complexity diagnostic inquiry across multiple sub-assemblies. Routed directly to GPT-OSS 120B for cross-chapter causal graph generation.",
     expectedRoute: [
       "client_gateway",
       "classifier",
@@ -320,13 +320,13 @@ const SCENARIOS: Scenario[] = [
       "citation_hydrator",
       "sse_streamer"
     ],
-    expectedModel: "APEX",
+    expectedModel: "GPT-OSS 120B",
     expectedOutcome: "success",
     metrics: {
-      totalLatency: "4,680 ms",
+      totalLatency: "2,680 ms",
       evidenceScore: 0.94,
       citations: 6,
-      model: "APEX (Claude 3.5 Sonnet)"
+      model: "GPT-OSS 120B (Groq LPU)"
     }
   }
 ];
@@ -753,7 +753,7 @@ export default function LiveArchitectureFlowchart() {
               <span className="text-[11px] font-mono uppercase tracking-wider font-bold text-indigo-600 dark:text-indigo-400">
                 Tier 5 · Adaptive Model Cascade Router
               </span>
-              <span className="text-[10px] font-mono text-[var(--text-muted)]">NORD &lt;100ms | FORGE 1–3s | APEX 3–8s</span>
+              <span className="text-[10px] font-mono text-[var(--text-muted)]">Mini &lt;100ms | 20B 1–2s | 120B 2–4s</span>
             </div>
 
             <FlowNodeCard

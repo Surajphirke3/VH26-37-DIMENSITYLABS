@@ -81,16 +81,34 @@ class CrossEncoderReranker:
         if not chunks:
             return []
 
+        import re
+        error_code_matches = re.findall(r"\b[A-Z]{1,4}[-_]?\d{2,5}\b", query)
+
         scored = self._strategy.score(query, chunks)
         if not scored:
             # Fallback to original order
             return chunks[:top_k]
 
+        # Give strong boost to chunks that contain the exact queried error code
+        boosted_scored = []
+        for chunk, score in scored:
+            boost = 0.0
+            if error_code_matches:
+                content_lower = chunk.content.lower()
+                for code in error_code_matches:
+                    cl = code.lower()
+                    if cl in content_lower:
+                        boost += 6.0
+                    present = getattr(chunk, "error_codes_present", None)
+                    if present and any(cl == ec.lower() for ec in present):
+                        boost += 6.0
+            boosted_scored.append((chunk, float(score) + boost))
+
         import math
-        # Sort descending by raw score
-        scored.sort(key=lambda x: x[1], reverse=True)
+        # Sort descending by boosted score
+        boosted_scored.sort(key=lambda x: x[1], reverse=True)
         reranked = []
-        for chunk, score in scored[:top_k]:
+        for chunk, score in boosted_scored[:top_k]:
             raw_val = float(score)
             # Sigmoid normalization maps any logit (-inf, +inf) to (0.0, 1.0)
             try:

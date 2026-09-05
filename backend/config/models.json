@@ -1,29 +1,49 @@
 {
   "providers": {
-    "groq": {
+    "ollama": {
       "enabled": true,
-      "default_model": "qwen/qwen3.8-27b",
+      "default_model": "qwen3.5:9b",
       "models": [
         {
-          "id": "openai/gpt-oss-20b",
-          "name": "NORD — Fast Diagnostics",
-          "type": "fast",
-          "max_tokens": 1024,
-          "speed": "ultra_fast"
+          "id": "auto",
+          "name": "Auto Round-Robin (Ollama Cloud → Local → Groq)",
+          "type": "resilient_fallback",
+          "max_tokens": 4096,
+          "speed": "dynamic"
         },
         {
-          "id": "qwen/qwen3.8-27b",
-          "name": "FORGE — Industrial Reasoning",
-          "type": "reasoning",
-          "max_tokens": 1024,
+          "id": "qwen3.5:9b",
+          "name": "Qwen 3.5 9B (Ollama Cloud & Local)",
+          "type": "deep_reasoning",
+          "max_tokens": 4096,
+          "speed": "fast"
+        }
+      ]
+    },
+    "groq": {
+      "enabled": true,
+      "default_model": "openai/gpt-oss-120b",
+      "models": [
+        {
+          "id": "openai/gpt-oss-120b",
+          "name": "GPT-OSS 120B (Groq)",
+          "type": "deep_reasoning",
+          "max_tokens": 4096,
           "speed": "fast"
         },
         {
-          "id": "openai/gpt-oss-120b",
-          "name": "APEX — Deep Diagnostics",
-          "type": "deep_reasoning",
-          "max_tokens": 1024,
-          "speed": "moderate"
+          "id": "openai/gpt-oss-20b",
+          "name": "GPT-OSS 20B (Groq Fast)",
+          "type": "fast",
+          "max_tokens": 4096,
+          "speed": "ultra_fast"
+        },
+        {
+          "id": "groq/compound-mini",
+          "name": "Groq Compound Mini",
+          "type": "fast",
+          "max_tokens": 4096,
+          "speed": "ultra_fast"
         }
       ]
     },
@@ -35,26 +55,16 @@
           "id": "gemini-2.5-flash",
           "name": "Gemini 2.5 Flash",
           "type": "general",
-          "max_tokens": 1024
-        }
-      ]
-    },
-    "ollama": {
-      "enabled": false,
-      "default_model": "llama3.2",
-      "models": [
-        {
-          "id": "llama3.2",
-          "name": "Llama 3.2 Local",
-          "type": "general"
+          "max_tokens": 1024,
+          "speed": "fast"
         }
       ]
     }
   },
   "task_routing": {
-    "error_code_triage": "openai/gpt-oss-20b",
-    "balanced_troubleshooting": "qwen/qwen3.8-27b",
-    "deep_diagnostics": "openai/gpt-oss-120b",
-    "visual_inspection": "openai/gpt-oss-120b"
+    "error_code_triage": "qwen3.5:9b",
+    "balanced_troubleshooting": "qwen3.5:9b",
+    "deep_diagnostics": "qwen3.5:9b",
+    "visual_inspection": "qwen3.5:9b"
   }
 }

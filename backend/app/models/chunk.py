@@ -15,6 +15,7 @@ class ChunkType(str, enum.Enum):
     table = "table"
     warning = "warning"
     overlap = "overlap"
+    procedure_list = "procedure_list"
 
 
 class Chunk(BaseModel):

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, DragEvent, ChangeEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import LandingLayout from "@/components/landing/LandingLayout";
+import ConsoleLayout from "@/components/console/ConsoleLayout";
 import Spinner from "@/components/ui/Spinner";
 import {
   getMachines,
@@ -175,8 +175,8 @@ export default function UploadPage() {
   };
 
   return (
-    <LandingLayout>
-      <div className="pt-24 pb-16 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
+    <ConsoleLayout>
+      <div className="py-8 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-10">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 text-indigo-700 dark:text-indigo-300 font-mono text-xs font-semibold mb-3">
@@ -494,6 +494,6 @@ export default function UploadPage() {
           </div>
         )}
       </div>
-    </LandingLayout>
+    </ConsoleLayout>
   );
 }

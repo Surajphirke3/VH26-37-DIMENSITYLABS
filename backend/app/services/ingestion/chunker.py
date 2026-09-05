@@ -12,9 +12,29 @@ ERROR_CODE_PATTERN = re.compile(
 )
 
 HEADING_RE = re.compile(
-    r'^((?:\d+\.)+\d*\s+\w|[A-Z][A-Z\s]{4,}|.+:|\#+\s+.+)\s*$',
+    r'^((?:\d+\.)+\d*\s+\w|[A-Z][A-Z\s]{4,}|.+:|\#+\s+.+|第[\d一二三四五六七八九十]+[章节条])\s*$',
     re.MULTILINE,
 )
+
+# CJK Unicode ranges — for these scripts, character count ≈ token count.
+_CJK_RANGES = [
+    (0x4E00, 0x9FFF),   # CJK Unified Ideographs
+    (0x3040, 0x30FF),   # Hiragana + Katakana
+    (0xAC00, 0xD7AF),   # Hangul
+    (0x3400, 0x4DBF),   # CJK Extension A
+]
+
+
+def _estimate_tokens(text: str) -> int:
+    """Estimate token count: CJK characters count individually, others split on whitespace."""
+    cjk_chars = sum(
+        1 for ch in text
+        if any(s <= ord(ch) <= e for s, e in _CJK_RANGES)
+    )
+    if cjk_chars > len(text) * 0.3:
+        # CJK-dominant: chars ≈ tokens
+        return len(text)
+    return len(text.split())
 
 
 @dataclass
@@ -119,7 +139,7 @@ class ManualChunker:
         chunk_type = self._classify_content(content, codes)
         words = content.split()
 
-        if len(words) <= self.max_tokens:
+        if _estimate_tokens(content) <= self.max_tokens:
             return [Chunk(idx, chunk_type, content, page_start, page_end, heading, codes)]
 
         # Split at paragraph or list item boundaries for oversized sections
@@ -129,7 +149,7 @@ class ManualChunker:
 
         for para in paragraphs:
             combined = '\n\n'.join(current_paras + [para])
-            if len(combined.split()) > self.max_tokens and current_paras:
+            if _estimate_tokens(combined) > self.max_tokens and current_paras:
                 text = '\n\n'.join(current_paras)
                 chunk_codes = list(set(ERROR_CODE_PATTERN.findall(text)))
                 result.append(Chunk(
@@ -138,9 +158,9 @@ class ManualChunker:
                     text, page_start, page_end, heading, chunk_codes,
                 ))
                 # Context-preserving overlap
-                prev_words = text.split()
-                overlap_count = max(1, int(len(prev_words) * self.overlap_pct))
-                overlap_text = ' '.join(prev_words[-overlap_count:])
+                all_words = text.split() if _estimate_tokens(text) < len(text) * 0.3 else list(text)
+                overlap_count = max(1, int(len(all_words) * self.overlap_pct))
+                overlap_text = ''.join(all_words[-overlap_count:]) if _estimate_tokens(text) >= len(text) * 0.3 else ' '.join(all_words[-overlap_count:])
                 current_paras = [overlap_text, para]
             else:
                 current_paras.append(para)
