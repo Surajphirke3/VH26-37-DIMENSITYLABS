@@ -6,6 +6,8 @@ import { Image as ImageIcon, X, Sparkles, Cpu, Camera, Crosshair, RefreshCw, Shi
 interface MessageInputProps {
   onSend: (query: string, model?: string, imageData?: string) => void;
   isLoading: boolean;
+  variant?: "v1" | "v2";
+  activeModel?: string;
 }
 
 import { getModels } from "@/lib/api";
@@ -21,24 +23,32 @@ export interface ModelOption {
 }
 
 const DEFAULT_MODELS: ModelOption[] = [
-  { id: "auto", name: "Auto (Ollama Cloud → Local → Groq)", provider: "ollama" },
+  { id: "auto", name: "⚡ Auto Router (Nord ⚡ → Forge ⚙️ → Apex 🛡️)", provider: "router" },
+  { id: "nord", name: "🔵 Nord (Edge · Sub-350ms)", provider: "nord" },
+  { id: "forge", name: "🟠 Forge (Workshop · 8B Reasoning)", provider: "forge" },
+  { id: "apex", name: "🔴 Apex (Cloud · 70B Safety Critical)", provider: "apex" },
+  { id: "openai/gpt-oss-120b", name: "Apex / GPT-OSS 120B (Groq)", provider: "groq" },
   { id: "qwen3.5:9b", name: "Qwen 3.5 9B (Ollama Cloud & Local)", provider: "ollama" },
-  { id: "openai/gpt-oss-120b", name: "GPT-OSS 120B (Groq)", provider: "groq" },
-  { id: "openai/gpt-oss-20b", name: "GPT-OSS 20B (Groq Fast)", provider: "groq" },
-  { id: "groq/compound-mini", name: "Groq Compound Mini", provider: "groq" },
   { id: "gemini-2.5-flash", name: "Gemini 2.5 Flash", provider: "gemini" },
 ];
 
-export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
+export default function MessageInput({ onSend, isLoading, variant = "v2", activeModel }: MessageInputProps) {
   const { t } = useLanguage();
   const [value, setValue] = useState("");
-  const [selectedModel, setSelectedModel] = useState("auto");
+  const [selectedModel, setSelectedModel] = useState(activeModel || "auto");
   const [availableModels, setAvailableModels] = useState<ModelOption[]>(DEFAULT_MODELS);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [imageName, setImageName] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const hasErrorCode = ERROR_CODE_RE.test(value);
+
+  // Sync with activeModel prop if parent sets it
+  useEffect(() => {
+    if (activeModel) {
+      setSelectedModel(activeModel);
+    }
+  }, [activeModel]);
 
   // Fetch configured models from backend on mount
   useEffect(() => {
@@ -48,38 +58,35 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
         if (Array.isArray(list) && list.length > 0) {
           setAvailableModels(list);
           const def = res?.data?.default_model || res?.default_model;
-          if (def) {
-            setSelectedModel((prev) => (prev === "auto" ? "auto" : def));
-          }
+          if (def) setSelectedModel(def);
         }
       })
       .catch((err) => {
-        console.warn("Could not fetch models dynamically, using defaults:", err);
+        console.warn("Could not fetch models, using defaults:", err);
       });
   }, []);
 
   // Camera & Permission State
   const [isCameraModalOpen, setIsCameraModalOpen] = useState(false);
-  const [showPermissionPrompt, setShowPermissionPrompt] = useState(false);
-  const [hasCameraPermission, setHasCameraPermission] = useState(false);
   const [cameraFacing, setCameraFacing] = useState<"environment" | "user">("environment");
-  const [cameraError, setCameraError] = useState<string | null>(null);
   const [shutterFlash, setShutterFlash] = useState(false);
+  const [showPermissionPrompt, setShowPermissionPrompt] = useState(false);
+  const [cameraError, setCameraError] = useState(false);
 
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
   const handleImageSelect = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (!file.type.startsWith("image/")) return;
 
     setImageName(file.name);
+    setSelectedModel("openai/gpt-oss-120b");
 
     const reader = new FileReader();
-    reader.onload = (uploadEvent) => {
-      setSelectedImage(uploadEvent.target?.result as string);
+    reader.onloadend = () => {
+      setSelectedImage(reader.result as string);
     };
     reader.readAsDataURL(file);
   };
@@ -87,12 +94,14 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
   const removeImage = () => {
     setSelectedImage(null);
     setImageName(null);
-    if (fileInputRef.current) fileInputRef.current.value = "";
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   const stopCameraStream = useCallback(() => {
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach((t) => t.stop());
+      streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
     }
     if (videoRef.current) {
@@ -100,29 +109,41 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
     }
   }, []);
 
-  const startCameraStream = useCallback(async (facing: "environment" | "user") => {
-    stopCameraStream();
-    setCameraError(null);
+  const startCameraStream = useCallback(
+    async (facing: "environment" | "user" = "environment") => {
+      stopCameraStream();
+      setCameraError(false);
 
-    try {
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        throw new Error("WebRTC not supported in this browser");
+      if (typeof navigator === "undefined" || !navigator.mediaDevices?.getUserMedia) {
+        setCameraError(true);
+        return;
       }
-      const constraints: MediaStreamConstraints = {
-        video: { facingMode: { ideal: facing }, width: { ideal: 1280 }, height: { ideal: 720 } },
-        audio: false,
-      };
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
-      streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.play().catch(() => {});
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: facing,
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+          },
+          audio: false,
+        });
+        streamRef.current = stream;
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          try {
+            await videoRef.current.play();
+          } catch (playErr) {
+            console.warn("Autoplay was prevented:", playErr);
+          }
+        }
+      } catch (err) {
+        console.warn("Native camera stream unavailable, engaging fallback inspection frame:", err);
+        setCameraError(true);
       }
-    } catch (err: unknown) {
-      console.warn("Camera access warning:", err);
-      setCameraError("Camera unavailable. Optical simulation active.");
-    }
-  }, [stopCameraStream]);
+    },
+    [stopCameraStream]
+  );
 
   useEffect(() => {
     return () => {
@@ -131,22 +152,28 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
   }, [stopCameraStream]);
 
   const handleCameraClick = () => {
-    if (!hasCameraPermission) {
-      setShowPermissionPrompt(true);
-    } else {
+    const perm = typeof window !== "undefined" ? localStorage.getItem("mendx_camera_perm") : null;
+    if (perm === "granted") {
       setIsCameraModalOpen(true);
       startCameraStream(cameraFacing);
+    } else {
+      setShowPermissionPrompt(true);
     }
   };
 
   const handleGrantCameraPermission = () => {
-    setHasCameraPermission(true);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("mendx_camera_perm", "granted");
+    }
     setShowPermissionPrompt(false);
     setIsCameraModalOpen(true);
     startCameraStream(cameraFacing);
   };
 
   const handleDenyCameraPermission = () => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("mendx_camera_perm", "denied");
+    }
     setShowPermissionPrompt(false);
   };
 
@@ -220,36 +247,55 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
     el.style.height = `${Math.min(el.scrollHeight, 120)}px`;
   };
 
+  const isV2 = variant === "v2";
+
   return (
-    <div className="shrink-0 px-4 sm:px-6 py-3.5 border-t border-slate-200 dark:border-white/[0.08] bg-slate-50/95 dark:bg-black/80 backdrop-blur-xl transition-colors">
+    <div
+      className={`shrink-0 px-3 sm:px-6 py-2 sm:py-2.5 border-t transition-colors ${
+        isV2
+          ? "border-slate-200 dark:border-white/10 bg-white/95 dark:bg-slate-950/90 backdrop-blur-md"
+          : "border-slate-200 dark:border-white/[0.08] bg-slate-50/95 dark:bg-black/80 backdrop-blur-xl"
+      }`}
+    >
+      <div className={isV2 ? "max-w-3xl mx-auto" : ""}>
       {/* ── Top Bar: Error Code Detector & Model Selector ── */}
-      <div className="flex items-center justify-between flex-wrap gap-2 mb-2 px-1">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between gap-2 mb-1.5 px-1 min-w-0">
+        <div className="flex items-center gap-2 min-w-0 truncate">
           {hasErrorCode ? (
-            <div className="animate-fade-in flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-amber-500/15 border border-amber-500/35 text-amber-600 dark:text-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.15)]">
-              <span className="w-2 h-2 rounded-full bg-amber-500 dark:bg-amber-400 animate-ping" />
-              <span>{t("chat.faultPatternDetected", "FAULT PATTERN DETECTED → DIRECT OEM MANUAL SEARCH ACTIVATED")}</span>
+            <div className="animate-fade-in flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-400 truncate">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse shrink-0" />
+              <span className="truncate">{t("chat.faultPatternDetected", "Fault Pattern Detected → OEM Manual Search Active")}</span>
             </div>
           ) : (
-            <div className="hidden sm:flex items-center gap-1.5 text-[10px] font-mono text-slate-500 dark:text-slate-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
-              <span>{t("chat.terminalReady", "TERMINAL READY · TYPE SYMPTOM OR ERROR CODE")}</span>
+            <div className="hidden sm:flex items-center gap-1.5 text-[10px] font-mono text-slate-500 dark:text-slate-400 truncate">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+              <span className="truncate">{t("chat.terminalReady", "Ready · Type symptom, alarm code, or attach photo")}</span>
             </div>
           )}
         </div>
 
         {/* Model routing selector pill */}
-        <div className="flex items-center gap-1.5 ml-auto text-xs">
+        <div className="flex items-center gap-1.5 ml-auto text-xs shrink-0">
           {/* ── Language Selector ── */}
           <LanguageSelector variant="header-pill" showLabel={true} direction="up" />
 
-          <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 shadow-sm">
-            <Cpu className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 shadow-sm">
+            <span
+              className={`w-2 h-2 rounded-full shrink-0 ${
+                selectedModel.includes("apex") || selectedModel.includes("120b")
+                  ? "bg-rose-500"
+                  : selectedModel.includes("forge")
+                  ? "bg-amber-500"
+                  : selectedModel.includes("nord")
+                  ? "bg-sky-500"
+                  : "bg-indigo-500"
+              }`}
+            />
             <select
               value={selectedModel}
               onChange={(e) => setSelectedModel(e.target.value)}
               className="bg-transparent border-0 text-[11px] font-mono font-semibold text-slate-800 dark:text-slate-200 focus:outline-none cursor-pointer max-w-[210px] truncate"
-              title="Select AI Diagnostic Engine"
+              title="Select AI Diagnostic Tier"
             >
               {availableModels.map((m) => (
                 <option key={m.id} value={m.id} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200">
@@ -263,8 +309,8 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
 
       {/* Attached Image Preview */}
       {selectedImage && (
-        <div className="mb-2.5 flex items-center gap-3 p-2 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-500/30 rounded-xl animate-fade-in shadow-md">
-          <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-indigo-400/40 shrink-0">
+        <div className="mb-2.5 flex items-center gap-3 p-2 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl animate-fade-in shadow-sm">
+          <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-slate-300 dark:border-white/20 shrink-0">
             <img
               src={selectedImage}
               alt="Attached inspection"
@@ -274,8 +320,8 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
           <div className="flex-1 min-w-0">
             <p className="text-xs font-mono font-bold text-slate-900 dark:text-white truncate">{imageName || "Equipment Attachment"}</p>
             <div className="flex items-center gap-1.5 text-[10px] font-mono text-emerald-600 dark:text-emerald-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
-              <span>{t("chat.ocrActive", "Optical OCR Active · Auto-extracts Error Codes & Text")}</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              <span>{t("chat.ocrActive", "Optical OCR Active · Extracts Error Codes & Text")}</span>
             </div>
           </div>
           <button
@@ -289,8 +335,14 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
         </div>
       )}
 
-      {/* ── High-Tech Input Console ── */}
-      <div className="flex items-end gap-2.5 p-1.5 rounded-2xl bg-white dark:bg-black/60 border border-slate-200 dark:border-cyan-500/25 focus-within:border-cyan-500 dark:focus-within:border-cyan-400 focus-within:shadow-[0_0_20px_rgba(6,182,212,0.15)] shadow-sm transition-all">
+      {/* ── Input Container ── */}
+      <div
+        className={`flex items-end gap-2 p-1.5 rounded-2xl transition-all shadow-sm ${
+          isV2
+            ? "bg-slate-50 dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 focus-within:border-slate-400 dark:focus-within:border-white/25 focus-within:bg-white dark:focus-within:bg-slate-900"
+            : "bg-white dark:bg-black/60 border border-slate-200 dark:border-cyan-500/25 focus-within:border-cyan-500 dark:focus-within:border-cyan-400 focus-within:shadow-[0_0_20px_rgba(6,182,212,0.15)]"
+        }`}
+      >
         {/* Hidden File Input */}
         <input
           ref={fileInputRef}
@@ -306,7 +358,7 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
           type="button"
           onClick={() => fileInputRef.current?.click()}
           disabled={isLoading}
-          className="shrink-0 w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-700/80 text-amber-600 dark:text-amber-400 transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95"
+          className="shrink-0 w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 dark:border-white/10 bg-white hover:bg-slate-100 dark:bg-slate-800/80 dark:hover:bg-slate-700/80 text-slate-600 dark:text-slate-300 transition-all cursor-pointer shadow-sm active:scale-95"
           title={t("chat.attachImage", "Attach equipment photo / nameplate")}
         >
           <ImageIcon className="w-4 h-4" />
@@ -317,8 +369,8 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
           type="button"
           onClick={handleCameraClick}
           disabled={isLoading}
-          className="shrink-0 w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-700/80 text-cyan-600 dark:text-cyan-400 transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95"
-          title={t("chat.capturePhoto", "Open camera & optical OCR scanner")}
+          className="shrink-0 w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 dark:border-white/10 bg-white hover:bg-slate-100 dark:bg-slate-800/80 dark:hover:bg-slate-700/80 text-slate-600 dark:text-slate-300 transition-all cursor-pointer shadow-sm active:scale-95"
+          title={t("chat.capturePhoto", "Open camera & optical scanner")}
         >
           <Camera className="w-4 h-4" />
         </button>
@@ -331,27 +383,27 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
             onChange={handleChange}
             onKeyDown={handleKey}
             disabled={isLoading}
-            rows={2}
-            placeholder={t("chat.placeholder", "Enter fault code (e.g. Alarm 102, F01043), symptom description, or attach photo…")}
-            className="w-full px-3 py-2 text-xs sm:text-sm font-sans rounded-xl leading-relaxed bg-transparent border-0 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none"
+            rows={1}
+            placeholder={t("chat.placeholder", "Enter fault code, symptom description, or attach photo…")}
+            className="w-full px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-sans rounded-xl leading-relaxed bg-transparent border-0 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none"
             style={{
-              minHeight: "48px",
-              maxHeight: "120px",
+              minHeight: "40px",
+              maxHeight: "100px",
               resize: "none",
             }}
           />
           {isLoading && (
-            <div className="absolute right-2 bottom-2 flex items-center gap-1 text-[10px] font-mono text-cyan-600 dark:text-cyan-400">
+            <div className="absolute right-2 bottom-2 flex items-center gap-1 text-[10px] font-mono text-slate-500 dark:text-slate-400">
               <div
-                className="w-3.5 h-3.5 rounded-full border-2 border-cyan-400/20 border-t-cyan-500"
+                className="w-3.5 h-3.5 rounded-full border-2 border-slate-400/20 border-t-slate-600 dark:border-t-slate-200"
                 style={{ animation: "spin 0.8s linear infinite" }}
               />
-              <span className="hidden sm:inline font-semibold">{t("chat.grounding", "Grounding...")}</span>
+              <span className="hidden sm:inline font-medium">{t("chat.grounding", "Analyzing...")}</span>
             </div>
           )}
         </div>
 
-        {/* High-Tech Execute Button */}
+        {/* Execute Button */}
         <button
           id="send-btn"
           onClick={submit}
@@ -359,7 +411,9 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
           className={`shrink-0 h-10 px-4 flex items-center justify-center gap-2 rounded-xl font-mono text-xs font-bold transition-all ${
             isLoading || (!value.trim() && !selectedImage)
               ? "bg-slate-200 dark:bg-slate-800/60 border border-slate-300/60 dark:border-white/5 text-slate-400 dark:text-slate-500 cursor-not-allowed"
-              : "bg-gradient-to-r from-cyan-500 via-indigo-600 to-indigo-700 text-white shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+              : isV2
+              ? "bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 shadow-sm cursor-pointer active:scale-95"
+              : "bg-gradient-to-r from-cyan-500 via-indigo-600 to-indigo-700 text-white shadow-[0_0_20px_rgba(6,182,212,0.4)] cursor-pointer active:scale-95"
           }`}
           aria-label={t("chat.send", "Send")}
         >
@@ -371,11 +425,12 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
       </div>
 
       <div className="mt-2 flex items-center justify-between px-1 text-[10px] font-mono text-slate-500 dark:text-slate-400 flex-wrap gap-1">
-        <span>{t("chat.keyboardHints", "↵ Enter to transmit · Shift+↵ for new line · Multilingual & Multimodal")}</span>
+        <span>{t("chat.keyboardHints", "↵ Enter to send · Shift+↵ for new line · Multilingual")}</span>
         <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400" />
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
           MODBUS / CANopen CONNECTED
         </span>
+      </div>
       </div>
 
       {/* Hidden Canvas for Frame Capture */}

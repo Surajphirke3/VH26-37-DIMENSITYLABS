@@ -91,6 +91,13 @@ class Settings(BaseSettings):
         "http://127.0.0.1:8081",
         "http://localhost:8000",
         "http://127.0.0.1:8000",
+        # Vercel deployments (all branches/previews)
+        "https://vh26-37-dimensitylabs.vercel.app",
+        "https://mend-x.dimensitylabs.dev",
+        # Cloudflare quick tunnels (trycloudflare.com)
+        "https://leave-ntsc-drinking-metro.trycloudflare.com",
+        "https://motel-spyware-buzz-paris.trycloudflare.com",
+        "https://bend-giving-matches-factors.trycloudflare.com",
     ]
     UPLOAD_DIR: str = "./uploads"
 
@@ -124,8 +131,16 @@ class Settings(BaseSettings):
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod
     def parse_cors_origins(cls, v: object) -> object:
+        """Accept either a JSON list string '["a","b"]' or a comma-separated string 'a,b'."""
         if isinstance(v, str):
-            return [origin.strip() for origin in v.split(",")]
+            v = v.strip()
+            if v.startswith("["):
+                import json as _json
+                try:
+                    return _json.loads(v)
+                except Exception:
+                    pass
+            return [origin.strip() for origin in v.split(",") if origin.strip()]
         return v
 
 

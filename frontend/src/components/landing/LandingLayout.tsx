@@ -10,22 +10,24 @@ import { useAuth } from "@/lib/auth-context";
 import IndustrialHeroBackground from "@/components/landing/IndustrialHeroBackground";
 import LanguageSelector from "@/components/common/LanguageSelector";
 import { useLanguage } from "@/lib/i18n/context";
+import { LogOut } from "lucide-react";
 
 interface NavLinkItem {
   href: string;
   key: string;
   defaultLabel: string;
+  shortLabel?: string;
   isModels?: boolean;
 }
 
 const PUBLIC_LINKS: NavLinkItem[] = [
-  { href: "/", key: "nav.home", defaultLabel: "Home" },
-  { href: "/problem", key: "nav.problemSolution", defaultLabel: "Problem & Solution" },
-  { href: "/models", key: "nav.ourModels", defaultLabel: "Our Models", isModels: true },
-  { href: "/architecture", key: "nav.architecture", defaultLabel: "Architecture" },
-  { href: "/workflow", key: "nav.howItWorks", defaultLabel: "How It Works" },
-  { href: "/help", key: "nav.help", defaultLabel: "Help & FAQ" },
-  { href: "/inspector", key: "nav.judgeInspection", defaultLabel: "Judge Inspection ⚡" },
+  { href: "/", key: "nav.home", defaultLabel: "Home", shortLabel: "Home" },
+  { href: "/problem", key: "nav.problemSolution", defaultLabel: "Problem & Solution", shortLabel: "Problem" },
+  { href: "/models", key: "nav.ourModels", defaultLabel: "Our Models", shortLabel: "Models", isModels: true },
+  { href: "/architecture", key: "nav.architecture", defaultLabel: "Architecture", shortLabel: "Architecture" },
+  { href: "/workflow", key: "nav.howItWorks", defaultLabel: "How It Works", shortLabel: "Workflow" },
+  { href: "/help", key: "nav.help", defaultLabel: "Help & FAQ", shortLabel: "Help" },
+  { href: "/inspector", key: "nav.judgeInspection", defaultLabel: "Judge Inspection ⚡", shortLabel: "Inspect ⚡" },
 ];
 
 
@@ -52,7 +54,7 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
   }, [pathname]);
 
   return (
-    <div className="min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)] transition-colors duration-300 relative selection:bg-indigo-500/30 selection:text-indigo-200">
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-[var(--bg-base)] text-[var(--text-primary)] transition-colors duration-300 relative selection:bg-indigo-500/30 selection:text-indigo-200">
       {/* Top Ambient Glow Bar */}
       <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-1 bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-80 z-50 pointer-events-none blur-[1px]" />
 
@@ -67,29 +69,29 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
             : "bg-[var(--bg-base)]/90 backdrop-blur-xl border-b border-[var(--border)]/70 py-1.5"
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+        <div className="w-full max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 lg:gap-3 xl:gap-4">
           {/* Brand Logo & Name - NO circle/box, direct prominent emblem */}
-          <Link href="/" className="flex items-center gap-3 shrink-0 group py-1">
+          <Link href="/" className="flex items-center gap-2.5 shrink-0 group py-1">
             <Image
               src={theme === "light" ? "/brand-icon-light.png" : "/brand-icon-dark.png"}
               alt="MEND-X"
-              width={40}
-              height={40}
-              className="w-10 h-10 object-contain drop-shadow-sm group-hover:scale-105 transition-transform duration-200"
+              width={36}
+              height={36}
+              className="w-8 h-8 sm:w-9 sm:h-9 object-contain drop-shadow-sm group-hover:scale-105 transition-transform duration-200"
               priority
             />
             <div className="flex flex-col leading-tight">
               <span className="font-black text-xl sm:text-2xl tracking-tight text-slate-900 dark:text-white transition-colors flex items-center gap-0.5">
                 MEND<span className="text-teal-600 dark:text-teal-400">-X</span>
               </span>
-              <span className="font-mono text-[9px] text-slate-500 dark:text-slate-400 tracking-wider uppercase font-semibold">
+              <span className="hidden 2xl:block font-mono text-[9px] text-slate-500 dark:text-slate-400 tracking-wider uppercase font-semibold">
                 {t("nav.tagline", "From Failure to Function")}
               </span>
             </div>
           </Link>
 
           {/* Desktop Nav Links */}
-          <nav className="hidden lg:flex items-center gap-1 bg-slate-100/80 dark:bg-white/[0.04] p-1.5 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] backdrop-blur-md shadow-sm">
+          <nav className="hidden lg:flex items-center gap-0.5 bg-slate-100/80 dark:bg-white/[0.04] p-1 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] backdrop-blur-md shadow-sm shrink-0">
             {navLinks.map((link) => {
               const active = pathname === link.href;
 
@@ -103,13 +105,14 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
                   >
                     <Link
                       href={link.href}
-                      className={`px-3.5 py-1.5 text-xs font-semibold rounded-xl transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap ${
+                      className={`px-2.5 xl:px-3 py-1.5 text-xs font-semibold rounded-xl transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap ${
                         active
                           ? "text-slate-900 dark:text-white bg-white dark:bg-white/[0.12] shadow-sm font-bold border border-slate-200/80 dark:border-white/[0.08]"
                           : "text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/[0.08]"
                       }`}
                     >
-                      <span>{t(link.key, link.defaultLabel)}</span>
+                      <span className="hidden 2xl:inline">{t(link.key, link.defaultLabel)}</span>
+                      <span className="2xl:hidden">{link.shortLabel || t(link.key, link.defaultLabel)}</span>
                       <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-md bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold">
                         3
                       </span>
@@ -211,22 +214,23 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`px-3.5 py-1.5 text-xs font-semibold rounded-xl transition-all duration-200 whitespace-nowrap ${
+                  className={`px-2.5 xl:px-3 py-1.5 text-xs font-semibold rounded-xl transition-all duration-200 whitespace-nowrap ${
                     active
                       ? "text-slate-900 dark:text-white bg-white dark:bg-white/[0.12] shadow-sm font-bold border border-slate-200/80 dark:border-white/[0.08]"
                       : "text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/[0.08] border border-transparent"
                   }`}
                 >
-                  {t(link.key, link.defaultLabel)}
+                  <span className="hidden 2xl:inline">{t(link.key, link.defaultLabel)}</span>
+                  <span className="2xl:hidden">{link.shortLabel || t(link.key, link.defaultLabel)}</span>
                 </Link>
               );
             })}
           </nav>
 
           {/* Right Controls & CTAs */}
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 xl:gap-2.5 shrink-0">
             {/* Status dot */}
-            <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-mono text-[10px] font-semibold tracking-wider whitespace-nowrap">
+            <div className="hidden 2xl:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-mono text-[10px] font-semibold tracking-wider whitespace-nowrap">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
               {t("nav.systemOnline", "ONLINE")}
             </div>
@@ -237,25 +241,28 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
             {/* Theme Toggle */}
             <ThemeToggle />
 
-            <div className="hidden sm:block h-4 w-px bg-slate-200 dark:bg-white/10" />
-
             {/* Authenticated User or Sign In */}
             {user ? (
-              <div className="flex items-center gap-2.5">
-                <div className="hidden sm:flex flex-col text-right leading-none">
-                  <span className="text-xs font-bold text-[var(--text-primary)] max-w-[110px] truncate">
-                    {user.full_name || user.email.split("@")[0]}
-                  </span>
-                  <span className="text-[9px] font-mono text-emerald-500 uppercase font-bold mt-0.5">
-                    {user.role}
-                  </span>
+              <div className="flex items-center gap-1.5 pl-1">
+                <div className="flex items-center gap-1.5 px-2 py-1 rounded-xl bg-slate-100/80 dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.08]">
+                  <div className="w-5 h-5 rounded-md bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-mono font-bold text-[10px] flex items-center justify-center shrink-0">
+                    {(user.full_name || user.email)[0].toUpperCase()}
+                  </div>
+                  <div className="hidden sm:flex flex-col text-left leading-none">
+                    <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200 max-w-[70px] xl:max-w-[100px] truncate">
+                      {user.full_name || user.email.split("@")[0]}
+                    </span>
+                    <span className="text-[8px] font-mono text-emerald-500 uppercase font-bold mt-0.5">
+                      {user.role}
+                    </span>
+                  </div>
                 </div>
                 <button
                   onClick={logout}
-                  className="text-xs font-semibold text-rose-500 hover:text-rose-400 px-2 py-1 rounded-lg hover:bg-rose-500/10 transition-colors whitespace-nowrap"
+                  className="p-1.5 rounded-lg text-rose-500 hover:text-rose-400 hover:bg-rose-500/10 transition-colors shrink-0"
                   title={t("nav.signOut", "Sign Out")}
                 >
-                  {t("nav.signOut", "Sign Out")}
+                  <LogOut className="w-3.5 h-3.5" />
                 </button>
               </div>
             ) : (
@@ -267,10 +274,10 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
               </Link>
             )}
 
-            {/* Console button */}
+            {/* Console button - ALWAYS VISIBLE */}
             <Link
               href={user ? "/dashboard" : "/login"}
-              className="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 shadow-md shadow-indigo-600/25 transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 hover:scale-[1.02] active:scale-95"
+              className="px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 shadow-md shadow-indigo-600/25 transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 hover:scale-[1.02] active:scale-95"
             >
               <span>{t("nav.console", "Console")}</span>
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -299,7 +306,7 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
 
         {/* Mobile Menu Dropdown */}
         {mobileOpen && (
-          <div className="md:hidden bg-[var(--bg-surface)]/98 backdrop-blur-2xl border-t border-[var(--border)] px-4 py-4 space-y-2 animate-slide-down shadow-2xl">
+          <div className="lg:hidden bg-[var(--bg-surface)]/98 backdrop-blur-2xl border-t border-[var(--border)] px-4 py-4 space-y-2 animate-slide-down shadow-2xl">
             {navLinks.map((link) => {
               const active = pathname === link.href;
               return (

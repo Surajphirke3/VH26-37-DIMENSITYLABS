@@ -179,10 +179,10 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[var(--bg-base)] text-[var(--text-primary)] transition-colors duration-200">
+    <div className="flex h-screen h-[100dvh] max-h-screen max-h-[100dvh] w-full max-w-full overflow-hidden bg-[var(--bg-base)] text-[var(--text-primary)] transition-colors duration-200">
       {/* ── SIDEBAR ── */}
       <aside
-        className="shrink-0 flex flex-col transition-all duration-300 border-r border-[var(--border)] relative z-20 select-none"
+        className="shrink-0 flex flex-col transition-all duration-300 border-r border-[var(--border)] relative z-20 select-none h-full max-h-full overflow-hidden"
         style={{
           width: sidebarOpen ? "280px" : "0px",
           background: "var(--bg-surface)",
@@ -191,7 +191,7 @@ export default function DashboardPage() {
       >
         <div
           style={{ width: "280px", opacity: sidebarOpen ? 1 : 0 }}
-          className="flex flex-col h-full transition-opacity duration-300"
+          className="flex flex-col h-full min-h-0 max-h-full overflow-hidden transition-opacity duration-300"
         >
           {/* Logo & Console Indicator */}
           <div className="px-5 py-4 flex items-center justify-between border-b border-[var(--border)]">
@@ -292,8 +292,8 @@ export default function DashboardPage() {
           </div>
 
           {/* Active Troubleshooting Sessions */}
-          <div className="flex-1 px-3 py-3 overflow-y-auto">
-            <div className="flex items-center justify-between mb-2 px-2">
+          <div className="flex-1 min-h-0 px-3 py-3 flex flex-col overflow-hidden">
+            <div className="flex items-center justify-between mb-2 px-2 shrink-0">
               <p className="text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">
                 {t("dashboard.diagnosticSessions", "Diagnostic Sessions")}
               </p>
@@ -307,7 +307,7 @@ export default function DashboardPage() {
               </button>
             </div>
 
-            <div className="space-y-1.5 overflow-y-auto max-h-[320px] px-0.5">
+            <div className="flex-1 min-h-0 space-y-1.5 overflow-y-auto px-0.5">
               {conversations.length === 0 ? (
                 <div className="px-3 py-6 text-center text-[11px] text-slate-500 border border-dashed border-white/10 rounded-xl">
                   {t("dashboard.noActiveSessions", "No active sessions. Click '+ New' to initiate diagnostic intake.")}
@@ -412,17 +412,17 @@ export default function DashboardPage() {
       </aside>
 
       {/* ── MAIN WORKSPACE ── */}
-      <main className="flex-1 flex flex-col overflow-hidden bg-[var(--bg-base)] relative">
+      <main className="flex-1 flex flex-col min-h-0 min-w-0 h-full max-h-full overflow-hidden bg-[var(--bg-base)] relative">
         <div className="absolute inset-0 bg-grid opacity-25 pointer-events-none z-0" />
 
         {/* Top SCADA Flight Deck Header */}
         <header
-          className="flex items-center justify-between px-6 py-3 shrink-0 border-b border-[var(--border)] backdrop-blur-md relative z-30 bg-[var(--bg-surface)]/85"
+          className="flex items-center justify-between px-3 sm:px-6 py-2 sm:py-2.5 h-14 sm:h-16 shrink-0 border-b border-[var(--border)] backdrop-blur-md relative z-30 bg-[var(--bg-surface)]/85 gap-2 min-w-0"
         >
-          <div className="flex items-center gap-3 min-w-0">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0 truncate">
             <button
               onClick={() => setSidebarOpen((v) => !v)}
-              className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/[0.05] transition-colors text-slate-400 hover:text-white cursor-pointer"
+              className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/[0.05] transition-colors text-slate-400 hover:text-white cursor-pointer shrink-0"
               title={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -435,9 +435,9 @@ export default function DashboardPage() {
               </svg>
             </button>
 
-            <div className="min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <div className="flex items-center gap-1.5">
+            <div className="min-w-0 truncate">
+              <div className="flex items-center gap-2 min-w-0 truncate">
+                <div className="flex items-center gap-1.5 shrink-0">
                   <span className="font-mono font-black text-xs uppercase tracking-wider text-slate-800 dark:text-slate-100">
                     {t("dashboard.hudTitle", "DIAGNOSTICS HUD")}
                   </span>
@@ -446,41 +446,44 @@ export default function DashboardPage() {
                   </span>
                 </div>
                 {selectedMachine ? (
-                  <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-[10px] font-mono font-bold bg-indigo-500/10 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30">
+                  <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-[10px] font-mono font-bold bg-indigo-500/10 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30 truncate min-w-0 max-w-[160px] sm:max-w-[240px]">
                     <ManufacturerLogo name={selectedMachine.name} manufacturer={selectedMachine.manufacturer} size="xs" />
                     <span className="truncate">{selectedMachine.name}</span>
                     <button
                       type="button"
                       onClick={() => setSelectedMachine(null)}
-                      className="hover:text-rose-500 transition-colors ml-1 font-bold text-xs cursor-pointer"
+                      className="hover:text-rose-500 transition-colors ml-1 font-bold text-xs cursor-pointer shrink-0"
                       title="Clear machine filter"
                     >
                       ×
                     </button>
                   </div>
                 ) : (
-                  <span className="px-2 py-0.5 rounded-lg text-[10px] font-mono font-bold bg-amber-500/10 dark:bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30 flex items-center gap-1">
+                  <span className="px-2 py-0.5 rounded-lg text-[10px] font-mono font-bold bg-amber-500/10 dark:bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30 flex items-center gap-1 shrink-0">
                     <span className="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-amber-400 animate-pulse" />
-                    {t("dashboard.fleetMode", "Fleet Wide Mode")}
+                    <span className="hidden sm:inline">{t("dashboard.fleetMode", "Fleet Wide Mode")}</span>
+                    <span className="sm:hidden">Fleet</span>
                   </span>
                 )}
               </div>
-              <p className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 flex items-center gap-1 mt-0.5 font-semibold">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
-                {selectedMachine
-                  ? `TARGET: ${selectedMachine.model} · ZERO-HALLUCINATION GROUNDED`
-                  : "FLEET DISAMBIGUATION · CROSS-MACHINE ANN ACTIVE"}
+              <p className="hidden md:flex text-[10px] font-mono text-emerald-600 dark:text-emerald-400 items-center gap-1 mt-0.5 font-semibold truncate">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse shrink-0" />
+                <span className="truncate">
+                  {selectedMachine
+                    ? `TARGET: ${selectedMachine.model} · ZERO-HALLUCINATION GROUNDED`
+                    : "FLEET DISAMBIGUATION · CROSS-MACHINE ANN ACTIVE"}
+                </span>
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {/* View Mode Switcher: Desktop | Mobile | Both */}
-            <div className="flex items-center gap-1 p-1 rounded-xl bg-slate-100 dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 text-xs font-mono">
+            <div className="flex items-center gap-0.5 sm:gap-1 p-0.5 sm:p-1 rounded-xl bg-slate-100 dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 text-xs font-mono">
               <button
                 type="button"
                 onClick={() => setViewMode("desktop")}
-                className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                className={`px-2 sm:px-3 py-1 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                   viewMode === "desktop"
                     ? "bg-gradient-to-r from-cyan-500 to-indigo-600 text-white shadow-[0_0_12px_rgba(6,182,212,0.4)]"
                     : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
@@ -488,13 +491,13 @@ export default function DashboardPage() {
                 title="Desktop Console View"
               >
                 <Monitor className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">{t("dashboard.desktop", "Desktop")}</span>
+                <span className="hidden xl:inline">{t("dashboard.desktop", "Desktop")}</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setViewMode("mobile")}
-                className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                className={`px-2 sm:px-3 py-1 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                   viewMode === "mobile"
                     ? "bg-gradient-to-r from-cyan-500 to-indigo-600 text-white shadow-[0_0_12px_rgba(6,182,212,0.4)]"
                     : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
@@ -502,13 +505,13 @@ export default function DashboardPage() {
                 title="Mobile Field Device Simulator"
               >
                 <Smartphone className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">{t("dashboard.fieldMobile", "Field Mobile")}</span>
+                <span className="hidden xl:inline">{t("dashboard.fieldMobile", "Field Mobile")}</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setViewMode("split")}
-                className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                className={`px-2 sm:px-3 py-1 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                   viewMode === "split"
                     ? "bg-gradient-to-r from-cyan-500 to-indigo-600 text-white shadow-[0_0_12px_rgba(6,182,212,0.4)]"
                     : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
@@ -516,11 +519,11 @@ export default function DashboardPage() {
                 title="Split View: Desktop Console + Mobile Device"
               >
                 <Columns className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">{t("dashboard.dualSplit", "Dual Split")}</span>
+                <span className="hidden xl:inline">{t("dashboard.dualSplit", "Dual Split")}</span>
               </button>
             </div>
 
-            <div className="hidden xl:flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-[11px] font-mono text-emerald-600 dark:text-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.15)] font-semibold">
+            <div className="hidden 2xl:flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-[11px] font-mono text-emerald-600 dark:text-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.15)] font-semibold">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_6px_rgba(16,185,129,0.8)]" />
               <span className="font-bold">MODBUS TCP 502 · CANopen ACTIVE</span>
             </div>
@@ -528,7 +531,7 @@ export default function DashboardPage() {
             {user?.role === "admin" && (
               <Link
                 href="/admin"
-                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-xs font-mono font-bold text-indigo-300 hover:text-white transition-all shadow-sm"
+                className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-xs font-mono font-bold text-indigo-300 hover:text-white transition-all shadow-sm"
                 title="Switch to Administrative Management Console"
               >
                 <Settings className="w-3.5 h-3.5" />
@@ -543,20 +546,22 @@ export default function DashboardPage() {
 
         {/* ── WORKSPACE CONTENT ── */}
         {viewMode === "mobile" ? (
-          <div className="flex-1 overflow-y-auto p-6 flex flex-col items-center justify-center relative z-10 animate-fade-in">
-            <MobileDeviceSimulator
-              initialMachine={selectedMachine ?? undefined}
-              availableMachines={machines}
-              onMachineChange={(m) => setSelectedMachine(m)}
-            />
+          <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 flex flex-col items-center relative z-10 animate-fade-in">
+            <div className="my-auto py-4 flex justify-center w-full">
+              <MobileDeviceSimulator
+                initialMachine={selectedMachine ?? undefined}
+                availableMachines={machines}
+                onMachineChange={(m) => setSelectedMachine(m)}
+              />
+            </div>
           </div>
         ) : viewMode === "split" ? (
-          <div className="flex-1 overflow-hidden relative z-10 grid grid-cols-1 xl:grid-cols-12 gap-0 animate-fade-in h-full">
+          <div className="flex-1 min-h-0 min-w-0 overflow-hidden relative z-10 grid grid-cols-1 xl:grid-cols-12 gap-0 animate-fade-in h-full max-h-full">
             {/* Left Column: Desktop Console */}
-            <div className="xl:col-span-7 h-full overflow-hidden border-r border-[var(--border)] flex flex-col">
+            <div className="xl:col-span-7 h-full max-h-full min-h-0 min-w-0 overflow-hidden border-r border-[var(--border)] flex flex-col">
               {activeConvId === null ? (
-                <div className="flex-1 overflow-y-auto p-6 lg:p-8 relative z-10 flex flex-col items-center justify-center">
-                  <div className="max-w-xl w-full mx-auto space-y-6 text-center animate-fade-in">
+                <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 lg:p-8 relative z-10 flex flex-col items-center">
+                  <div className="max-w-xl w-full mx-auto space-y-6 text-center animate-fade-in my-auto py-6">
                     <div className="inline-flex items-center justify-center p-3 rounded-2xl bg-white dark:bg-white/[0.05] border border-slate-200/90 dark:border-white/10 shadow-lg">
                       <Image
                         src={isLight ? "/brand-icon-light.png" : "/brand-icon-dark.png"}
@@ -587,7 +592,7 @@ export default function DashboardPage() {
                   </div>
                 </div>
               ) : (
-                <div className="flex-1 overflow-hidden relative z-10">
+                <div className="flex-1 flex flex-col min-h-0 min-w-0 overflow-hidden relative z-10 h-full max-h-full">
                   <ChatInterface
                     conversationId={activeConvId}
                     machineId={selectedMachine?.id ?? null}
@@ -606,17 +611,19 @@ export default function DashboardPage() {
             </div>
 
             {/* Right Column: Mobile Field Device Simulator */}
-            <div className="xl:col-span-5 h-full overflow-y-auto p-6 bg-slate-950/40 backdrop-blur-sm flex items-center justify-center">
-              <MobileDeviceSimulator
-                initialMachine={selectedMachine ?? undefined}
-                availableMachines={machines}
-                onMachineChange={(m) => setSelectedMachine(m)}
-              />
+            <div className="xl:col-span-5 h-full min-h-0 overflow-y-auto p-4 sm:p-6 bg-slate-950/40 backdrop-blur-sm flex flex-col items-center">
+              <div className="my-auto py-4 flex justify-center w-full">
+                <MobileDeviceSimulator
+                  initialMachine={selectedMachine ?? undefined}
+                  availableMachines={machines}
+                  onMachineChange={(m) => setSelectedMachine(m)}
+                />
+              </div>
             </div>
           </div>
         ) : activeConvId === null ? (
-          <div className="flex-1 overflow-y-auto p-6 lg:p-10 relative z-10 flex flex-col items-center justify-center">
-            <div className="max-w-4xl w-full mx-auto space-y-8 animate-slide-up">
+          <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 lg:p-10 relative z-10 flex flex-col items-center">
+            <div className="max-w-4xl w-full mx-auto space-y-6 sm:space-y-8 animate-slide-up my-auto py-6">
               
               {/* Center Hero Banner */}
               <div className="text-center space-y-4">
@@ -775,7 +782,7 @@ export default function DashboardPage() {
             </div>
           </div>
         ) : (
-          <div className="flex-1 overflow-hidden relative z-10">
+          <div className="flex-1 flex flex-col min-h-0 min-w-0 overflow-hidden relative z-10 h-full max-h-full">
             <ChatInterface
               conversationId={activeConvId}
               machineId={selectedMachine?.id ?? null}

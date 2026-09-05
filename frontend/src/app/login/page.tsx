@@ -82,7 +82,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-[var(--bg-base)] text-[var(--text-primary)] transition-colors duration-300 flex flex-col justify-between relative overflow-hidden">
+    <div className="min-h-screen w-full max-w-full bg-[var(--bg-base)] text-[var(--text-primary)] transition-colors duration-300 flex flex-col justify-between relative overflow-x-hidden overflow-y-auto">
       {/* ── Top Ambient Glow Line ── */}
       <div
         className={`fixed top-0 left-0 right-0 h-1 transition-all duration-500 z-50 pointer-events-none ${
@@ -93,7 +93,7 @@ export default function LoginPage() {
       />
 
       {/* ── Top Header Navigation ── */}
-      <header className="relative z-30 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex items-center justify-between">
+      <header className="relative z-30 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-5 flex items-center justify-between shrink-0">
         <Link
           href="/"
           className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-100/90 dark:bg-white/[0.05] hover:bg-slate-200/90 dark:hover:bg-white/[0.1] border border-slate-200 dark:border-white/10 transition-all duration-200 shadow-sm"
@@ -114,8 +114,8 @@ export default function LoginPage() {
       </header>
 
       {/* ── Main Split View Container ── */}
-      <main className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 flex-1 flex items-center justify-center">
-        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+      <main className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex-1 flex items-center justify-center my-auto">
+        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-center my-auto">
           
           {/* ── Left Column: System & Role Overview ── */}
           <div className="hidden lg:flex lg:col-span-7 flex-col justify-center space-y-8 pr-4">
@@ -210,7 +210,7 @@ export default function LoginPage() {
 
           {/* ── Right Column: Two-Mode Login Card ── */}
           <div className="lg:col-span-5 w-full max-w-md mx-auto">
-            <div className="rounded-3xl p-6 sm:p-8 bg-white/95 dark:bg-[#0c1017]/95 border border-slate-200/90 dark:border-white/10 shadow-2xl backdrop-blur-xl transition-all relative overflow-hidden">
+            <div className="rounded-3xl p-5 sm:p-7 bg-white/95 dark:bg-[#0c1017]/95 border border-slate-200/90 dark:border-white/10 shadow-2xl backdrop-blur-xl transition-all relative overflow-hidden">
               
               {/* Card Accent Top Line */}
               <div

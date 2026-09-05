@@ -42,7 +42,7 @@ export default function RootLayout({
       <head>
         <meta name="theme-color" content="#06070a" />
       </head>
-      <body className="font-sans antialiased min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)] transition-colors duration-200">
+      <body className="font-sans antialiased min-h-screen w-full max-w-full overflow-x-hidden bg-[var(--bg-base)] text-[var(--text-primary)] transition-colors duration-200">
         <ThemeProvider>
           <SessionProvider>
             <LanguageProvider>{children}</LanguageProvider>

@@ -42,9 +42,18 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
     )
 
+    # Normalize double slashes in paths (e.g., //api/v1/... -> /api/v1/...)
+    @app.middleware("http")
+    async def normalize_path_middleware(request: Request, call_next):
+        if request.scope.get("path", "").startswith("//"):
+            import re
+            request.scope["path"] = re.sub(r"^/+", "/", request.scope["path"])
+        return await call_next(request)
+
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.CORS_ORIGINS,
+        allow_origin_regex=r"https?://.*",
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],

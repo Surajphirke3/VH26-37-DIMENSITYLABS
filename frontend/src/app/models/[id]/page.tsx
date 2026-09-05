@@ -35,8 +35,8 @@ function ModelDetailClient({ modelId }: { modelId: string }) {
       </div>
 
       {/* Hero */}
-      <section className="relative z-10 pt-40 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <Link href="/models" className="inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors mb-8">
+      <section className="relative z-10 pt-24 sm:pt-28 md:pt-32 pb-12 sm:pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <Link href="/models" className="inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors mb-6 sm:mb-8">
           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" /></svg>
           All Models
         </Link>
