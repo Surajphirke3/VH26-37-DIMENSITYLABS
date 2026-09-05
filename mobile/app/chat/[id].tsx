@@ -64,7 +64,9 @@ function AssistantBubble({
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
             <View style={styles.aiBadge}>
               <Ionicons name="sparkles" size={12} color={colors.accentAi} />
-              <Text style={styles.aiBadgeText}>MEND - X AI</Text>
+              <Text style={styles.aiBadgeText}>
+                {resp?.model_used ? `AUTO • ${resp.model_used.split('/').pop()?.toUpperCase()}` : 'MEND - X AI'}
+              </Text>
             </View>
             {resp?.language_detected && resp.language_detected.toLowerCase() !== 'en' && (
               <View style={styles.langDetectedBadge}>
@@ -162,7 +164,12 @@ function AssistantBubble({
 }
 
 export default function ChatScreen() {
-  const { id, prompt } = useLocalSearchParams<{ id: string; prompt?: string }>();
+  const { id, prompt, machineId, modelId } = useLocalSearchParams<{
+    id: string;
+    prompt?: string;
+    machineId?: string;
+    modelId?: string;
+  }>();
   const navigation = useNavigation();
   const { language, autoDetect, t, activeLanguageInfo } = useLanguage();
   const [messages, setMessages] = useState<Message[]>([]);
@@ -170,7 +177,10 @@ export default function ChatScreen() {
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
   const [machines, setMachines] = useState<Machine[]>([]);
-  const [selectedMachine, setSelectedMachine] = useState<string | null>(null);
+  const [selectedMachine, setSelectedMachine] = useState<string | null>(machineId || null);
+  const [selectedModel, setSelectedModel] = useState<string | null>(
+    modelId && modelId !== 'auto' ? modelId : null
+  );
   const [disambigOptions, setDisambigOptions] = useState<DisambiguationOption[]>([]);
   const [pendingQuery, setPendingQuery] = useState<string | null>(null);
   const [showDisambig, setShowDisambig] = useState(false);
@@ -225,7 +235,12 @@ export default function ChatScreen() {
         backendQuery = `${query}\n\n[Respond in ${activeLanguageInfo.name} (${activeLanguageInfo.nativeName})]`;
       }
 
-      const resp = await sendMessage(id, backendQuery, selectedMachine ?? undefined);
+      const resp = await sendMessage(
+        id,
+        backendQuery,
+        selectedMachine ?? undefined,
+        selectedModel || undefined
+      );
       if (resp.disambiguation_options && resp.disambiguation_options.length > 0) {
         setDisambigOptions(resp.disambiguation_options);
         setPendingQuery(query);
@@ -320,6 +335,13 @@ export default function ChatScreen() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.machineStripContent}
         >
+          <View style={[styles.mChip, { backgroundColor: 'rgba(16, 185, 129, 0.12)', borderColor: 'rgba(16, 185, 129, 0.35)', flexDirection: 'row', alignItems: 'center', gap: 4 }]}>
+            <Ionicons name="sparkles" size={11} color={colors.accentAi} />
+            <Text style={[styles.mChipText, { color: colors.accentAi, fontWeight: '700' }]}>
+              {selectedModel ? selectedModel : 'Model: Auto'}
+            </Text>
+          </View>
+
           <TouchableOpacity
             style={[
               styles.mChip,

@@ -86,6 +86,22 @@ export default function ModelsScreen() {
       <Text style={S.pageTitle}>AI Models</Text>
       <Text style={S.pageSub}>MEND-X intelligently routes queries to the optimal model tier based on task complexity.</Text>
 
+      {/* Auto-Routing (Adaptive Tri-Tier) Card */}
+      <View style={[S.card, { borderLeftColor: C.success, borderLeftWidth: 4, backgroundColor: C.surfaceElevated, borderColor: C.success + '40' }]}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+          <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, marginRight: 8 }}>
+            <Ionicons name="sparkles" size={16} color={C.accent} />
+            <Text style={[S.modelName, { color: C.text, fontSize: 16 }]} numberOfLines={1}>Auto-Router (Adaptive)</Text>
+            <View style={S.activeBadge}><Ionicons name="checkmark-circle" size={12} color={C.success} /><Text style={S.activeText}>DEFAULT</Text></View>
+          </View>
+          <View style={[S.tierBadge, { backgroundColor: C.success + '20', borderColor: C.success }]}><Text style={[S.tierText, { color: C.success }]}>TRI-TIER</Text></View>
+        </View>
+        <Text style={S.provider}>Dynamic Real-Time Router · &lt;100ms – 2s</Text>
+        <Text style={S.desc}>Queries are dynamically routed across NORD (fast errors), FORGE (multi-step repair), or APEX (deep reasoning & vision) based on symptom complexity.</Text>
+      </View>
+
+      <Text style={S.sectionTitle}>Available Model Tiers</Text>
+
       {models.map((model) => {
         const tier = getTier(model);
         const tc = TC[tier] ?? TC.NORD;

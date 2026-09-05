@@ -157,12 +157,7 @@ export default function DashboardScreen() {
 
   async function handleAction(action: QuickAction) {
     if (action.action === 'new-chat') {
-      try {
-        const conv = await createConversation();
-        router.push(`/chat/${conv.conversation_id}`);
-      } catch {
-        // Handle error
-      }
+      router.push('/new-chat' as never);
     } else if (action.route) {
       router.push(action.route as never);
     }

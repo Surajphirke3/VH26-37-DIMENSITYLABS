@@ -208,8 +208,9 @@ export default function StatusScreen() {
           status="ready"
           icon="sparkles"
         >
-          <MetaLine label="Active LLM" value="Groq (llama-3.3-70b-versatile)" />
-          <MetaLine label="Fallback" value="Ollama (local qwen3.5)" />
+          <MetaLine label="Routing Mode" value="Auto (Adaptive Tri-Tier)" />
+          <MetaLine label="Active Engine" value="Groq LPU (llama-3.3-70b)" />
+          <MetaLine label="Local Fallback" value="Ollama (local qwen)" />
           <MetaLine label="RAG Disambiguation" value="Active (Threshold 0.3)" />
         </ServiceCard>
 

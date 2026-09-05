@@ -38,15 +38,11 @@ export default function NewChatScreen() {
       getModels(),
       getActiveModel().catch(() => null),
     ])
-      .then(([ms, modelsData, activeData]) => {
+      .then(([ms, modelsData]) => {
         setMachines(ms);
         setModels(modelsData.models ?? []);
-        if (activeData) {
-          const match = modelsData.models.find(
-            (m) => m.id === activeData.active_model || m.name === activeData.active_model
-          );
-          setSelectedModel(match?.id ?? null);
-        }
+        // Keep model default on Auto (adaptive routing)
+        setSelectedModel(null);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -108,7 +104,8 @@ export default function NewChatScreen() {
           <Text style={S.label}>AI Model <Text style={S.optional}>(optional)</Text></Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={S.chipRow} contentContainerStyle={{ gap: 10, paddingRight: 4 }}>
             <TouchableOpacity style={[S.chip, !selectedModel && S.chipActive]} onPress={() => setSelectedModel(null)}>
-              <Text style={[S.chipText, !selectedModel && S.chipTextActive]}>Auto</Text>
+              <Ionicons name="sparkles" size={13} color={!selectedModel ? '#fff' : C.accent} />
+              <Text style={[S.chipText, !selectedModel && S.chipTextActive]}>Auto (Recommended)</Text>
             </TouchableOpacity>
             {models.map((mdl) => (
               <TouchableOpacity key={mdl.id} style={[S.chip, selectedModel === mdl.id && S.chipActive]} onPress={() => setSelectedModel(selectedModel === mdl.id ? null : mdl.id)}>
