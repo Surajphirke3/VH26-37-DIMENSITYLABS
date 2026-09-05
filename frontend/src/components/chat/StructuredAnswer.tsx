@@ -17,6 +17,7 @@ import {
   HelpCircle,
   FileText,
   Zap,
+  Camera,
 } from "lucide-react";
 import type { TroubleshootingResponse } from "@/lib/types";
 import ConfidenceBadge from "@/components/ui/ConfidenceBadge";
@@ -112,6 +113,33 @@ export default function StructuredAnswer({ response, onSuggestionClick }: Props)
             </span>
             <span className="font-bold text-emerald-600 dark:text-emerald-400">{latencyBreakdown.llm_ms || 0}ms</span>
           </div>
+        </div>
+      )}
+
+      {/* ── Optical OCR Scan Extraction Card ── */}
+      {response.ocr_result && (response.ocr_result.error_code || response.ocr_result.extracted_text) && (
+        <div className="p-3.5 rounded-xl bg-cyan-50/90 dark:bg-cyan-950/40 border border-cyan-300 dark:border-cyan-500/30 text-xs shadow-sm">
+          <div className="flex items-center justify-between gap-2 flex-wrap mb-1.5">
+            <div className="flex items-center gap-2 text-cyan-800 dark:text-cyan-300 font-mono font-bold">
+              <Camera className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
+              <span>OPTICAL OCR DETECTED</span>
+              {response.ocr_result.error_code && (
+                <span className="px-2 py-0.5 rounded-md bg-cyan-600 text-white font-mono font-black text-[11px] shadow-sm">
+                  {response.ocr_result.error_code}
+                </span>
+              )}
+            </div>
+            {response.ocr_result.machine_brand && (
+              <span className="px-2 py-0.5 rounded bg-cyan-500/15 border border-cyan-500/30 text-cyan-700 dark:text-cyan-300 font-mono text-[10px] font-bold">
+                {response.ocr_result.machine_brand}
+              </span>
+            )}
+          </div>
+          {response.ocr_result.extracted_text && (
+            <p className="font-mono text-[11px] text-slate-700 dark:text-cyan-100/90 bg-white/70 dark:bg-black/30 p-2 rounded-lg border border-cyan-200 dark:border-cyan-500/20 line-clamp-2">
+              &quot;{response.ocr_result.extracted_text}&quot;
+            </p>
+          )}
         </div>
       )}
 

@@ -73,8 +73,6 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
     if (!file.type.startsWith("image/")) return;
 
     setImageName(file.name);
-    // Automatically switch to vision model if image attached
-    setSelectedModel("openai/gpt-oss-120b");
 
     const reader = new FileReader();
     reader.onload = (uploadEvent) => {
@@ -271,9 +269,9 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-xs font-mono font-bold text-slate-900 dark:text-white truncate">{imageName || "Equipment Attachment"}</p>
-            <div className="flex items-center gap-1.5 text-[10px] font-mono text-cyan-600 dark:text-cyan-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 dark:bg-cyan-400 animate-pulse" />
-              <span>Vision OCR Neural Model Armed</span>
+            <div className="flex items-center gap-1.5 text-[10px] font-mono text-emerald-600 dark:text-emerald-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
+              <span>Optical OCR Active · Auto-extracts Error Codes &amp; Text</span>
             </div>
           </div>
           <button

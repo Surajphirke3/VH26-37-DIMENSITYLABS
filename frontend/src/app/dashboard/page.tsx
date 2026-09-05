@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -25,11 +25,6 @@ import {
   Smartphone,
   Columns,
   Trash2,
-  Menu,
-  X,
-  LogOut,
-  PanelLeftClose,
-  PanelLeftOpen,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { getMachines, createConversation, listConversations, deleteConversation } from "@/lib/api";
@@ -85,21 +80,7 @@ export default function DashboardPage() {
   const [conversations, setConversations] = useState<ConvEntry[]>([]);
   const [activeConvId, setActiveConvId] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [navMenuOpen, setNavMenuOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"desktop" | "mobile" | "split">("desktop");
-  const navMenuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (navMenuRef.current && !navMenuRef.current.contains(e.target as Node)) {
-        setNavMenuOpen(false);
-      }
-    }
-    if (navMenuOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-      return () => document.removeEventListener("mousedown", handleClickOutside);
-    }
-  }, [navMenuOpen]);
 
   useEffect(() => {
     if (!authLoading && !user) router.replace("/login");
@@ -198,7 +179,7 @@ export default function DashboardPage() {
     <div className="flex h-screen overflow-hidden bg-[var(--bg-base)] text-[var(--text-primary)] transition-colors duration-200">
       {/* ── SIDEBAR ── */}
       <aside
-        className="shrink-0 flex flex-col transition-all duration-300 border-r border-[var(--border)] relative z-20 select-none overflow-hidden"
+        className="shrink-0 flex flex-col transition-all duration-300 border-r border-[var(--border)] relative z-20 select-none"
         style={{
           width: sidebarOpen ? "280px" : "0px",
           background: "var(--bg-surface)",
@@ -242,27 +223,17 @@ export default function DashboardPage() {
               </div>
             </Link>
 
-            <div className="flex items-center gap-1.5">
-              <button
-                type="button"
-                onClick={() => setSidebarOpen(false)}
-                className="p-1 rounded-md text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors cursor-pointer"
-                title="Collapse Sidebar"
-              >
-                <PanelLeftClose className="w-4 h-4" />
-              </button>
-              <Link
-                href="/"
-                className="text-[10px] font-mono text-slate-400 hover:text-indigo-500 transition-colors px-1.5 py-1 rounded hover:bg-slate-100 dark:hover:bg-white/[0.05]"
-                title="Return to Public Website"
-              >
-                Portal ↗
-              </Link>
-            </div>
+            <Link
+              href="/"
+              className="text-[10px] font-mono text-slate-400 hover:text-indigo-500 transition-colors px-1.5 py-1 rounded hover:bg-slate-100 dark:hover:bg-white/[0.05]"
+              title="Return to Public Website"
+            >
+              Portal ↗
+            </Link>
           </div>
 
           {/* Machine Selector */}
-          <div className="px-4 py-3.5 border-b border-[var(--border)]">
+          <div className="px-4 py-3.5 border-b border-[var(--border)] relative z-30">
             <p className="text-[10px] font-mono font-bold uppercase tracking-widest mb-2 px-1 text-slate-400 dark:text-slate-500">
               Active Machine Filter
             </p>
@@ -443,227 +414,23 @@ export default function DashboardPage() {
 
         {/* Top SCADA Flight Deck Header */}
         <header
-          className="flex items-center justify-between px-6 py-3 shrink-0 border-b border-[var(--border)] backdrop-blur-md relative z-30 bg-[var(--bg-surface)]/90"
+          className="flex items-center justify-between px-6 py-3 shrink-0 border-b border-[var(--border)] backdrop-blur-md relative z-10 bg-[var(--bg-surface)]/85"
         >
           <div className="flex items-center gap-3 min-w-0">
-            {/* Interactive SCADA Drop Menu */}
-            <div ref={navMenuRef} className="relative">
-              <button
-                type="button"
-                onClick={() => setNavMenuOpen((v) => !v)}
-                className={`p-1.5 rounded-lg border transition-all cursor-pointer flex items-center justify-center ${
-                  navMenuOpen
-                    ? "bg-indigo-50 dark:bg-indigo-950/40 border-indigo-500/50 text-indigo-600 dark:text-indigo-400 shadow-sm"
-                    : "border-slate-200/80 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/[0.06] text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
-                }`}
-                title="Open Navigation Menu"
-                aria-label="Navigation Menu"
-                aria-expanded={navMenuOpen}
-              >
-                {navMenuOpen ? (
-                  <X className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-                ) : (
-                  <Menu className="w-5 h-5" />
-                )}
-              </button>
-
-              {navMenuOpen && (
-                <div className="absolute left-0 top-full mt-2 w-76 rounded-2xl bg-white dark:bg-[#10131c] border border-slate-200 dark:border-white/15 p-2.5 shadow-2xl z-50 animate-fade-in divide-y divide-slate-100 dark:divide-white/10 backdrop-blur-2xl">
-                  {/* Console Operator Profile Strip */}
-                  <div className="px-3 py-2 flex items-center justify-between">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <div className="w-7 h-7 rounded-lg bg-indigo-500/10 dark:bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold font-mono text-xs shrink-0">
-                        {user?.email ? user.email.slice(0, 2).toUpperCase() : "OP"}
-                      </div>
-                      <div className="min-w-0">
-                        <div className="text-[11px] font-bold text-slate-900 dark:text-slate-100 truncate">
-                          {user?.email || "Diagnostic Operator"}
-                        </div>
-                        <div className="text-[9px] font-mono text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                          <span>MEND-X ONLINE</span>
-                        </div>
-                      </div>
-                    </div>
-                    <span className="px-2 py-0.5 rounded-md text-[9px] font-mono font-bold uppercase tracking-wider bg-indigo-500/10 text-indigo-600 dark:text-indigo-300 border border-indigo-500/20">
-                      {user?.role || "USER"}
-                    </span>
-                  </div>
-
-                  {/* Core Navigation Links */}
-                  <div className="py-2 space-y-1">
-                    <div className="px-2 text-[9px] font-mono font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1">
-                      Console Navigation
-                    </div>
-
-                    <Link
-                      href="/dashboard"
-                      onClick={() => setNavMenuOpen(false)}
-                      className="flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-semibold bg-indigo-500/10 text-indigo-600 dark:text-indigo-300 border border-indigo-500/20 transition-colors"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Activity className="w-4 h-4 text-indigo-500" />
-                        <span>Diagnostics HUD</span>
-                      </div>
-                      <span className="text-[10px] font-mono text-indigo-500 font-bold">ACTIVE</span>
-                    </Link>
-
-                    <Link
-                      href="/documents"
-                      onClick={() => setNavMenuOpen(false)}
-                      className="flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
-                    >
-                      <div className="flex items-center gap-2">
-                        <FileText className="w-4 h-4 text-slate-400" />
-                        <span>OEM Manuals & PDFs</span>
-                      </div>
-                      <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-                    </Link>
-
-                    {user?.role === "admin" && (
-                      <Link
-                        href="/admin"
-                        onClick={() => setNavMenuOpen(false)}
-                        className="flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-medium text-amber-700 dark:text-amber-300 hover:bg-amber-500/10 transition-colors"
-                      >
-                        <div className="flex items-center gap-2">
-                          <ShieldCheck className="w-4 h-4 text-amber-500" />
-                          <span>Admin Ingestion Suite</span>
-                        </div>
-                        <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-600 dark:text-amber-400 font-bold">
-                          ADMIN
-                        </span>
-                      </Link>
-                    )}
-
-                    <Link
-                      href="/inspector"
-                      onClick={() => setNavMenuOpen(false)}
-                      className="flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Zap className="w-4 h-4 text-cyan-500" />
-                        <span>8-Stage RAG Inspector</span>
-                      </div>
-                      <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-                    </Link>
-                  </div>
-
-                  {/* Actions & Sidebar Toggle */}
-                  <div className="py-2 space-y-1">
-                    <div className="px-2 text-[9px] font-mono font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1">
-                      Quick Operations
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setNavMenuOpen(false);
-                        startNewConversation(selectedMachine ?? undefined);
-                      }}
-                      className="w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-medium text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/10 transition-colors cursor-pointer text-left"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Plus className="w-4 h-4 text-emerald-500" />
-                        <span>Launch New Session</span>
-                      </div>
-                      <span className="text-[9px] font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded">
-                        NEW
-                      </span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSidebarOpen((v) => !v);
-                        setNavMenuOpen(false);
-                      }}
-                      className="w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors cursor-pointer text-left"
-                    >
-                      <div className="flex items-center gap-2">
-                        {sidebarOpen ? (
-                          <PanelLeftClose className="w-4 h-4 text-slate-400" />
-                        ) : (
-                          <PanelLeftOpen className="w-4 h-4 text-slate-400" />
-                        )}
-                        <span>{sidebarOpen ? "Collapse Left Sidebar" : "Expand Left Sidebar"}</span>
-                      </div>
-                      <span className="text-[10px] font-mono text-slate-400">
-                        {sidebarOpen ? "Open" : "Closed"}
-                      </span>
-                    </button>
-                  </div>
-
-                  {/* Machine Scope Switcher */}
-                  <div className="py-2 space-y-1">
-                    <div className="px-2 flex items-center justify-between mb-1">
-                      <span className="text-[9px] font-mono font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                        Target Machine Scope
-                      </span>
-                      <span className="text-[9px] font-mono text-indigo-500 dark:text-indigo-400 font-semibold">
-                        {selectedMachine ? selectedMachine.model : "Fleet Mode"}
-                      </span>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedMachine(null);
-                        setNavMenuOpen(false);
-                      }}
-                      className={`w-full text-left px-2.5 py-1.5 rounded-xl text-xs flex items-center justify-between transition-colors cursor-pointer ${
-                        !selectedMachine
-                          ? "bg-indigo-600 text-white font-bold"
-                          : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5"
-                      }`}
-                    >
-                      <span>All Equipment (Fleet Mode)</span>
-                      {!selectedMachine && <span className="text-[10px]">✓</span>}
-                    </button>
-
-                    <div className="pt-0.5 space-y-0.5 max-h-36 overflow-y-auto">
-                      {machines.map((m) => (
-                        <button
-                          key={m.id}
-                          type="button"
-                          onClick={() => {
-                            setSelectedMachine(m);
-                            setNavMenuOpen(false);
-                          }}
-                          className={`w-full text-left px-2.5 py-1.5 rounded-xl text-xs flex items-center justify-between transition-colors cursor-pointer ${
-                            selectedMachine?.id === m.id
-                              ? "bg-indigo-600 text-white font-bold"
-                              : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5"
-                          }`}
-                        >
-                          <div className="flex items-center gap-2 truncate mr-2">
-                            <ManufacturerLogo name={m.name} manufacturer={m.manufacturer} size="xs" />
-                            <span className="truncate">{m.name}</span>
-                          </div>
-                          <span className="text-[9px] font-mono opacity-70 shrink-0">{m.model}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Sign Out Footer */}
-                  <div className="pt-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setNavMenuOpen(false);
-                        logout();
-                        router.replace("/login");
-                      }}
-                      className="w-full flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer"
-                    >
-                      <LogOut className="w-4 h-4" />
-                      <span>Sign Out Operator</span>
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
+            <button
+              onClick={() => setSidebarOpen((v) => !v)}
+              className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/[0.05] transition-colors text-slate-400 hover:text-white cursor-pointer"
+              title={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            </button>
 
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
@@ -825,7 +592,7 @@ export default function DashboardPage() {
                         setSelectedMachine(null);
                       } else {
                         const found = machines.find((m) => m.id === id);
-                        if (found) setSelectedMachine(found);
+                        setSelectedMachine(found || null);
                       }
                     }}
                     onFirstMessage={handleFirstMessage}
@@ -1013,7 +780,7 @@ export default function DashboardPage() {
                   setSelectedMachine(null);
                 } else {
                   const found = machines.find((m) => m.id === id);
-                  if (found) setSelectedMachine(found);
+                  setSelectedMachine(found || null);
                 }
               }}
               onFirstMessage={handleFirstMessage}
