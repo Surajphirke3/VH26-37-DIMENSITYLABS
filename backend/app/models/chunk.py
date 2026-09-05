@@ -1,7 +1,17 @@
 
 import enum
 
-from pgvector.sqlalchemy import Vector
+try:
+    from pgvector.sqlalchemy import Vector
+except ImportError:
+    from sqlalchemy.types import UserDefinedType
+
+    class Vector(UserDefinedType):  # type: ignore
+        def __init__(self, dim: int = 768):
+            self.dim = dim
+
+        def get_col_spec(self, **kw):
+            return f"vector({self.dim})"
 from sqlalchemy import ARRAY, Column, Enum, ForeignKey, Index, Integer, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
