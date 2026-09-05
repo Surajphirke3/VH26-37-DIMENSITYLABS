@@ -3,7 +3,20 @@ import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-nati
 import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
-const C = { bg: '#0f172a', surface: '#1e293b', border: '#334155', accent: '#6366f1', text: '#f1f5f9', muted: '#94a3b8', success: '#22c55e', warning: '#f59e0b', error: '#ef4444' };
+import { colors } from '@/lib/theme';
+
+const C = {
+  bg: colors.background,
+  surface: colors.surface,
+  surfaceElevated: colors.surfaceElevated,
+  border: colors.border,
+  accent: colors.accent,
+  text: colors.text,
+  muted: colors.muted,
+  success: colors.success,
+  warning: colors.warning,
+  error: colors.error,
+};
 
 function ScoreBar({ score }: { score: number }) {
   const pct = Math.round(score * 100);

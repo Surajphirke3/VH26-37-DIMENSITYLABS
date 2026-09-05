@@ -9,10 +9,19 @@ import { getMachines, createMachine, deactivateMachine, getManuals, deleteManual
 import { useAuth } from '@/lib/auth-context';
 import type { Machine, Manual } from '@/lib/types';
 
+import { colors } from '@/lib/theme';
+
 const C = {
-  bg: '#0f172a', surface: '#1e293b', border: '#334155',
-  accent: '#6366f1', text: '#f1f5f9', muted: '#94a3b8',
-  success: '#22c55e', error: '#ef4444', warning: '#f59e0b',
+  bg: colors.background,
+  surface: colors.surface,
+  surfaceElevated: colors.surfaceElevated,
+  border: colors.border,
+  accent: colors.accent,
+  text: colors.text,
+  muted: colors.muted,
+  success: colors.success,
+  error: colors.error,
+  warning: colors.warning,
 };
 
 const CATEGORIES = ['CNC', 'Hydraulic', 'Pneumatic', 'Electrical', 'Mechanical', 'Other'];

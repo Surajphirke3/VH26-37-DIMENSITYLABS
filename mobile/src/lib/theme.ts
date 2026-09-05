@@ -1,24 +1,59 @@
+// ==============================================================================
+// MEND - X | Mobile Design System & Tokens
+// Aligned with Next.js Web Frontend (globals.css Cyber Noir Theme)
+// ==============================================================================
+
 export const colors = {
-  background: "#0f172a",
-  surface: "#1e293b",
-  surfaceElevated: "#263548",
-  border: "#334155",
+  // Base Surfaces (exact matches to globals.css)
+  bgBase: "#06070a",
+  background: "#06070a",
+  surface: "#0c0e14",
+  surfaceElevated: "#121520",
+  surfaceOverlay: "#181c2b",
+
+  // Borders
+  border: "rgba(255, 255, 255, 0.08)",
+  borderSolid: "#1a1e2d",
+  borderHover: "rgba(255, 255, 255, 0.18)",
+  borderAccent: "rgba(99, 102, 241, 0.5)",
+
+  // Brand & Accent Colors
   accent: "#6366f1",
+  accentPrimary: "#6366f1",
   accentHover: "#4f46e5",
   accentMuted: "#312e81",
-  text: "#f1f5f9",
-  textSecondary: "#cbd5e1",
-  muted: "#94a3b8",
-  success: "#22c55e",
-  successMuted: "#14532d",
+  accentViolet: "#8b5cf6",
+  accentPink: "#ec4899",
+  accentAi: "#10b981",
+  accentCyan: "#06b6d4",
+
+  // Typography
+  text: "#f8fafc",
+  textPrimary: "#f8fafc",
+  textSecondary: "#a1a1aa",
+  muted: "#71717a",
+  textMuted: "#71717a",
+
+  // Status & Semantics
+  success: "#10b981",
+  successMuted: "rgba(16, 185, 129, 0.15)",
   warning: "#f59e0b",
-  warningMuted: "#451a03",
+  warningMuted: "rgba(245, 158, 11, 0.15)",
   error: "#ef4444",
-  errorMuted: "#450a0a",
-  info: "#38bdf8",
-  infoMuted: "#0c4a6e",
-  overlay: "rgba(0,0,0,0.6)",
+  errorMuted: "rgba(239, 68, 68, 0.15)",
+  info: "#06b6d4",
+  infoMuted: "rgba(6, 182, 212, 0.15)",
+
+  // Ambient & Overlays
+  overlay: "rgba(0, 0, 0, 0.78)",
+  cyberGlow: "rgba(99, 102, 241, 0.25)",
 } as const;
+
+export const roleColors: Record<string, { main: string; bg: string; border: string }> = {
+  admin: { main: "#ef4444", bg: "rgba(239, 68, 68, 0.12)", border: "rgba(239, 68, 68, 0.35)" },
+  technician: { main: "#10b981", bg: "rgba(16, 185, 129, 0.12)", border: "rgba(16, 185, 129, 0.35)" },
+  manager: { main: "#f59e0b", bg: "rgba(245, 158, 11, 0.12)", border: "rgba(245, 158, 11, 0.35)" },
+};
 
 export const spacing = {
   xs: 4,
@@ -59,34 +94,40 @@ export const typography = {
 
 export const borderRadius = {
   xs: 4,
-  sm: 6,
-  md: 8,
-  lg: 12,
-  xl: 16,
-  xxl: 20,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 24,
   full: 9999,
 } as const;
 
 export const shadows = {
   sm: {
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.18,
-    shadowRadius: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.35,
+    shadowRadius: 4,
     elevation: 2,
   },
   md: {
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.22,
-    shadowRadius: 5,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    elevation: 5,
   },
   lg: {
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.28,
-    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.65,
+    shadowRadius: 20,
     elevation: 8,
+  },
+  glow: {
+    shadowColor: "#6366f1",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.4,
+    shadowRadius: 16,
+    elevation: 6,
   },
 } as const;

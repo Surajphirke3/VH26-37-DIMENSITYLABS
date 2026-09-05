@@ -61,7 +61,7 @@ export default function MessageInput({
           <Ionicons
             name="arrow-up"
             size={18}
-            color={canSend ? colors.text : colors.muted}
+            color={canSend ? "#ffffff" : colors.muted}
           />
         </TouchableOpacity>
       </View>
@@ -75,18 +75,17 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
     gap: spacing.sm,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
+    paddingVertical: spacing.sm + 2,
     backgroundColor: colors.surface,
     borderTopWidth: 1,
     borderTopColor: colors.border,
-    ...shadows.sm,
   },
   input: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.surfaceElevated,
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: borderRadius.xl,
+    borderRadius: borderRadius.lg,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm + 2,
     fontSize: 15,
@@ -94,15 +93,19 @@ const styles = StyleSheet.create({
     maxHeight: 96,
   },
   sendBtn: {
-    width: 36,
-    height: 36,
+    width: 38,
+    height: 38,
     borderRadius: borderRadius.full,
-    backgroundColor: colors.border,
+    backgroundColor: colors.surfaceElevated,
+    borderWidth: 1,
+    borderColor: colors.border,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 2,
   },
   sendBtnActive: {
     backgroundColor: colors.accent,
+    borderColor: colors.accent,
+    ...shadows.glow,
   },
 });

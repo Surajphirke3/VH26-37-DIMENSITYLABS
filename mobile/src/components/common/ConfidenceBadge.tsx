@@ -9,10 +9,10 @@ interface ConfidenceBadgeProps {
   score?: number | null;
 }
 
-const levelConfig: Record<ConfidenceLevel, { bg: string; text: string; label: string }> = {
-  HIGH:   { bg: colors.successMuted, text: colors.success, label: "HIGH" },
-  MEDIUM: { bg: colors.warningMuted, text: colors.warning, label: "MED" },
-  LOW:    { bg: colors.errorMuted,   text: colors.error,   label: "LOW" },
+const levelConfig: Record<ConfidenceLevel, { bg: string; text: string; border: string; label: string }> = {
+  HIGH:   { bg: "rgba(16, 185, 129, 0.12)", text: colors.success, border: "rgba(16, 185, 129, 0.35)", label: "HIGH" },
+  MEDIUM: { bg: "rgba(245, 158, 11, 0.12)", text: colors.warning, border: "rgba(245, 158, 11, 0.35)", label: "MED" },
+  LOW:    { bg: "rgba(239, 68, 68, 0.12)",  text: colors.error,   border: "rgba(239, 68, 68, 0.35)",  label: "LOW" },
 };
 
 export default function ConfidenceBadge({ level, score }: ConfidenceBadgeProps) {
@@ -22,7 +22,7 @@ export default function ConfidenceBadge({ level, score }: ConfidenceBadgeProps) 
   const pct = score != null ? `${Math.round(score * 100)}%` : null;
 
   return (
-    <View style={[styles.pill, { backgroundColor: cfg.bg }]}>
+    <View style={[styles.pill, { backgroundColor: cfg.bg, borderColor: cfg.border }]}>
       <Text style={[styles.levelText, { color: cfg.text }]}>{cfg.label}</Text>
       {pct ? (
         <>
@@ -40,9 +40,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     alignSelf: "flex-start",
     borderRadius: borderRadius.full,
+    borderWidth: 1,
     paddingHorizontal: spacing.sm + 2,
     paddingVertical: spacing.xs - 1,
-    gap: spacing.xs - 1,
+    gap: spacing.xs,
   },
   levelText: {
     fontSize: typography.size.xs,
@@ -52,7 +53,7 @@ const styles = StyleSheet.create({
   divider: {
     width: 1,
     height: 10,
-    opacity: 0.4,
+    opacity: 0.3,
   },
   scoreText: {
     fontSize: typography.size.xs,

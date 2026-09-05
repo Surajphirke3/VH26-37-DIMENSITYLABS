@@ -9,10 +9,19 @@ import { getManualDetail, getManualChunks, reprocessManual } from '@/lib/api';
 import type { Manual, ManualChunk } from '@/lib/types';
 import { useAuth } from '@/lib/auth-context';
 
+import { colors } from '@/lib/theme';
+
 const C = {
-  bg: '#0f172a', surface: '#1e293b', border: '#334155',
-  accent: '#6366f1', text: '#f1f5f9', muted: '#94a3b8',
-  success: '#22c55e', warning: '#f59e0b', error: '#ef4444',
+  bg: colors.background,
+  surface: colors.surface,
+  surfaceElevated: colors.surfaceElevated,
+  border: colors.border,
+  accent: colors.accent,
+  text: colors.text,
+  muted: colors.muted,
+  success: colors.success,
+  warning: colors.warning,
+  error: colors.error,
 };
 
 const STATUS_COLORS: Record<string, string> = {

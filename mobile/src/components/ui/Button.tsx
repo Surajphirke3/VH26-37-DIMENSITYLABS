@@ -7,12 +7,12 @@ import {
   View,
   ViewStyle,
 } from "react-native";
-import { colors, borderRadius, typography, spacing } from "@/lib/theme";
+import { colors, borderRadius, typography, spacing, shadows } from "@/lib/theme";
 
 interface ButtonProps {
   label: string;
   onPress: () => void;
-  variant?: "primary" | "secondary" | "danger" | "ghost";
+  variant?: "primary" | "secondary" | "danger" | "ghost" | "ai";
   size?: "sm" | "md" | "lg";
   loading?: boolean;
   disabled?: boolean;
@@ -20,15 +20,16 @@ interface ButtonProps {
 }
 
 const variantStyles: Record<string, { bg: string; border?: string; text: string }> = {
-  primary: { bg: colors.accent, text: colors.text },
-  secondary: { bg: colors.surface, border: colors.border, text: colors.text },
-  danger: { bg: colors.error, text: colors.text },
-  ghost: { bg: "transparent", text: colors.muted },
+  primary:   { bg: colors.accent, text: "#ffffff" },
+  secondary: { bg: colors.surfaceElevated, border: colors.border, text: colors.text },
+  danger:    { bg: colors.error, text: "#ffffff" },
+  ghost:     { bg: "transparent", text: colors.textSecondary },
+  ai:        { bg: colors.accentAi, text: "#ffffff" },
 };
 
 const sizeStyles: Record<string, { px: number; py: number; fontSize: number; iconGap: number }> = {
   sm: { px: spacing.md, py: spacing.xs + 2, fontSize: typography.size.sm, iconGap: spacing.xs },
-  md: { px: spacing.lg, py: spacing.sm + 2, fontSize: typography.size.base, iconGap: spacing.sm },
+  md: { px: spacing.lg, py: spacing.sm + 4, fontSize: typography.size.base, iconGap: spacing.sm },
   lg: { px: spacing.xl, py: spacing.md, fontSize: typography.size.md, iconGap: spacing.sm },
 };
 
@@ -41,8 +42,8 @@ export default function Button({
   disabled = false,
   icon,
 }: ButtonProps) {
-  const v = variantStyles[variant];
-  const s = sizeStyles[size];
+  const v = variantStyles[variant] ?? variantStyles.primary;
+  const s = sizeStyles[size] ?? sizeStyles.md;
   const isDisabled = disabled || loading;
 
   const containerStyle: ViewStyle = {
@@ -57,6 +58,7 @@ export default function Button({
     alignItems: "center",
     justifyContent: "center",
     gap: s.iconGap,
+    ...(variant === "primary" ? shadows.glow : shadows.sm),
   };
 
   return (
@@ -64,7 +66,7 @@ export default function Button({
       style={containerStyle}
       onPress={onPress}
       disabled={isDisabled}
-      activeOpacity={0.75}
+      activeOpacity={0.8}
     >
       {loading ? (
         <ActivityIndicator size="small" color={v.text} />
@@ -80,7 +82,7 @@ export default function Button({
 
 const styles = StyleSheet.create({
   label: {
-    fontWeight: typography.weight.semibold,
-    letterSpacing: 0.2,
+    fontWeight: typography.weight.bold,
+    letterSpacing: 0.3,
   },
 });

@@ -46,6 +46,7 @@ export default function Input({
         style={[
           styles.input,
           { borderColor },
+          focused && styles.inputFocused,
           multiline && styles.multiline,
         ]}
         value={value}
@@ -70,24 +71,31 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
   },
   label: {
-    fontSize: typography.size.sm,
-    fontWeight: typography.weight.medium,
-    color: colors.muted,
+    fontSize: typography.size.xs,
+    fontWeight: typography.weight.semibold,
+    color: colors.textSecondary,
+    letterSpacing: 0.5,
+    textTransform: "uppercase",
     marginBottom: 2,
   },
   input: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.surfaceElevated,
     borderWidth: 1,
+    borderColor: colors.border,
     borderRadius: borderRadius.md,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm + 2,
+    paddingVertical: spacing.sm + 4,
     fontSize: typography.size.base,
     color: colors.text,
+  },
+  inputFocused: {
+    borderColor: colors.accent,
+    backgroundColor: colors.surfaceOverlay,
   },
   multiline: {
     minHeight: 96,
     textAlignVertical: "top",
-    paddingTop: spacing.sm + 2,
+    paddingTop: spacing.sm + 4,
   },
   error: {
     fontSize: typography.size.xs,

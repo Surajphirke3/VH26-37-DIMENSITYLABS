@@ -1,13 +1,7 @@
+import React from 'react';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-
-const C = {
-  surface: '#1e293b',
-  accent: '#6366f1',
-  muted: '#94a3b8',
-  border: '#334155',
-  bg: '#0f172a',
-};
+import { colors } from '@/lib/theme';
 
 type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
 
@@ -26,21 +20,35 @@ export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
-        headerStyle: { backgroundColor: C.surface },
-        headerTintColor: '#f1f5f9',
-        headerTitleStyle: { fontWeight: '600' },
+        headerStyle: {
+          backgroundColor: colors.surface,
+          borderBottomWidth: 1,
+          borderBottomColor: colors.border,
+        },
+        headerTintColor: colors.text,
+        headerTitleStyle: {
+          fontWeight: '700',
+          fontSize: 17,
+          color: colors.text,
+          letterSpacing: 0.3,
+        },
         headerShadowVisible: false,
         tabBarStyle: {
-          backgroundColor: C.surface,
-          borderTopColor: C.border,
+          backgroundColor: colors.surface,
+          borderTopColor: colors.border,
           borderTopWidth: 1,
-          paddingBottom: 4,
-          paddingTop: 4,
-          height: 60,
+          paddingBottom: 6,
+          paddingTop: 6,
+          height: 62,
         },
-        tabBarActiveTintColor: C.accent,
-        tabBarInactiveTintColor: C.muted,
-        tabBarLabelStyle: { fontSize: 11, fontWeight: '500', marginTop: 2 },
+        tabBarActiveTintColor: colors.accent,
+        tabBarInactiveTintColor: colors.muted,
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: '600',
+          marginTop: 2,
+          letterSpacing: 0.2,
+        },
       }}
     >
       <Tabs.Screen

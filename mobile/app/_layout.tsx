@@ -28,15 +28,17 @@ function AuthGate({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+import { colors } from '@/lib/theme';
+
 // ─── Stack Navigator ──────────────────────────────────────────────────────────
 function RootStack() {
   return (
     <Stack
       screenOptions={{
-        headerStyle: { backgroundColor: '#1e293b' },
-        headerTintColor: '#f1f5f9',
-        headerTitleStyle: { fontWeight: '600', color: '#f1f5f9' },
-        contentStyle: { backgroundColor: '#0f172a' },
+        headerStyle: { backgroundColor: colors.surface },
+        headerTintColor: colors.text,
+        headerTitleStyle: { fontWeight: '700', color: colors.text },
+        contentStyle: { backgroundColor: colors.background },
         headerShadowVisible: false,
       }}
     >
@@ -68,7 +70,7 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <AuthProvider>
-        <StatusBar style="light" backgroundColor="#0f172a" />
+        <StatusBar style="light" backgroundColor={colors.background} />
         <AuthGate>
           <RootStack />
         </AuthGate>

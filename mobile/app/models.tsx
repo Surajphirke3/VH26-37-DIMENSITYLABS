@@ -5,7 +5,20 @@ import { Ionicons } from '@expo/vector-icons';
 import { getModels, getActiveModel } from '@/lib/api';
 import type { AIModel } from '@/lib/types';
 
-const C = { bg: '#0f172a', surface: '#1e293b', border: '#334155', accent: '#6366f1', text: '#f1f5f9', muted: '#94a3b8', success: '#22c55e', warning: '#f59e0b', error: '#ef4444' };
+import { colors } from '@/lib/theme';
+
+const C = {
+  bg: colors.background,
+  surface: colors.surface,
+  surfaceElevated: colors.surfaceElevated,
+  border: colors.border,
+  accent: colors.accent,
+  text: colors.text,
+  muted: colors.muted,
+  success: colors.success,
+  warning: colors.warning,
+  error: colors.error,
+};
 const TC: Record<string, { color: string; label: string; bg: string }> = {
   NORD: { color: '#38bdf8', label: 'NORD', bg: '#0ea5e920' },
   FORGE: { color: '#f59e0b', label: 'FORGE', bg: '#f59e0b20' },
