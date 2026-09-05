@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: "standalone",
+  // Vercel handles output tracing natively and will error if standalone is used with Next.js 16
+  output: process.env.VERCEL ? undefined : "standalone",
   images: {
     remotePatterns: [
       {
