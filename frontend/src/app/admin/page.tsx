@@ -309,15 +309,15 @@ export default function AdminPage() {
                   {machines.map((m, i) => (
                     <div
                       key={m.id}
-                      className="flex items-center justify-between p-4 rounded-xl transition-all animate-fade-in bg-white/[0.02] border border-white/[0.05] hover:bg-white/[0.04] hover:border-white/[0.1]"
+                      className="flex items-center justify-between p-4 rounded-xl transition-all animate-fade-in bg-slate-50 dark:bg-white/[0.02] border border-slate-200 dark:border-white/[0.05] hover:bg-slate-100 dark:hover:bg-white/[0.04] hover:border-slate-300 dark:hover:border-white/[0.1]"
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-xl flex items-center justify-center text-sm shrink-0 bg-indigo-500/10 border border-indigo-500/20">
                           ⚙️
                         </div>
                         <div>
-                          <p className="text-sm font-semibold text-slate-100">{m.name}</p>
-                          <p className="text-xs text-slate-400">
+                          <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{m.name}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">
                             {[m.manufacturer, m.model].filter(Boolean).join(" · ")}
                           </p>
                         </div>

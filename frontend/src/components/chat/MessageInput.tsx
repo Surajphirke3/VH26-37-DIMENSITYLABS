@@ -220,20 +220,20 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
   };
 
   return (
-    <div className="shrink-0 px-4 sm:px-6 py-3.5 border-t border-slate-700/60 dark:border-white/[0.08] bg-slate-950/90 dark:bg-black/80 backdrop-blur-xl transition-colors">
+    <div className="shrink-0 px-4 sm:px-6 py-3.5 border-t border-slate-200 dark:border-white/[0.08] bg-slate-50/95 dark:bg-black/80 backdrop-blur-xl transition-colors">
       {/* ── Top Bar: Error Code Detector & Model Selector ── */}
       <div className="flex items-center justify-between flex-wrap gap-2 mb-2 px-1">
         <div className="flex items-center gap-2">
           {hasErrorCode ? (
-            <div className="animate-fade-in flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-amber-500/15 border border-amber-500/35 text-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.2)]">
-              <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+            <div className="animate-fade-in flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-amber-500/15 border border-amber-500/35 text-amber-600 dark:text-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.15)]">
+              <span className="w-2 h-2 rounded-full bg-amber-500 dark:bg-amber-400 animate-ping" />
               <span>FAULT PATTERN DETECTED → DIRECT OEM MANUAL SEARCH ACTIVATED</span>
             </div>
           ) : (
-            <div className="hidden sm:flex items-center gap-1.5 text-[10px] font-mono text-slate-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <div className="hidden sm:flex items-center gap-1.5 text-[10px] font-mono text-slate-500 dark:text-slate-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
               <span>TERMINAL READY</span>
-              <span className="text-slate-600">·</span>
+              <span className="text-slate-400 dark:text-slate-600">·</span>
               <span>TYPE SYMPTOM OR ERROR CODE</span>
             </div>
           )}
@@ -241,16 +241,16 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
 
         {/* Model routing selector pill */}
         <div className="flex items-center gap-1.5 ml-auto text-xs">
-          <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-800/80 border border-white/10 text-slate-300">
-            <Cpu className="w-3.5 h-3.5 text-cyan-400" />
+          <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 shadow-sm">
+            <Cpu className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
             <select
               value={selectedModel}
               onChange={(e) => setSelectedModel(e.target.value)}
-              className="bg-transparent border-0 text-[11px] font-mono font-semibold text-slate-200 focus:outline-none cursor-pointer max-w-[210px] truncate"
+              className="bg-transparent border-0 text-[11px] font-mono font-semibold text-slate-800 dark:text-slate-200 focus:outline-none cursor-pointer max-w-[210px] truncate"
               title="Select AI Diagnostic Engine"
             >
               {availableModels.map((m) => (
-                <option key={m.id} value={m.id} className="bg-slate-900 text-slate-200">
+                <option key={m.id} value={m.id} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200">
                   {m.name}
                 </option>
               ))}
@@ -261,7 +261,7 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
 
       {/* Attached Image Preview */}
       {selectedImage && (
-        <div className="mb-2.5 flex items-center gap-3 p-2 bg-indigo-950/40 border border-indigo-500/30 rounded-xl animate-fade-in shadow-lg">
+        <div className="mb-2.5 flex items-center gap-3 p-2 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-500/30 rounded-xl animate-fade-in shadow-md">
           <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-indigo-400/40 shrink-0">
             <img
               src={selectedImage}
@@ -270,16 +270,16 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
             />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-mono font-bold text-white truncate">{imageName || "Equipment Attachment"}</p>
-            <div className="flex items-center gap-1.5 text-[10px] font-mono text-cyan-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+            <p className="text-xs font-mono font-bold text-slate-900 dark:text-white truncate">{imageName || "Equipment Attachment"}</p>
+            <div className="flex items-center gap-1.5 text-[10px] font-mono text-cyan-600 dark:text-cyan-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 dark:bg-cyan-400 animate-pulse" />
               <span>Vision OCR Neural Model Armed</span>
             </div>
           </div>
           <button
             type="button"
             onClick={removeImage}
-            className="p-1.5 hover:bg-white/10 rounded-lg text-slate-400 hover:text-white transition-colors cursor-pointer"
+            className="p-1.5 hover:bg-slate-200 dark:hover:bg-white/10 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white transition-colors cursor-pointer"
             title="Remove attachment"
           >
             <X className="w-4 h-4" />
@@ -288,7 +288,7 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
       )}
 
       {/* ── High-Tech Input Console ── */}
-      <div className="flex items-end gap-2.5 p-1.5 rounded-2xl bg-slate-900/90 dark:bg-black/60 border border-slate-700/60 dark:border-cyan-500/25 focus-within:border-cyan-400 focus-within:shadow-[0_0_25px_rgba(6,182,212,0.2)] transition-all">
+      <div className="flex items-end gap-2.5 p-1.5 rounded-2xl bg-white dark:bg-black/60 border border-slate-200 dark:border-cyan-500/25 focus-within:border-cyan-500 dark:focus-within:border-cyan-400 focus-within:shadow-[0_0_20px_rgba(6,182,212,0.15)] shadow-sm transition-all">
         {/* Hidden File Input */}
         <input
           ref={fileInputRef}
@@ -304,7 +304,7 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
           type="button"
           onClick={() => fileInputRef.current?.click()}
           disabled={isLoading}
-          className="shrink-0 w-10 h-10 flex items-center justify-center rounded-xl border border-white/10 bg-slate-800/80 hover:bg-slate-700/80 text-amber-400 transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95"
+          className="shrink-0 w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-700/80 text-amber-600 dark:text-amber-400 transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95"
           title="Attach equipment photo / nameplate"
         >
           <ImageIcon className="w-4 h-4" />
@@ -315,7 +315,7 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
           type="button"
           onClick={handleCameraClick}
           disabled={isLoading}
-          className="shrink-0 w-10 h-10 flex items-center justify-center rounded-xl border border-white/10 bg-slate-800/80 hover:bg-slate-700/80 text-cyan-400 transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95"
+          className="shrink-0 w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-700/80 text-cyan-600 dark:text-cyan-400 transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95"
           title="Open camera & optical OCR scanner"
         >
           <Camera className="w-4 h-4" />
@@ -331,7 +331,7 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
             disabled={isLoading}
             rows={2}
             placeholder="Enter fault code (e.g. Alarm 102, F01043), symptom description, or attach photo…"
-            className="w-full px-3 py-2 text-xs sm:text-sm font-sans rounded-xl leading-relaxed bg-transparent border-0 text-white placeholder:text-slate-500 focus:outline-none"
+            className="w-full px-3 py-2 text-xs sm:text-sm font-sans rounded-xl leading-relaxed bg-transparent border-0 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none"
             style={{
               minHeight: "48px",
               maxHeight: "120px",
@@ -339,12 +339,12 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
             }}
           />
           {isLoading && (
-            <div className="absolute right-2 bottom-2 flex items-center gap-1 text-[10px] font-mono text-cyan-400">
+            <div className="absolute right-2 bottom-2 flex items-center gap-1 text-[10px] font-mono text-cyan-600 dark:text-cyan-400">
               <div
-                className="w-3.5 h-3.5 rounded-full border-2 border-cyan-400/20 border-t-cyan-400"
+                className="w-3.5 h-3.5 rounded-full border-2 border-cyan-400/20 border-t-cyan-500"
                 style={{ animation: "spin 0.8s linear infinite" }}
               />
-              <span className="hidden sm:inline">Grounding...</span>
+              <span className="hidden sm:inline font-semibold">Grounding...</span>
             </div>
           )}
         </div>
@@ -356,7 +356,7 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
           disabled={isLoading || (!value.trim() && !selectedImage)}
           className={`shrink-0 h-10 px-4 flex items-center justify-center gap-2 rounded-xl font-mono text-xs font-bold transition-all ${
             isLoading || (!value.trim() && !selectedImage)
-              ? "bg-slate-800/60 border border-white/5 text-slate-500 cursor-not-allowed"
+              ? "bg-slate-200 dark:bg-slate-800/60 border border-slate-300/60 dark:border-white/5 text-slate-400 dark:text-slate-500 cursor-not-allowed"
               : "bg-gradient-to-r from-cyan-500 via-indigo-600 to-indigo-700 text-white shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
           }`}
           aria-label="Send query"
@@ -368,10 +368,10 @@ export default function MessageInput({ onSend, isLoading }: MessageInputProps) {
         </button>
       </div>
 
-      <div className="mt-2 flex items-center justify-between px-1 text-[10px] font-mono text-slate-400 flex-wrap gap-1">
+      <div className="mt-2 flex items-center justify-between px-1 text-[10px] font-mono text-slate-500 dark:text-slate-400 flex-wrap gap-1">
         <span>↵ Enter to transmit · Shift+↵ for new line · Multilingual & Multimodal</span>
-        <span className="text-emerald-400 font-semibold flex items-center gap-1">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+        <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400" />
           MODBUS / CANopen CONNECTED
         </span>
       </div>

@@ -256,7 +256,7 @@ export default function ChatInterface({
   return (
     <div className="flex flex-col h-full bg-[var(--bg-base)] text-[var(--text-primary)] transition-colors duration-200 relative overflow-hidden">
       {/* ── High-Tech Grounded Equipment Context HUD ── */}
-      <div className="px-6 py-2.5 bg-slate-900/90 dark:bg-black/60 border-b border-slate-200 dark:border-white/[0.08] backdrop-blur-md flex items-center justify-between shrink-0 z-20">
+      <div className="px-6 py-2.5 bg-slate-100/90 dark:bg-black/60 border-b border-slate-200 dark:border-white/[0.08] backdrop-blur-md flex items-center justify-between shrink-0 z-20">
         <div className="flex items-center gap-3 min-w-0">
           {currentMachine ? (
             <div className="flex items-center gap-2 min-w-0">
@@ -267,34 +267,34 @@ export default function ChatInterface({
               />
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-slate-100 truncate">
+                  <span className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
                     {currentMachine.name}
                   </span>
-                  <span className="px-1.5 py-0.2 rounded font-mono text-[9px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                  <span className="px-1.5 py-0.2 rounded font-mono text-[9px] font-bold bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30">
                     {currentMachine.model}
                   </span>
                 </div>
-                <div className="flex items-center gap-2 text-[10px] font-mono text-emerald-400">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <div className="flex items-center gap-2 text-[10px] font-mono text-emerald-600 dark:text-emerald-400">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
                   <span>GROUNDED RAG ACTIVE</span>
-                  <span className="text-slate-500">·</span>
-                  <span className="text-slate-400">Air-gapped Vector Store</span>
+                  <span className="text-slate-400 dark:text-slate-500">·</span>
+                  <span className="text-slate-500 dark:text-slate-400">Air-gapped Vector Store</span>
                 </div>
               </div>
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 font-mono text-[10px] font-bold">
+              <div className="w-6 h-6 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-600 dark:text-amber-400 font-mono text-[10px] font-bold">
                 ALL
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-bold text-amber-400">Fleet Wide Mode</span>
-                  <span className="px-1.5 py-0.2 rounded font-mono text-[9px] font-bold bg-amber-500/10 text-amber-300 border border-amber-500/20">
+                  <span className="text-xs font-bold text-amber-600 dark:text-amber-400">Fleet Wide Mode</span>
+                  <span className="px-1.5 py-0.2 rounded font-mono text-[9px] font-bold bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20">
                     CROSS-MACHINE
                   </span>
                 </div>
-                <p className="text-[10px] font-mono text-slate-400">
+                <p className="text-[10px] font-mono text-slate-500 dark:text-slate-400">
                   Auto-disambiguating across all indexed OEM manuals
                 </p>
               </div>
@@ -307,15 +307,15 @@ export default function ChatInterface({
           <button
             type="button"
             onClick={() => setShowMachineDropdown((v) => !v)}
-            className="px-2.5 py-1 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 border border-white/10 text-[11px] font-mono text-slate-300 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
+            className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-white/10 text-[11px] font-mono text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
           >
             <span>Target: {currentMachine ? currentMachine.model : "All Fleet"}</span>
             <ChevronDown className="w-3 h-3 text-slate-400" />
           </button>
 
           {showMachineDropdown && (
-            <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-slate-900 border border-white/15 p-2 shadow-2xl z-50 animate-fade-in divide-y divide-white/5">
-              <div className="px-2 py-1.5 text-[10px] font-mono font-bold uppercase text-slate-400">
+            <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/15 p-2 shadow-2xl z-50 animate-fade-in divide-y divide-slate-100 dark:divide-white/5">
+              <div className="px-2 py-1.5 text-[10px] font-mono font-bold uppercase text-slate-500 dark:text-slate-400">
                 Ground Diagnostics On:
               </div>
               <button
@@ -325,7 +325,9 @@ export default function ChatInterface({
                   setShowMachineDropdown(false);
                 }}
                 className={`w-full text-left px-2.5 py-2 rounded-xl text-xs flex items-center justify-between transition-colors cursor-pointer ${
-                  !machineId ? "bg-indigo-600 text-white font-bold" : "text-slate-300 hover:bg-white/5"
+                  !machineId
+                    ? "bg-indigo-600 text-white font-bold"
+                    : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5"
                 }`}
               >
                 <span>All Equipment (Fleet Mode)</span>
@@ -344,7 +346,7 @@ export default function ChatInterface({
                     className={`w-full text-left px-2.5 py-2 rounded-xl text-xs flex items-center justify-between transition-colors cursor-pointer ${
                       machineId === m.id
                         ? "bg-indigo-600 text-white font-bold"
-                        : "text-slate-300 hover:bg-white/5"
+                        : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5"
                     }`}
                   >
                     <div className="flex items-center gap-2 truncate mr-2">
@@ -367,16 +369,16 @@ export default function ChatInterface({
           <div className="max-w-2xl mx-auto my-8 space-y-6 animate-fade-in text-center">
             {/* Cyber graphic */}
             <div className="relative inline-flex items-center justify-center p-4 rounded-3xl bg-gradient-to-b from-indigo-500/10 via-cyan-500/5 to-transparent border border-cyan-500/20 shadow-[0_0_40px_rgba(6,182,212,0.15)]">
-              <div className="w-16 h-16 rounded-2xl bg-black/60 border border-cyan-400/30 flex items-center justify-center text-cyan-400">
+              <div className="w-16 h-16 rounded-2xl bg-cyan-50 dark:bg-black/60 border border-cyan-500/30 flex items-center justify-center text-cyan-600 dark:text-cyan-400">
                 <Activity className="w-8 h-8 animate-pulse" />
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <h2 className="text-xl sm:text-2xl font-black text-slate-100 tracking-tight">
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
                 MEND-X Industrial Diagnostic Engine
               </h2>
-              <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
+              <p className="text-xs text-slate-600 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
                 Ground every troubleshooting response directly on verified OEM schematics, error fault
                 tables, and field manuals.
               </p>
@@ -384,7 +386,7 @@ export default function ChatInterface({
 
             {/* Quick Fault Launchers */}
             <div className="pt-2 text-left space-y-2">
-              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 block px-1">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block px-1">
                 Quick Test Fault Probes:
               </span>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -393,20 +395,20 @@ export default function ChatInterface({
                     key={idx}
                     type="button"
                     onClick={() => handleSend(preset.query)}
-                    className="p-3 rounded-2xl bg-slate-900/60 hover:bg-slate-800/80 border border-slate-700/60 hover:border-cyan-500/40 text-left transition-all group cursor-pointer shadow-sm hover:shadow-[0_0_20px_rgba(6,182,212,0.15)]"
+                    className="p-3 rounded-2xl bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 hover:border-cyan-500/40 text-left transition-all group cursor-pointer shadow-sm hover:shadow-[0_4px_20px_rgba(6,182,212,0.15)]"
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <span className="px-2 py-0.5 rounded font-mono text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">
+                      <span className="px-2 py-0.5 rounded font-mono text-[10px] font-bold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/30">
                         {preset.code}
                       </span>
-                      <span className="text-[10px] font-mono text-slate-400 group-hover:text-cyan-400 transition-colors">
+                      <span className="text-[10px] font-mono text-slate-400 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
                         Launch Probe →
                       </span>
                     </div>
-                    <p className="text-xs font-bold text-slate-200 group-hover:text-white transition-colors">
+                    <p className="text-xs font-bold text-slate-900 dark:text-slate-200 group-hover:text-cyan-600 dark:group-hover:text-white transition-colors">
                       {preset.title}
                     </p>
-                    <p className="text-[11px] text-slate-400 truncate mt-0.5 font-mono">
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5 font-mono">
                       {preset.brand}
                     </p>
                   </button>
@@ -426,12 +428,12 @@ export default function ChatInterface({
             {msg.role === "user" ? (
               /* ── User Operator Bubble ── */
               <div className="max-w-[85%] sm:max-w-[70%] space-y-1">
-                <div className="flex items-center justify-end gap-2 text-[10px] font-mono text-indigo-300/80 pr-1">
+                <div className="flex items-center justify-end gap-2 text-[10px] font-mono text-indigo-500 dark:text-indigo-300/80 pr-1 font-semibold">
                   <span>FIELD OPERATOR TRANSMISSION</span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 dark:bg-indigo-400" />
                 </div>
 
-                <div className="p-4 rounded-2xl rounded-tr-sm bg-gradient-to-br from-indigo-600/90 to-violet-700/90 border border-indigo-400/30 text-white shadow-lg shadow-indigo-500/20 text-sm leading-relaxed backdrop-blur-md">
+                <div className="p-4 rounded-2xl rounded-tr-sm bg-gradient-to-br from-indigo-600 to-violet-700 dark:from-indigo-600/90 dark:to-violet-700/90 border border-indigo-400/30 text-white shadow-lg shadow-indigo-500/20 text-sm leading-relaxed backdrop-blur-md">
                   {msg.image_data && (
                     <div className="mb-3 rounded-xl overflow-hidden border border-white/20 relative">
                       <img
@@ -462,33 +464,33 @@ export default function ChatInterface({
               </div>
             ) : (
               /* ── Assistant Grounded Diagnostic Card ── */
-              <div className="max-w-[95%] sm:max-w-[90%] w-full rounded-2xl rounded-tl-sm p-5 sm:p-6 bg-slate-900/90 dark:bg-[#0c101b]/95 border border-slate-700/60 dark:border-cyan-500/20 shadow-xl shadow-black/40 backdrop-blur-xl relative overflow-hidden">
+              <div className="max-w-[95%] sm:max-w-[90%] w-full rounded-2xl rounded-tl-sm p-5 sm:p-6 bg-white dark:bg-[#0c101b]/95 border border-slate-200 dark:border-cyan-500/20 shadow-xl shadow-slate-200/50 dark:shadow-black/40 backdrop-blur-xl relative overflow-hidden">
                 {/* Cyber Corner Accent */}
                 <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-cyan-500/10 via-transparent to-transparent pointer-events-none" />
 
                 {/* AI Card Header */}
-                <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-slate-700/60 dark:border-white/[0.08] flex-wrap gap-2">
+                <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-slate-200 dark:border-white/[0.08] flex-wrap gap-2">
                   <div className="flex items-center gap-2.5">
                     <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-cyan-500/25">
                       <Cpu className="w-4 h-4" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-black tracking-tight text-white">
+                        <span className="text-xs font-black tracking-tight text-slate-900 dark:text-white">
                           MEND-X NEURAL DIAGNOSTICS
                         </span>
-                        <span className="px-1.5 py-0.2 rounded font-mono text-[9px] font-bold bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
+                        <span className="px-1.5 py-0.2 rounded font-mono text-[9px] font-bold bg-cyan-500/10 dark:bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 border border-cyan-500/30">
                           SCADA v2.4
                         </span>
                       </div>
-                      <p className="text-[10px] font-mono text-emerald-400 flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      <p className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 flex items-center gap-1 font-semibold">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
                         <span>VERIFIED GROUNDING ISOLATION</span>
                       </p>
                     </div>
                   </div>
 
-                  <span className="text-[10px] font-mono text-slate-400">
+                  <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400">
                     {new Date(msg.timestamp).toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",
@@ -500,33 +502,33 @@ export default function ChatInterface({
                 {msg.response ? (
                   renderAssistantContent(msg.response, handleDisambiguate, (s) => handleSend(s))
                 ) : (
-                  <p className="text-sm text-slate-200 leading-relaxed">{msg.content}</p>
+                  <p className="text-sm text-slate-800 dark:text-slate-200 leading-relaxed">{msg.content}</p>
                 )}
 
                 {/* 8-Stage Execution Pipeline Drawer Toggle */}
-                <div className="mt-4 pt-3 border-t border-slate-700/60 dark:border-white/[0.08] flex items-center justify-between flex-wrap gap-2">
+                <div className="mt-4 pt-3 border-t border-slate-200 dark:border-white/[0.08] flex items-center justify-between flex-wrap gap-2">
                   <button
                     type="button"
                     onClick={() => toggleTrace(msg.id)}
-                    className="inline-flex items-center gap-2 text-xs font-mono text-cyan-400 hover:text-cyan-300 font-bold transition-all cursor-pointer group"
+                    className="inline-flex items-center gap-2 text-xs font-mono text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 dark:hover:text-cyan-300 font-bold transition-all cursor-pointer group"
                   >
-                    <Zap className="w-3.5 h-3.5 text-cyan-400 group-hover:scale-110 transition-transform" />
+                    <Zap className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400 group-hover:scale-110 transition-transform" />
                     <span>⚡ {expandedTraces[msg.id] ? "Hide" : "Inspect"} 8-Stage RAG Execution Trace</span>
                   </button>
 
-                  <div className="flex items-center gap-1 text-[10px] font-mono text-slate-500">
+                  <div className="flex items-center gap-1 text-[10px] font-mono text-slate-400 dark:text-slate-500">
                     <span>MANUALS</span>
                     <span>→</span>
                     <span>CHUNKS</span>
                     <span>→</span>
                     <span>VECTORS</span>
                     <span>→</span>
-                    <span className="text-cyan-400 font-bold">CITED SOLUTION</span>
+                    <span className="text-cyan-600 dark:text-cyan-400 font-bold">CITED SOLUTION</span>
                   </div>
                 </div>
 
                 {expandedTraces[msg.id] && (
-                  <div className="mt-3.5 pt-3 border-t border-cyan-500/20 animate-fade-in">
+                  <div className="mt-3.5 pt-3 border-t border-slate-200 dark:border-cyan-500/20 animate-fade-in">
                     <ExecutionPipelineTracker
                       isExecuting={false}
                       query={messages.find((_, i) => i === idx - 1)?.content}

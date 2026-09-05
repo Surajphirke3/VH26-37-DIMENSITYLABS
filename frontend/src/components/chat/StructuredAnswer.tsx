@@ -46,7 +46,7 @@ export default function StructuredAnswer({ response, onSuggestionClick }: Props)
   return (
     <div className="space-y-4 text-sm font-sans">
       {/* ── Top SCADA Diagnostic Telemetry Strip ── */}
-      <div className="flex items-center justify-between gap-2.5 flex-wrap p-2.5 rounded-xl bg-slate-900/60 dark:bg-black/40 border border-slate-200/80 dark:border-white/[0.08] backdrop-blur-md">
+      <div className="flex items-center justify-between gap-2.5 flex-wrap p-2.5 rounded-xl bg-slate-100/90 dark:bg-black/40 border border-slate-200 dark:border-white/[0.08] backdrop-blur-md">
         <div className="flex items-center gap-2 flex-wrap">
           <ConfidenceBadge level={response.confidence_level} score={response.evidence_score} />
 
@@ -58,13 +58,13 @@ export default function StructuredAnswer({ response, onSuggestionClick }: Props)
 
           {modelUsed && (
             <span className="inline-flex items-center gap-1 text-[10px] font-mono px-2 py-0.5 rounded-md bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 font-semibold">
-              <Cpu className="w-3 h-3 text-indigo-400" />
+              <Cpu className="w-3 h-3 text-indigo-500 dark:text-indigo-400" />
               <span>{modelUsed.replace(/^openai\//, "").replace(/^groq\//, "")}</span>
             </span>
           )}
 
           {language && language !== "en" && (
-            <span className="inline-flex items-center gap-1 text-[10px] uppercase font-mono px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-500 border border-amber-500/20 font-bold">
+            <span className="inline-flex items-center gap-1 text-[10px] uppercase font-mono px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-500 border border-amber-500/20 font-bold">
               <Languages className="w-3 h-3" />
               <span>LANG: {language}</span>
             </span>
@@ -75,10 +75,10 @@ export default function StructuredAnswer({ response, onSuggestionClick }: Props)
           <button
             type="button"
             onClick={() => setShowTimings((prev) => !prev)}
-            className="inline-flex items-center gap-1 text-[10px] font-mono px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-white/[0.06] border border-slate-200 dark:border-white/[0.1] text-slate-600 dark:text-slate-300 hover:text-indigo-500 hover:border-indigo-500/30 transition-all cursor-pointer"
+            className="inline-flex items-center gap-1 text-[10px] font-mono px-2.5 py-1 rounded-lg bg-white dark:bg-white/[0.06] border border-slate-200 dark:border-white/[0.1] text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-500/30 transition-all cursor-pointer shadow-sm"
             title="Click to toggle pipeline latency breakdown"
           >
-            <Clock className="w-3 h-3 text-amber-400" />
+            <Clock className="w-3 h-3 text-amber-500 dark:text-amber-400" />
             <span className="font-bold">{response.total_latency_ms}ms</span>
             {latencyBreakdown && (
               <ChevronDown
@@ -93,32 +93,32 @@ export default function StructuredAnswer({ response, onSuggestionClick }: Props)
 
       {/* Latency timing breakdown HUD */}
       {showTimings && latencyBreakdown && (
-        <div className="grid grid-cols-3 gap-2 p-3 rounded-xl bg-slate-950/70 border border-indigo-500/25 text-center font-mono text-xs animate-fade-in shadow-inner">
-          <div className="border-r border-white/10 pr-2">
-            <span className="text-[10px] uppercase tracking-wider text-slate-400 block font-semibold">
+        <div className="grid grid-cols-3 gap-2 p-3 rounded-xl bg-slate-100/90 dark:bg-slate-950/70 border border-indigo-500/30 dark:border-indigo-500/25 text-center font-mono text-xs animate-fade-in shadow-sm">
+          <div className="border-r border-slate-200 dark:border-white/10 pr-2">
+            <span className="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 block font-semibold">
               Vector Search
             </span>
-            <span className="font-bold text-cyan-400">{latencyBreakdown.retrieval_ms || 0}ms</span>
+            <span className="font-bold text-cyan-600 dark:text-cyan-400">{latencyBreakdown.retrieval_ms || 0}ms</span>
           </div>
-          <div className="border-r border-white/10 pr-2">
-            <span className="text-[10px] uppercase tracking-wider text-slate-400 block font-semibold">
+          <div className="border-r border-slate-200 dark:border-white/10 pr-2">
+            <span className="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 block font-semibold">
               Cross-Rerank
             </span>
-            <span className="font-bold text-amber-400">{latencyBreakdown.rerank_ms || 0}ms</span>
+            <span className="font-bold text-amber-600 dark:text-amber-400">{latencyBreakdown.rerank_ms || 0}ms</span>
           </div>
           <div>
-            <span className="text-[10px] uppercase tracking-wider text-slate-400 block font-semibold">
+            <span className="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 block font-semibold">
               Inference Stream
             </span>
-            <span className="font-bold text-emerald-400">{latencyBreakdown.llm_ms || 0}ms</span>
+            <span className="font-bold text-emerald-600 dark:text-emerald-400">{latencyBreakdown.llm_ms || 0}ms</span>
           </div>
         </div>
       )}
 
       {/* ── Diagnostic Executive Summary ── */}
-      <div className="p-4 rounded-xl bg-slate-900/40 dark:bg-slate-950/60 border border-slate-200 dark:border-white/[0.08] shadow-sm space-y-1.5">
+      <div className="p-4 rounded-xl bg-white dark:bg-slate-950/60 border border-slate-200 dark:border-white/[0.08] shadow-sm space-y-1.5">
         <div className="flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-widest text-cyan-600 dark:text-cyan-400">
-          <Zap className="w-3.5 h-3.5 text-cyan-400" />
+          <Zap className="w-3.5 h-3.5 text-cyan-500 dark:text-cyan-400" />
           <span>Diagnostic Assessment</span>
         </div>
         <p className="font-medium text-sm leading-relaxed text-slate-900 dark:text-slate-100">
@@ -191,14 +191,14 @@ export default function StructuredAnswer({ response, onSuggestionClick }: Props)
 
                 {/* Industrial Safety Warning / LOTO */}
                 {step.warning && (
-                  <div className="ml-9 p-3 rounded-xl bg-rose-950/40 border border-rose-500/40 text-rose-300 relative overflow-hidden flex items-start gap-2.5 shadow-sm">
+                  <div className="ml-9 p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-500/40 text-rose-800 dark:text-rose-300 relative overflow-hidden flex items-start gap-2.5 shadow-sm">
                     <div className="absolute top-0 bottom-0 left-0 w-1.5 hazard-stripes-danger" />
-                    <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                    <AlertTriangle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
                     <div>
-                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-rose-400 block mb-0.5">
+                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-rose-700 dark:text-rose-400 block mb-0.5">
                         CRITICAL SAFETY NOTICE · LOTO MANDATORY
                       </span>
-                      <p className="text-xs font-medium text-rose-200 leading-relaxed">
+                      <p className="text-xs font-medium text-rose-900 dark:text-rose-200 leading-relaxed">
                         {step.warning}
                       </p>
                     </div>
@@ -213,8 +213,8 @@ export default function StructuredAnswer({ response, onSuggestionClick }: Props)
       {/* ── Follow-up Probing Questions ── */}
       {response.follow_up_suggestions.length > 0 && (
         <div className="space-y-2 pt-2">
-          <div className="flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400">
-            <HelpCircle className="w-3.5 h-3.5 text-indigo-400" />
+          <div className="flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+            <HelpCircle className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400" />
             <span>Interactive Diagnostic Probes</span>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -226,7 +226,7 @@ export default function StructuredAnswer({ response, onSuggestionClick }: Props)
                 className="text-xs px-3.5 py-1.5 rounded-xl font-medium transition-all hover:scale-[1.02] active:scale-[0.98] bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/25 text-indigo-700 dark:text-indigo-300 shadow-sm flex items-center gap-1.5 cursor-pointer text-left"
               >
                 <span>{s}</span>
-                <span className="text-indigo-400 opacity-60">→</span>
+                <span className="text-indigo-500 dark:text-indigo-400 opacity-60">→</span>
               </button>
             ))}
           </div>
@@ -235,7 +235,7 @@ export default function StructuredAnswer({ response, onSuggestionClick }: Props)
 
       {/* ── Grounded OEM Sources & Verified Citations ── */}
       {response.citations.length > 0 && (
-        <div className="rounded-xl overflow-hidden border border-slate-200 dark:border-white/[0.1] bg-slate-900/40 dark:bg-black/30 transition-colors">
+        <div className="rounded-xl overflow-hidden border border-slate-200 dark:border-white/[0.1] bg-white dark:bg-black/30 transition-colors shadow-sm">
           <button
             type="button"
             onClick={() => setCitationsOpen((o) => !o)}
@@ -245,7 +245,7 @@ export default function StructuredAnswer({ response, onSuggestionClick }: Props)
               <FileText className="w-4 h-4 text-amber-500" />
               <span>VERIFIED OEM CITATIONS & SCHEMATICS ({response.citations.length})</span>
             </span>
-            <span className="text-[10px] font-mono text-indigo-400 flex items-center gap-1">
+            <span className="text-[10px] font-mono text-indigo-600 dark:text-indigo-400 flex items-center gap-1">
               <span>{citationsOpen ? "COLLAPSE" : "EXPAND"}</span>
               <ChevronDown
                 className={`w-3.5 h-3.5 transition-transform ${citationsOpen ? "rotate-180" : ""}`}
@@ -281,7 +281,7 @@ export default function StructuredAnswer({ response, onSuggestionClick }: Props)
                       <button
                         type="button"
                         onClick={() => copyCitation(c.excerpt, c.citation_id)}
-                        className="p-1 text-slate-400 hover:text-slate-200 rounded transition-colors cursor-pointer"
+                        className="p-1 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded transition-colors cursor-pointer"
                         title="Copy verbatim citation snippet"
                       >
                         {copiedCitationId === c.citation_id ? (
@@ -299,7 +299,7 @@ export default function StructuredAnswer({ response, onSuggestionClick }: Props)
                     </p>
                   )}
 
-                  <div className="p-2.5 rounded-lg bg-black/40 border border-white/[0.06] font-mono text-[11px] leading-relaxed text-slate-300 select-text">
+                  <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/[0.06] font-mono text-[11px] leading-relaxed text-slate-800 dark:text-slate-300 select-text">
                     &ldquo;{c.excerpt}&rdquo;
                   </div>
                 </div>
