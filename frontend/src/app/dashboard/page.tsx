@@ -546,20 +546,22 @@ export default function DashboardPage() {
 
         {/* ── WORKSPACE CONTENT ── */}
         {viewMode === "mobile" ? (
-          <div className="flex-1 overflow-y-auto p-6 flex flex-col items-center justify-center relative z-10 animate-fade-in">
-            <MobileDeviceSimulator
-              initialMachine={selectedMachine ?? undefined}
-              availableMachines={machines}
-              onMachineChange={(m) => setSelectedMachine(m)}
-            />
+          <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 flex flex-col items-center relative z-10 animate-fade-in">
+            <div className="my-auto py-4 flex justify-center w-full">
+              <MobileDeviceSimulator
+                initialMachine={selectedMachine ?? undefined}
+                availableMachines={machines}
+                onMachineChange={(m) => setSelectedMachine(m)}
+              />
+            </div>
           </div>
         ) : viewMode === "split" ? (
           <div className="flex-1 min-h-0 min-w-0 overflow-hidden relative z-10 grid grid-cols-1 xl:grid-cols-12 gap-0 animate-fade-in h-full max-h-full">
             {/* Left Column: Desktop Console */}
             <div className="xl:col-span-7 h-full max-h-full min-h-0 min-w-0 overflow-hidden border-r border-[var(--border)] flex flex-col">
               {activeConvId === null ? (
-                <div className="flex-1 min-h-0 overflow-y-auto p-6 lg:p-8 relative z-10 flex flex-col items-center justify-center">
-                  <div className="max-w-xl w-full mx-auto space-y-6 text-center animate-fade-in">
+                <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 lg:p-8 relative z-10 flex flex-col items-center">
+                  <div className="max-w-xl w-full mx-auto space-y-6 text-center animate-fade-in my-auto py-6">
                     <div className="inline-flex items-center justify-center p-3 rounded-2xl bg-white dark:bg-white/[0.05] border border-slate-200/90 dark:border-white/10 shadow-lg">
                       <Image
                         src={isLight ? "/brand-icon-light.png" : "/brand-icon-dark.png"}
@@ -609,17 +611,19 @@ export default function DashboardPage() {
             </div>
 
             {/* Right Column: Mobile Field Device Simulator */}
-            <div className="xl:col-span-5 h-full overflow-y-auto p-6 bg-slate-950/40 backdrop-blur-sm flex items-center justify-center">
-              <MobileDeviceSimulator
-                initialMachine={selectedMachine ?? undefined}
-                availableMachines={machines}
-                onMachineChange={(m) => setSelectedMachine(m)}
-              />
+            <div className="xl:col-span-5 h-full min-h-0 overflow-y-auto p-4 sm:p-6 bg-slate-950/40 backdrop-blur-sm flex flex-col items-center">
+              <div className="my-auto py-4 flex justify-center w-full">
+                <MobileDeviceSimulator
+                  initialMachine={selectedMachine ?? undefined}
+                  availableMachines={machines}
+                  onMachineChange={(m) => setSelectedMachine(m)}
+                />
+              </div>
             </div>
           </div>
         ) : activeConvId === null ? (
-          <div className="flex-1 overflow-y-auto p-6 lg:p-10 relative z-10 flex flex-col items-center justify-center">
-            <div className="max-w-4xl w-full mx-auto space-y-8 animate-slide-up">
+          <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 lg:p-10 relative z-10 flex flex-col items-center">
+            <div className="max-w-4xl w-full mx-auto space-y-6 sm:space-y-8 animate-slide-up my-auto py-6">
               
               {/* Center Hero Banner */}
               <div className="text-center space-y-4">

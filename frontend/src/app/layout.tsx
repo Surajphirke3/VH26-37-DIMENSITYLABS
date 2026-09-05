@@ -38,11 +38,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`h-full ${inter.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
       <head>
         <meta name="theme-color" content="#06070a" />
       </head>
-      <body className="font-sans antialiased h-full min-h-full bg-[var(--bg-base)] text-[var(--text-primary)] transition-colors duration-200">
+      <body className="font-sans antialiased min-h-screen w-full max-w-full overflow-x-hidden bg-[var(--bg-base)] text-[var(--text-primary)] transition-colors duration-200">
         <ThemeProvider>
           <SessionProvider>
             <LanguageProvider>{children}</LanguageProvider>
