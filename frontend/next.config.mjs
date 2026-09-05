@@ -11,6 +11,15 @@ const nextConfig = {
       },
     ],
   },
+  // Allow Cloudflare tunnel and any other reverse-proxy origins to reach the dev server
+  // Next.js 15+ rejects Host headers that don't match localhost by default
+  allowedDevOrigins: [
+    "*.trycloudflare.com",
+    "trycloudflare.com",
+    "*.ngrok.io",
+    "*.ngrok-free.app",
+    "*.loca.lt",
+  ],
   async rewrites() {
     const apiUrl = process.env.INTERNAL_API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
     return [

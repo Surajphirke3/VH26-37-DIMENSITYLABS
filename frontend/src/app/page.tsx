@@ -106,37 +106,37 @@ export default function HomePage() {
       </div>
 
       {/* ─── HERO SECTION ─── */}
-      <section className="relative z-10 pt-40 pb-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col items-center text-center">
+      <section className="relative z-10 pt-24 sm:pt-28 md:pt-32 pb-8 sm:pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col items-center text-center">
         {/* Dynamic Status Pill */}
-        <div className="inline-flex items-center gap-3 mb-10 px-4 py-2 rounded-full glass border border-[var(--border)] animate-slide-up shadow-sm" style={{ animationDelay: "0.1s" }}>
-          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25">
+        <div className="inline-flex items-center gap-3 mb-4 sm:mb-6 px-4 py-1.5 sm:py-2 rounded-full glass border border-[var(--border)] animate-slide-up shadow-sm" style={{ animationDelay: "0.1s" }}>
+          <div className="flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25">
             <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981] animate-pulse" />
             <span className="font-mono text-[10px] font-bold text-emerald-600 dark:text-emerald-400 tracking-widest uppercase">
               {t("landing.systemOperational", "System Operational")}
             </span>
           </div>
           <span className="w-px h-4 bg-[var(--border)]" />
-          <span className="font-mono text-[10px] font-bold text-slate-500 tracking-widest uppercase">MEND-X Core v1.2.1</span>
+          <span className="font-mono text-[10px] font-bold text-slate-500 tracking-widest uppercase">MEND-X Core v3.0.0</span>
         </div>
 
         {/* Hero Headline */}
-        <div className="relative mb-8 animate-slide-up" style={{ animationDelay: "0.2s" }}>
-          <h1 className="font-black text-[clamp(3.5rem,8vw,7rem)] leading-[1] tracking-tighter uppercase text-[var(--text-primary)]">
+        <div className="relative mb-4 sm:mb-6 animate-slide-up" style={{ animationDelay: "0.2s" }}>
+          <h1 className="font-black text-4xl sm:text-6xl md:text-7xl lg:text-[5rem] leading-[1.05] tracking-tight uppercase text-[var(--text-primary)]">
             From <span className="opacity-90">Failure</span>
             <br />
             To <span className="gradient-text-emerald font-black" style={{ filter: 'drop-shadow(0 0 20px rgba(16,185,129,0.3))' }}>Function.</span>
           </h1>
         </div>
 
-        <p className="text-base sm:text-lg text-[var(--text-muted)] max-w-2xl leading-relaxed mb-12 animate-slide-up" style={{ animationDelay: "0.3s" }}>
+        <p className="text-sm sm:text-base md:text-lg text-[var(--text-muted)] max-w-2xl leading-relaxed mb-6 sm:mb-8 animate-slide-up" style={{ animationDelay: "0.3s" }}>
           {t("landing.heroDesc", "Factory lines halt. Alarms trigger. Technicians scramble through 800-page PDFs. MEND-X eliminates the blind spot: A zero-hallucination industrial RAG engine that transforms OEM manuals into precise, cited repair protocols.")}
         </p>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full animate-slide-up" style={{ animationDelay: "0.4s" }}>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-4 w-full animate-slide-up" style={{ animationDelay: "0.4s" }}>
           <Link
             href="/dashboard"
-            className="group relative w-full sm:w-auto px-8 py-4 rounded-xl font-bold text-sm text-white overflow-hidden transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2"
+            className="group relative w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl font-bold text-sm text-white overflow-hidden transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-violet-600 to-indigo-600 bg-[length:200%_auto] group-hover:bg-[position:100%_center] transition-all duration-500" />
             <svg className="relative w-4 h-4 z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -146,7 +146,7 @@ export default function HomePage() {
           </Link>
           <Link
             href="/problem"
-            className="group w-full sm:w-auto px-8 py-4 rounded-xl font-semibold text-sm text-[var(--text-primary)] bg-[var(--bg-surface)] hover:bg-[var(--glass-bg-hover)] border border-[var(--border)] transition-all flex items-center justify-center gap-2 shadow-sm"
+            className="group w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl font-semibold text-sm text-[var(--text-primary)] bg-[var(--bg-surface)] hover:bg-[var(--glass-bg-hover)] border border-[var(--border)] transition-all flex items-center justify-center gap-2 shadow-sm"
           >
             {t("landing.exploreCrisis", "Explore the Crisis")}
             <svg className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -157,9 +157,9 @@ export default function HomePage() {
       </section>
 
       {/* ─── LIVE INFINITE MARQUEE ─── */}
-      <div className="relative z-10 w-full overflow-hidden border-y border-[var(--border)] py-4 backdrop-blur-sm bg-[var(--bg-elevated)]/30">
-        <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[var(--bg-base)] to-transparent z-10" />
-        <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[var(--bg-base)] to-transparent z-10" />
+      <div className="relative z-10 w-full overflow-hidden border-y border-[var(--border)] py-3 sm:py-3.5 backdrop-blur-sm bg-[var(--bg-elevated)]/30">
+        <div className="absolute inset-y-0 left-0 w-24 sm:w-32 bg-gradient-to-r from-[var(--bg-base)] to-transparent z-10 pointer-events-none" />
+        <div className="absolute inset-y-0 right-0 w-24 sm:w-32 bg-gradient-to-l from-[var(--bg-base)] to-transparent z-10 pointer-events-none" />
         <div className="flex gap-8 items-center" style={{ animation: "marquee 25s linear infinite", whiteSpace: "nowrap" }}>
           {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((item, i) => (
             <span key={i} className="flex-shrink-0 font-mono text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-widest flex items-center gap-3">
@@ -171,18 +171,18 @@ export default function HomePage() {
       </div>
 
       {/* ─── INDUSTRIAL METRICS GRID ─── */}
-      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-24">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-10 sm:py-14 md:py-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {STATS.map((stat, i) => (
             <div
               key={i}
-              className="glass-card hover:border-indigo-500/30 p-8 flex flex-col gap-3 group animate-slide-up"
+              className="glass-card hover:border-indigo-500/30 p-5 sm:p-6 lg:p-7 flex flex-col gap-2.5 group animate-slide-up"
               style={{ animationDelay: `${0.1 * i}s` }}
             >
-              <div className="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center font-mono text-xs font-bold text-indigo-500 border border-indigo-500/20 group-hover:scale-110 transition-transform">
+              <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center font-mono text-xs font-bold text-indigo-500 border border-indigo-500/20 group-hover:scale-110 transition-transform">
                 0{i + 1}
               </div>
-              <span className="font-black text-4xl sm:text-5xl text-[var(--text-primary)] font-mono tracking-tighter mt-4 group-hover:gradient-text transition-all">
+              <span className="font-black text-3xl sm:text-4xl text-[var(--text-primary)] font-mono tracking-tighter mt-2 group-hover:gradient-text transition-all">
                 {stat.value}
               </span>
               <span className="text-xs text-[var(--text-muted)] font-medium leading-relaxed">{stat.label}</span>
@@ -192,7 +192,7 @@ export default function HomePage() {
       </section>
 
       {/* ─── TRI-TIER LLM ROUTING SYSTEM ─── */}
-      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto pt-24 pb-28 scroll-mt-28">
+      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto pt-10 sm:pt-14 pb-16 sm:pb-20 scroll-mt-24">
         <div className="text-center mb-16 animate-slide-up">
           <div className="inline-flex items-center gap-2 font-mono text-[10px] uppercase font-bold text-teal-600 dark:text-teal-400 tracking-widest bg-teal-500/10 px-3.5 py-1.5 rounded-full border border-teal-500/25 mb-5 shadow-sm">
             <span className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse" />

@@ -180,19 +180,19 @@ export default function WorkflowPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative z-10 pt-40 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col items-center text-center">
-        <div className="inline-flex items-center gap-3 mb-8 px-4 py-2 rounded-full glass border border-[var(--border)] animate-slide-up" style={{ animationDelay: "0.1s" }}>
-          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25">
+      <section className="relative z-10 pt-24 sm:pt-28 md:pt-32 pb-10 sm:pb-14 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col items-center text-center">
+        <div className="inline-flex items-center gap-3 mb-4 sm:mb-6 px-4 py-1.5 sm:py-2 rounded-full glass border border-[var(--border)] animate-slide-up" style={{ animationDelay: "0.1s" }}>
+          <div className="flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25">
             <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981] animate-pulse" />
             <span className="font-mono text-[10px] font-bold text-emerald-600 dark:text-emerald-400 tracking-widest uppercase">Process Flow</span>
           </div>
         </div>
 
-        <h1 className="font-black text-[clamp(3rem,8vw,6rem)] leading-[1] tracking-tighter uppercase text-[var(--text-primary)] mb-6 animate-slide-up" style={{ animationDelay: "0.2s" }}>
+        <h1 className="font-black text-4xl sm:text-5xl md:text-6xl lg:text-7xl leading-[1.08] tracking-tight uppercase text-[var(--text-primary)] mb-4 sm:mb-6 animate-slide-up" style={{ animationDelay: "0.2s" }}>
           From Alarm to <span className="gradient-text-emerald">Resolution.</span>
         </h1>
 
-        <p className="text-base sm:text-lg text-[var(--text-muted)] max-w-3xl leading-relaxed mb-8 animate-slide-up" style={{ animationDelay: "0.3s" }}>
+        <p className="text-sm sm:text-base md:text-lg text-[var(--text-muted)] max-w-3xl leading-relaxed mb-6 sm:mb-8 animate-slide-up" style={{ animationDelay: "0.3s" }}>
           Industrial troubleshooting accelerated. From manual ingestion to field technician workflow, MEND-X integrates into existing plant operations while transforming diagnostic speed.
         </p>
       </section>
