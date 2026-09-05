@@ -35,6 +35,7 @@ import MobileDeviceSimulator from "@/components/mobile/MobileDeviceSimulator";
 import Spinner from "@/components/ui/Spinner";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import { useTheme } from "@/lib/theme-context";
+import ManufacturerLogo from "@/components/common/ManufacturerLogo";
 
 interface ConvEntry {
   id: string;
@@ -513,6 +514,7 @@ export default function DashboardPage() {
             <MobileDeviceSimulator
               initialMachine={selectedMachine ?? undefined}
               availableMachines={machines}
+              onMachineChange={(m) => setSelectedMachine(m)}
             />
           </div>
         ) : viewMode === "split" ? (
@@ -571,6 +573,7 @@ export default function DashboardPage() {
               <MobileDeviceSimulator
                 initialMachine={selectedMachine ?? undefined}
                 availableMachines={machines}
+                onMachineChange={(m) => setSelectedMachine(m)}
               />
             </div>
           </div>
@@ -642,17 +645,18 @@ export default function DashboardPage() {
                             : "bg-white/80 dark:bg-white/[0.03] border-slate-200/80 dark:border-white/[0.08] hover:border-indigo-300 dark:hover:border-white/20"
                         }`}
                       >
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="px-2 py-0.5 rounded-md text-[9px] font-mono font-bold uppercase bg-slate-100 dark:bg-white/[0.06] text-slate-600 dark:text-slate-300">
-                            {m.manufacturer || "OEM"}
+                        <div className="flex items-center justify-between mb-2.5">
+                          <ManufacturerLogo name={m.name} manufacturer={m.manufacturer} size="xs" />
+                          <span className="flex items-center gap-1">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                            <span className="text-[9px] font-mono text-emerald-500 font-bold">ONLINE</span>
                           </span>
-                          <span className="w-2 h-2 rounded-full bg-emerald-500" />
                         </div>
-                        <div className="font-bold text-sm text-slate-900 dark:text-white truncate">
+                        <div className="font-bold text-sm text-slate-900 dark:text-white truncate" title={m.name}>
                           {m.name}
                         </div>
                         <div className="text-xs text-slate-500 font-mono mt-0.5 truncate">
-                          {m.model}
+                          {m.model || m.manufacturer || "Industrial OEM"}
                         </div>
                       </button>
                     );

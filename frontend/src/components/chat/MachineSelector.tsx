@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import type { Machine } from "@/lib/types";
+import ManufacturerLogo from "@/components/common/ManufacturerLogo";
 
 interface MachineSelectorProps {
   machines: Machine[];
@@ -25,14 +26,15 @@ export default function MachineSelector({ machines, selected, onChange }: Machin
   const filtered = machines.filter(
     (m) =>
       m.name.toLowerCase().includes(search.toLowerCase()) ||
-      (m.model ?? "").toLowerCase().includes(search.toLowerCase())
+      (m.model ?? "").toLowerCase().includes(search.toLowerCase()) ||
+      (m.manufacturer ?? "").toLowerCase().includes(search.toLowerCase())
   );
 
   return (
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen((o) => !o)}
-        className={`flex items-center gap-2 px-3 py-2.5 w-full rounded-xl text-sm text-left transition-all border ${
+        className={`flex items-center gap-2.5 px-3 py-2.5 w-full rounded-xl text-sm text-left transition-all border ${
           open
             ? "border-indigo-500/50 shadow-[0_0_12px_rgba(99,102,241,0.15)]"
             : "border-slate-200 dark:border-white/10"
@@ -42,19 +44,23 @@ export default function MachineSelector({ machines, selected, onChange }: Machin
             : "text-slate-500 dark:text-slate-400 bg-slate-100/70 dark:bg-white/[0.04]"
         }`}
       >
-        <svg
-          className={`w-4 h-4 shrink-0 ${selected ? "text-indigo-600 dark:text-indigo-400" : "text-slate-400 dark:text-slate-600"}`}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"
-          />
-        </svg>
+        {selected ? (
+          <ManufacturerLogo name={selected.name} manufacturer={selected.manufacturer} size="xs" />
+        ) : (
+          <svg
+            className="w-4 h-4 shrink-0 text-slate-400 dark:text-slate-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"
+            />
+          </svg>
+        )}
         <span className="flex-1 truncate font-medium">
           {selected ? selected.name : "All Machines"}
         </span>
@@ -92,13 +98,13 @@ export default function MachineSelector({ machines, selected, onChange }: Machin
                 setOpen(false);
                 setSearch("");
               }}
-              className={`w-full text-left px-4 py-2.5 text-sm transition-all flex items-center gap-2 ${
+              className={`w-full text-left px-4 py-2.5 text-sm transition-all flex items-center gap-2.5 ${
                 !selected
                   ? "bg-indigo-50 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300 font-semibold"
                   : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/[0.04]"
               }`}
             >
-              <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
               </svg>
               <span className="font-medium">All Machines</span>
@@ -119,23 +125,25 @@ export default function MachineSelector({ machines, selected, onChange }: Machin
                     setOpen(false);
                     setSearch("");
                   }}
-                  className={`w-full text-left px-4 py-2.5 text-sm transition-all flex items-center justify-between gap-2 ${
+                  className={`w-full text-left px-3.5 py-2.5 text-sm transition-all flex items-center justify-between gap-2.5 ${
                     isSelected
                       ? "bg-indigo-50 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300 font-semibold"
                       : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/[0.04] hover:text-slate-900 dark:hover:text-slate-100"
                   }`}
                 >
-                  <div className="min-w-0">
-                    <span className="block font-semibold truncate">{m.name}</span>
-                    {m.model && (
-                      <span className="font-mono text-[10px] text-slate-400 dark:text-slate-500">
-                        {m.model}
-                      </span>
-                    )}
+                  <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                    <ManufacturerLogo name={m.name} manufacturer={m.manufacturer} size="xs" />
+                    <div className="min-w-0 flex-1">
+                      <span className="block font-semibold truncate">{m.name}</span>
+                      <div className="flex items-center gap-2 text-[10px] font-mono text-slate-400 dark:text-slate-500">
+                        {m.model && <span>{m.model}</span>}
+                        {m.manufacturer && <span>• {m.manufacturer}</span>}
+                      </div>
+                    </div>
                   </div>
                   {isSelected && (
                     <svg className="w-3.5 h-3.5 shrink-0 text-indigo-600 dark:text-indigo-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
                   )}
                 </button>
