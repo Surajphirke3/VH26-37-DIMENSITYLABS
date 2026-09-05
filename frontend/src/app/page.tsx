@@ -32,18 +32,18 @@ const STATS = [
 
 const MODEL_TIERS = [
   {
-    name: "Compound Mini",
+    name: "Nord",
     tier: "01 — FAST EDGE / TRIAGE",
     color: "#3b82f6",
     colorBg: "rgba(59,130,246,0.08)",
     colorBorder: "rgba(59,130,246,0.25)",
     desc: "Lightweight Groq LPU model for rapid-fire queries: error code lookups, symptom triage, and binary yes/no diagnostics. Optimized for PLCs and line controllers.",
-    specs: ["Groq Compound Mini", "Sub-100ms latency", "LPU acceleration", "Error code matching"],
+    specs: ["Groq Compound Mini LPU", "Sub-100ms latency", "LPU acceleration", "Error code matching"],
     logoDark: "/nord-dark.png",
     logoLight: "/nord-light.png",
   },
   {
-    name: "GPT-OSS 20B",
+    name: "Forge",
     tier: "02 — MID TIER WORKHORSE",
     color: "#f59e0b",
     colorBg: "rgba(245,158,11,0.08)",
@@ -54,7 +54,7 @@ const MODEL_TIERS = [
     logoLight: "/forge-light.png",
   },
   {
-    name: "GPT-OSS 120B",
+    name: "Apex",
     tier: "03 — DEEP REASONING",
     color: "#8b5cf6",
     colorBg: "rgba(139,92,246,0.08)",
@@ -84,9 +84,9 @@ const SECURITY_MATRIX = [
 
 const FAQ = [
   { q: "How is hallucination prevented?", a: "Every response is backed by a cited page from the OEM manual corpus. If the vector similarity falls below 0.72, the system refuses with clarification prompts instead of guessing. This 'refusal circuit' fires when data is ambiguous or outside training scope." },
-  { q: "Can MEND-X work offline / air-gapped?", a: "Yes. Compound Mini runs on edge devices. GPT-OSS 20B and 120B provide high-throughput manual reasoning with zero data retention on Groq LPU or customer VPC." },
+  { q: "Can MEND-X work offline / air-gapped?", a: "Yes. Nord runs on edge devices. Forge and Apex provide high-throughput manual reasoning with zero data retention on Groq LPU or customer VPC." },
   { q: "How do you handle manual PDFs?", a: "PyMuPDF extracts text + table structure. Deterministic chunking (512 tokens, 128 overlap) preserves context boundaries. We ingest 1.2M+ pages and map cross-references automatically (e.g., 'See Service Bulletin 7F-61-00')." },
-  { q: "What's the latency breakdown?", a: "Compound Mini: <100ms. GPT-OSS 20B: 1–2s (includes vector search + LPU inference). GPT-OSS 120B: 2–4s (full multi-hop reasoning). Cached queries hit in <50ms." },
+  { q: "What's the latency breakdown?", a: "Nord: <100ms. Forge: 1–2s (includes vector search + LPU inference). Apex: 2–4s (full multi-hop reasoning). Cached queries hit in <50ms." },
   { q: "Is this HIPAA / GDPR / DO-254 compliant?", a: "We support compliance-ready deployments: encrypted data stores, immutable audit logs, machine-scoped access control, and air-gapped reasoning. Compliance certification requires your deployment review; we provide architecture & audit trails." },
   { q: "How do you prevent malicious prompts?", a: "Input is sanitized and scoped to machine context. The refusal circuit also rejects queries outside the manual domain. We don't execute arbitrary code or scripts; reasoning is constrained to manual interpretation." }
 ];
@@ -238,7 +238,7 @@ export default function HomePage() {
                     {model.tier}
                   </span>
                   <span className="font-mono text-[11px] font-bold text-slate-500 dark:text-slate-400">
-                    {model.name.includes("Mini") ? "<100ms" : model.name.includes("20B") ? "1-2s" : "2-4s"}
+                    {model.name === "Nord" || model.name.includes("Mini") ? "<100ms" : model.name === "Forge" || model.name.includes("20B") ? "1-2s" : "2-4s"}
                   </span>
                 </div>
 
@@ -263,9 +263,9 @@ export default function HomePage() {
                     />
                   </h3>
                   <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400 font-semibold">
-                    {model.name.includes("Mini")
+                    {model.name === "Nord" || model.name.includes("Mini")
                       ? "Edge Heuristic Triage · Low Latency"
-                      : model.name.includes("20B")
+                      : model.name === "Forge" || model.name.includes("20B")
                       ? "Production RAG Synthesizer · Workhorse"
                       : "Root Cause Reasoning Engine · Deep Logic"}
                   </span>
@@ -364,9 +364,9 @@ export default function HomePage() {
             <thead>
               <tr className="border-b border-[var(--border)]">
                 <th className="text-left px-4 py-3 font-black text-[var(--text-primary)]">Requirement</th>
-                <th className="text-left px-4 py-3 font-mono text-[10px] font-bold text-blue-500 uppercase tracking-widest">Compound Mini (Fast)</th>
-                <th className="text-left px-4 py-3 font-mono text-[10px] font-bold text-amber-500 uppercase tracking-widest">GPT-OSS 20B (Workhorse)</th>
-                <th className="text-left px-4 py-3 font-mono text-[10px] font-bold text-violet-500 uppercase tracking-widest">GPT-OSS 120B (Reasoning)</th>
+                <th className="text-left px-4 py-3 font-mono text-[10px] font-bold text-blue-500 uppercase tracking-widest">Nord (Fast Edge)</th>
+                <th className="text-left px-4 py-3 font-mono text-[10px] font-bold text-amber-500 uppercase tracking-widest">Forge (Workhorse)</th>
+                <th className="text-left px-4 py-3 font-mono text-[10px] font-bold text-violet-500 uppercase tracking-widest">Apex (Deep Reasoning)</th>
               </tr>
             </thead>
             <tbody>

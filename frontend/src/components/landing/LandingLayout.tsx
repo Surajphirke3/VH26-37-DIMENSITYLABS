@@ -138,7 +138,7 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
                             </span>
                           </div>
 
-                          {/* Compound Mini */}
+                          {/* Nord */}
                           <Link
                             href="/models"
                             className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors group"
@@ -147,7 +147,7 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
                               <span className="w-2.5 h-2.5 rounded-full bg-blue-500 shrink-0 shadow-[0_0_8px_#3b82f6]" />
                               <div>
                                 <div className="font-bold text-xs text-slate-900 dark:text-white group-hover:text-blue-500 transition-colors">
-                                  Compound Mini
+                                  Nord
                                 </div>
                                 <div className="text-[10px] text-slate-500 dark:text-slate-400">Edge Triage · Groq LPU</div>
                               </div>
@@ -157,7 +157,7 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
                             </span>
                           </Link>
 
-                          {/* GPT-OSS 20B */}
+                          {/* Forge */}
                           <Link
                             href="/models"
                             className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors group"
@@ -166,7 +166,7 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
                               <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0 shadow-[0_0_8px_#f59e0b]" />
                               <div>
                                 <div className="font-bold text-xs text-slate-900 dark:text-white group-hover:text-amber-500 transition-colors">
-                                  GPT-OSS 20B
+                                  Forge
                                 </div>
                                 <div className="text-[10px] text-slate-500 dark:text-slate-400">Diagnostic Engine · Groq Fast</div>
                               </div>
@@ -176,7 +176,7 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
                             </span>
                           </Link>
 
-                          {/* GPT-OSS 120B */}
+                          {/* Apex */}
                           <Link
                             href="/models"
                             className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors group"
@@ -185,7 +185,7 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
                               <span className="w-2.5 h-2.5 rounded-full bg-violet-500 shrink-0 shadow-[0_0_8px_#8b5cf6]" />
                               <div>
                                 <div className="font-bold text-xs text-slate-900 dark:text-white group-hover:text-violet-500 transition-colors">
-                                  GPT-OSS 120B
+                                  Apex
                                 </div>
                                 <div className="text-[10px] text-slate-500 dark:text-slate-400">Deep Reasoning · Groq LPU</div>
                               </div>

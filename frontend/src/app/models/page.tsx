@@ -102,7 +102,7 @@ const MODELS_DATA: Record<ModelTierKey, ModelSpec> = {
     },
   },
   MINI: {
-    name: "Compound Mini",
+    name: "Nord",
     tierLabel: "TIER 01 · FAST EDGE / TRIAGE",
     tagline: "Instant Edge Triage & Error Code Matching",
     accentColor: "#3b82f6",
@@ -136,7 +136,7 @@ const MODELS_DATA: Record<ModelTierKey, ModelSpec> = {
     },
   },
   GPT20B: {
-    name: "GPT-OSS 20B",
+    name: "Forge",
     tierLabel: "TIER 02 · PRODUCTION WORKHORSE",
     tagline: "Fast Multi-Step Procedures & Component Cross-Reference",
     accentColor: "#f59e0b",
@@ -170,7 +170,7 @@ const MODELS_DATA: Record<ModelTierKey, ModelSpec> = {
     },
   },
   GPT120B: {
-    name: "GPT-OSS 120B",
+    name: "Apex",
     tierLabel: "TIER 03 · DEEP REASONING",
     tagline: "Root-Cause Analysis & Safety-Critical Diagnostics",
     accentColor: "#8b5cf6",
@@ -591,9 +591,9 @@ export default function ModelsPage() {
               <thead>
                 <tr className="border-b border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-white/[0.02]">
                   <th className="p-4 font-mono font-bold text-slate-500">Metric / Capability</th>
-                  <th className="p-4 font-bold text-blue-600 dark:text-blue-400">Compound Mini (Tier 01)</th>
-                  <th className="p-4 font-bold text-amber-600 dark:text-amber-400">GPT-OSS 20B (Tier 02)</th>
-                  <th className="p-4 font-bold text-violet-600 dark:text-violet-400">GPT-OSS 120B (Tier 03)</th>
+                  <th className="p-4 font-bold text-blue-600 dark:text-blue-400">Nord (Tier 01)</th>
+                  <th className="p-4 font-bold text-amber-600 dark:text-amber-400">Forge (Tier 02)</th>
+                  <th className="p-4 font-bold text-violet-600 dark:text-violet-400">Apex (Tier 03)</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-white/[0.05]">

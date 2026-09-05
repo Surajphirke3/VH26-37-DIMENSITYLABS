@@ -51,9 +51,9 @@ const PIPELINE_STAGES = [
 const LATENCY_BREAKDOWN = [
   { phase: "Query Ingestion", time: "<10ms", detail: "API gateway processing" },
   { phase: "pgvector ANN Search", time: "40–80ms", detail: "Cosine NN search (1M vectors)" },
-  { phase: "Compound Mini Inference", time: "<100ms", detail: "groq/compound-mini on Groq LPU" },
-  { phase: "GPT-OSS 20B Inference", time: "1–2s", detail: "openai/gpt-oss-20b (fast diagnostics)" },
-  { phase: "GPT-OSS 120B Inference", time: "2–4s", detail: "openai/gpt-oss-120b deep reasoning" },
+  { phase: "Nord Inference", time: "<100ms", detail: "Nord (Groq LPU)" },
+  { phase: "Forge Inference", time: "1–2s", detail: "Forge (Fast Diagnostics)" },
+  { phase: "Apex Inference", time: "2–4s", detail: "Apex (Deep Reasoning)" },
   { phase: "Response Serialization", time: "<5ms", detail: "JSON + streaming overhead" }
 ];
 
@@ -104,7 +104,7 @@ const DEPLOYMENT_MODES = [
   },
   {
     name: "Air-Gapped (Offline)",
-    latency: "<100ms (Compound Mini)",
+    latency: "<100ms (Nord)",
     dataResidency: "On-device vectors + local PG",
     compliance: "Zero external egress, no cloud calls",
     cost: "One-time license + maintenance",
@@ -113,9 +113,9 @@ const DEPLOYMENT_MODES = [
 ];
 
 const BENCHMARKS = [
-  { scenario: "Error Code Lookup (Compound Mini)", avgTime: "67ms", p99: "142ms", throughput: "14,900 q/s", accuracy: "99.2%" },
-  { scenario: "Multi-Step Procedure (GPT-OSS 20B)", avgTime: "1.24s", p99: "2.1s", throughput: "240 tok/s", accuracy: "98.4%" },
-  { scenario: "Root Cause Analysis (GPT-OSS 120B)", avgTime: "2.6s", p99: "4.2s", throughput: "180 tok/s", accuracy: "99.4%" },
+  { scenario: "Error Code Lookup (Nord)", avgTime: "67ms", p99: "142ms", throughput: "14,900 q/s", accuracy: "99.2%" },
+  { scenario: "Multi-Step Procedure (Forge)", avgTime: "1.24s", p99: "2.1s", throughput: "240 tok/s", accuracy: "98.4%" },
+  { scenario: "Root Cause Analysis (Apex)", avgTime: "2.6s", p99: "4.2s", throughput: "180 tok/s", accuracy: "99.4%" },
   { scenario: "Cold Start (Cache Miss)", avgTime: "512ms + model latency", p99: "1.2s + model latency", throughput: "N/A", accuracy: "N/A" },
 ];
 

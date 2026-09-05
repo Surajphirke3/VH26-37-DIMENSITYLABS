@@ -46,8 +46,8 @@ export interface AIModel {
 
 export const MODELS: AIModel[] = [
   {
-    id: "compound-mini",
-    name: "Groq Compound Mini",
+    id: "nord",
+    name: "Nord",
     tier: "01 — FAST EDGE / TRIAGE",
     tagline: "Instant. Edge. Zero Latency.",
     color: "#3b82f6",
@@ -61,7 +61,7 @@ export const MODELS: AIModel[] = [
     latency: "<100ms",
     useCase: "Error code lookups, symptom triage, binary yes/no diagnostics",
     longDesc:
-      "Groq Compound Mini is MEND-X's edge intelligence layer — a razor-sharp, sub-100-millisecond model running on Groq LPU purpose-built for the factory floor's fastest demands. Running with instant token generation, it delivers rapid response across vector search and error lookups. When a technician scans a fault code or enters a symptom, it answers before they blink.",
+      "Nord is MEND-X's edge intelligence layer — a razor-sharp, sub-100-millisecond model running on Groq LPU purpose-built for the factory floor's fastest demands. Running with instant token generation, it delivers rapid response across vector search and error lookups. When a technician scans a fault code or enters a symptom, it answers before they blink.",
     features: [
       {
         title: "Ultra-Fast LPU Inference",
@@ -116,7 +116,7 @@ export const MODELS: AIModel[] = [
     useCases: [
       {
         scenario: "Technician queries Siemens SINAMICS G120 fault F001",
-        response: "Compound Mini retrieves F001 overcurrent fault specifications and initial check points in <80ms.",
+        response: "Nord retrieves F001 overcurrent fault specifications and initial check points in <80ms.",
       },
       {
         scenario: "Night shift worker asks 'Is Alarm 5 critical?'",
@@ -140,8 +140,8 @@ export const MODELS: AIModel[] = [
     ],
   },
   {
-    id: "gpt-20b",
-    name: "GPT-OSS 20B",
+    id: "forge",
+    name: "Forge",
     tier: "02 — PRODUCTION WORKHORSE",
     tagline: "Fast Procedural Power. Multi-Step Intelligence.",
     color: "#f59e0b",
@@ -155,7 +155,7 @@ export const MODELS: AIModel[] = [
     latency: "1.0–1.8s",
     useCase: "Multi-step repair procedures, component cross-references, fault tree navigation",
     longDesc:
-      "GPT-OSS 20B on Groq LPU is the industrial workhorse. Delivering multi-step, context-rich reasoning that mid-complexity troubleshooting demands. Built with 128k context support, it ingests detailed manual chapters, traces nested fault trees, and generates step-by-step repair procedures complete with tool requirements, torque specifications, and part cross-references.",
+      "Forge on Groq LPU is the industrial workhorse. Delivering multi-step, context-rich reasoning that mid-complexity troubleshooting demands. Built with 128k context support, it ingests detailed manual chapters, traces nested fault trees, and generates step-by-step repair procedures complete with tool requirements, torque specifications, and part cross-references.",
     features: [
       {
         title: "Multi-Step Procedures",
@@ -231,13 +231,13 @@ export const MODELS: AIModel[] = [
       "Production-line troubleshooting",
     ],
     notFor: [
-      "Sub-50ms instant edge triggers (use Compound Mini)",
+      "Sub-50ms instant edge triggers (use Nord)",
       "Multi-system cascading root cause forensics",
     ],
   },
   {
-    id: "gpt-120b",
-    name: "GPT-OSS 120B",
+    id: "apex",
+    name: "Apex",
     tier: "03 — DEEP REASONING",
     tagline: "Maximum Reasoning. Critical Systems. Root Cause Analysis.",
     color: "#8b5cf6",
@@ -251,7 +251,7 @@ export const MODELS: AIModel[] = [
     latency: "2.0–3.8s",
     useCase: "Root cause analysis, safety-critical diagnostics, cross-manual disambiguation",
     longDesc:
-      "GPT-OSS 120B on Groq LPU is MEND-X's maximum reasoning tier — purpose-engineered for scenarios where getting it wrong has real consequences. Delivering deep multi-hop reasoning, it handles cross-manual ambiguity (such as identical fault codes across SINAMICS G120 and S120), safety-critical diagnostics, and complex scenarios where surface symptoms mask deeper systemic issues.",
+      "Apex on Groq LPU is MEND-X's maximum reasoning tier — purpose-engineered for scenarios where getting it wrong has real consequences. Delivering deep multi-hop reasoning, it handles cross-manual ambiguity (such as identical fault codes across SINAMICS G120 and S120), safety-critical diagnostics, and complex scenarios where surface symptoms mask deeper systemic issues.",
     features: [
       {
         title: "Multi-Hop Deductive Reasoning",
@@ -327,7 +327,7 @@ export const MODELS: AIModel[] = [
       "Cascading multi-subsystem breakdowns",
     ],
     notFor: [
-      "Sub-100ms rapid error code lookups (use Compound Mini)",
+      "Sub-100ms rapid error code lookups (use Nord)",
       "Simple binary status inquiries",
     ],
   },
