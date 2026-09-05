@@ -81,7 +81,7 @@ class Settings(BaseSettings):
 
     # App
     PROJECT_NAME: str = "MEND - X"
-    VERSION: str = "1.2.1"
+    VERSION: str = "3.0.0"
     ENVIRONMENT: str = "development"
     LOG_LEVEL: str = "INFO"
     MAX_UPLOAD_SIZE_MB: int = 100

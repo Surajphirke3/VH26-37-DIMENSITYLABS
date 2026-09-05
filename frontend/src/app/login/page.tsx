@@ -396,7 +396,7 @@ export default function LoginPage() {
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                   TLS 1.3 Air-Gapped Authentication
                 </span>
-                <span>MEND-X v1.2.1</span>
+                <span>MEND-X v3.0.0</span>
               </div>
             </div>
           </div>
