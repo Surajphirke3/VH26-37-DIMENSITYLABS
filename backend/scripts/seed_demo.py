@@ -15,15 +15,13 @@ import os
 # Allow running from project root or scripts/ directory
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from passlib.context import CryptContext
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 
 from app.core.config import settings
+from app.core.security import hash_password
 from app.models import User, Machine
 from app.models.user import UserRole
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 DEMO_USERS = [
@@ -79,7 +77,7 @@ async def seed(session: AsyncSession) -> None:
     for u in DEMO_USERS:
         user = User(
             email=u["email"],
-            password_hash=pwd_context.hash(u["password"]),
+            password_hash=hash_password(u["password"]),
             role=u["role"],
             full_name=u["full_name"],
             is_active=True,

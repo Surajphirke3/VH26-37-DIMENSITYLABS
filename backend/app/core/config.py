@@ -85,7 +85,13 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     LOG_LEVEL: str = "INFO"
     MAX_UPLOAD_SIZE_MB: int = 100
-    CORS_ORIGINS: List[str] = ["http://localhost:3000"]
+    CORS_ORIGINS: List[str] = [
+        "http://localhost:3000",
+        "http://localhost:8081",
+        "http://127.0.0.1:8081",
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
+    ]
     UPLOAD_DIR: str = "./uploads"
 
     # RAG & Retrieval Tuning

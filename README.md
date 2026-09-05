@@ -163,7 +163,7 @@ flowchart TD
 
 ## 🚀 Quick Start Guide
 
-You can run MEND - X using **Docker Compose** (recommended) or as separate **Backend & Frontend** services.
+> 📖 **Server Boot Reference:** See **[`boot.md`](boot.md)** for a dedicated, unified cheat sheet containing all startup commands for Frontend, Backend, Docker, and Expo Mobile.
 
 ### Option A: Docker Compose (Fastest)
 

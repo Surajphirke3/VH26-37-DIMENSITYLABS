@@ -47,7 +47,10 @@ lint:
 	cd backend && .venv/bin/ruff check app/ || true
 
 dev-api:
-	cd backend && .venv/bin/uvicorn app.main:app --reload --port 8000
+	cd backend && .venv/bin/uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 dev-frontend:
 	cd frontend && npm run dev
+
+dev-mobile:
+	cd mobile && npx expo start

@@ -5,6 +5,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user
@@ -29,6 +30,7 @@ async def list_conversations(
     """List recent conversations for the current user."""
     result = await db.execute(
         select(Conversation)
+        .options(selectinload(Conversation.machine))
         .where(Conversation.user_id == current_user.id)
         .order_by(Conversation.updated_at.desc())
         .limit(50)
@@ -42,6 +44,7 @@ async def list_conversations(
                 "conversation_id": str(c.id),
                 "title": c.title or "Diagnostic Session",
                 "machine_id": str(c.machine_id) if c.machine_id else None,
+                "machine_name": c.machine.name if c.machine else None,
                 "created_at": str(c.created_at),
                 "updated_at": str(c.updated_at),
             }
