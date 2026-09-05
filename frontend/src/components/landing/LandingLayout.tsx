@@ -195,12 +195,19 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
                             </span>
                           </Link>
 
-                          <div className="pt-2 border-t border-slate-100 dark:border-white/[0.06] text-center">
+                          <div className="pt-2 border-t border-slate-100 dark:border-white/[0.06] flex flex-col gap-1 text-center">
+                            <Link
+                              href="/space"
+                              className="text-[11px] font-bold text-sky-600 dark:text-sky-400 hover:underline flex items-center justify-center gap-1.5 py-0.5"
+                            >
+                              <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" />
+                              <span>Enter Tri-Model Space (Nord · Forge · Apex) 🌌</span>
+                            </Link>
                             <Link
                               href="/models"
-                              className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center justify-center gap-1"
+                              className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 hover:underline"
                             >
-                              Explore Model Matrix &amp; Simulator →
+                              Explore Technical Specs Matrix →
                             </Link>
                           </div>
                         </div>

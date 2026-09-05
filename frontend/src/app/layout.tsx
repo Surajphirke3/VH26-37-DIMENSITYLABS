@@ -4,6 +4,7 @@ import "./globals.css";
 import { SessionProvider } from "@/lib/auth-context";
 import { ThemeProvider } from "@/lib/theme-context";
 import { LanguageProvider } from "@/lib/i18n/context";
+import { SpaceWarpProvider } from "@/components/common/SpaceWarpPortal";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -45,7 +46,9 @@ export default function RootLayout({
       <body className="font-sans antialiased min-h-screen w-full max-w-full overflow-x-hidden bg-[var(--bg-base)] text-[var(--text-primary)] transition-colors duration-200">
         <ThemeProvider>
           <SessionProvider>
-            <LanguageProvider>{children}</LanguageProvider>
+            <LanguageProvider>
+              <SpaceWarpProvider>{children}</SpaceWarpProvider>
+            </LanguageProvider>
           </SessionProvider>
         </ThemeProvider>
       </body>

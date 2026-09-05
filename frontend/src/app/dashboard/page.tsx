@@ -25,6 +25,7 @@ import {
   Smartphone,
   Columns,
   Trash2,
+  Sparkles,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { getMachines, createConversation, listConversations, deleteConversation } from "@/lib/api";
@@ -37,6 +38,7 @@ import ThemeToggle from "@/components/ui/ThemeToggle";
 import LanguageSelector from "@/components/common/LanguageSelector";
 import { useTheme } from "@/lib/theme-context";
 import { useLanguage } from "@/lib/i18n/context";
+import { useSpaceWarp } from "@/components/common/SpaceWarpPortal";
 import ManufacturerLogo from "@/components/common/ManufacturerLogo";
 
 interface ConvEntry {
@@ -77,6 +79,7 @@ export default function DashboardPage() {
   const { t } = useLanguage();
   const isLight = theme === "light";
   const router = useRouter();
+  const { triggerWarp } = useSpaceWarp();
 
   const [machines, setMachines] = useState<Machine[]>([]);
   const [selectedMachine, setSelectedMachine] = useState<Machine | null>(null);
@@ -522,6 +525,25 @@ export default function DashboardPage() {
                 <span className="hidden xl:inline">{t("dashboard.dualSplit", "Dual Split")}</span>
               </button>
             </div>
+
+            {/* Tri-Model Space Dimensional Portal CTA */}
+            <button
+              type="button"
+              onClick={() =>
+                triggerWarp(
+                  "/space",
+                  "Entering Tri-Model Space",
+                  "Activating Nord, Forge & Apex high-dimensional reasoning domain…"
+                )
+              }
+              className="px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-mono font-bold text-white bg-gradient-to-r from-sky-500 via-indigo-600 to-rose-500 hover:from-sky-400 hover:to-rose-400 shadow-[0_0_20px_rgba(56,189,248,0.35)] border border-sky-400/40 transition-all flex items-center gap-1.5 sm:gap-2 cursor-pointer hover:scale-[1.03] active:scale-95 shrink-0"
+              title="Traverse into the dedicated Tri-Model Space Page (Nord · Forge · Apex)"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-sky-200 animate-pulse shrink-0" />
+              <span className="hidden sm:inline">Tri-Model Space</span>
+              <span className="sm:hidden">Space</span>
+              <span className="text-[10px] font-mono px-1 rounded bg-white/20">3</span>
+            </button>
 
             <div className="hidden 2xl:flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-[11px] font-mono text-emerald-600 dark:text-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.15)] font-semibold">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_6px_rgba(16,185,129,0.8)]" />
