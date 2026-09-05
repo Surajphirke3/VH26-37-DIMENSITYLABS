@@ -65,51 +65,6 @@ const MODEL_TIERS = [
   }
 ];
 
-const CASE_STUDIES = [
-  {
-    title: "Automotive Tier-1: Welding Cell Recovery",
-    company: "Global OEM Supplier",
-    industry: "Automotive",
-    issue: "KUKA KR-210 servo fault preventing production cell handshake",
-    traditional: "4.2 hours manual troubleshooting + schematic cross-referencing",
-    mendx: "8 minutes: MEND-X isolated Profinet board contact issue from 3 nested fault trees",
-    roi: "$18,400 downtime saved",
-    metrics: [
-      { label: "Cycles Restored", value: "847 / 8h shift" },
-      { label: "Capital Recovered", value: "$18.4K saved" },
-      { label: "Documentation Queries", value: "SINAMICS G120 & S120 mapped" }
-    ]
-  },
-  {
-    title: "Aerospace Machining: Spindle Bearing Alarm",
-    company: "Precision Flight Systems",
-    industry: "Aerospace",
-    issue: "Haas VF-4 thermal expansion alarm during 5-axis finish cut",
-    traditional: "Full spindle replacement scheduled (3-day lead time)",
-    mendx: "Identified coolant manifold valve blockage — resolved with 20-minute line flush",
-    roi: "$42,000 part cost + 3 days avoided",
-    metrics: [
-      { label: "Production Uptime", value: "99.4%" },
-      { label: "Direct Savings", value: "$42,000 part avoided" },
-      { label: "Resolution Speed", value: "20 min flush" }
-    ]
-  },
-  {
-    title: "Packaging Plant: Intermittent Line Jam",
-    company: "CVM Packaging",
-    industry: "Food & Beverage",
-    issue: "Siemens S7-1500 PLC profinet bus drops intermittently on shift 2",
-    traditional: "Intermittent fault unresolved for 3 weeks",
-    mendx: "Cross-referenced Siemens S120 manual: identified missing termination resistor on rack 4",
-    roi: "Zero repeat drops in 90 days",
-    metrics: [
-      { label: "Drop Frequency", value: "0 in 90 days" },
-      { label: "Manual Grounding", value: "Siemens S120 verified" },
-      { label: "Mean Time to Detect", value: "6.2 seconds" }
-    ]
-  }
-];
-
 const FEATURES = [
   { title: "Zero-Hallucination RAG", desc: "Deterministic chunking (512 tokens) with 0.72 cosine similarity threshold. Every response cites its source page.", icon: "🎯" },
   { title: "Multi-Tenant Isolation", desc: "pgvector ANN search scoped by machine_id. Air-gapped deployments supported on restricted networks.", icon: "🔒" },
@@ -365,68 +320,6 @@ export default function HomePage() {
 
       {/* ─── LIVE DIAGNOSTIC SIMULATOR ─── */}
       <DiagnosticSimulator />
-
-      {/* ─── CASE STUDIES / INDUSTRIAL POST-MORTEMS ─── */}
-      <section className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-24 border-t border-[var(--border)]">
-        <div className="text-center mb-16 animate-slide-up">
-          <span className="inline-block font-mono text-[10px] uppercase font-bold text-amber-500 tracking-widest bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20 mb-4">
-            Real-World Impact
-          </span>
-          <h2 className="font-black text-3xl sm:text-5xl text-[var(--text-primary)] tracking-tight leading-tight">
-            Industrial <span className="gradient-text-gold">Success Stories.</span>
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-1 gap-12">
-          {CASE_STUDIES.map((study, idx) => (
-            <div
-              key={idx}
-              className="cyber-card p-8 sm:p-12 animate-slide-up"
-              style={{ animationDelay: `${0.15 * idx}s` }}
-            >
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-2xl">🏭</span>
-                  </div>
-                  <h3 className="font-black text-xl text-[var(--text-primary)] mb-2">{study.title}</h3>
-                  <p className="text-sm text-[var(--text-muted)] mb-4">{study.company}</p>
-                  <div className="inline-flex gap-2 flex-wrap">
-                    <span className="font-mono text-[9px] font-black text-white bg-amber-600/80 px-2 py-1 rounded uppercase tracking-wider">
-                      {study.industry}
-                    </span>
-                  </div>
-                </div>
-
-                <div>
-                  <p className="text-xs font-mono font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2">The Fault</p>
-                  <p className="text-sm font-medium text-[var(--text-primary)] mb-6">{study.issue}</p>
-
-                  <p className="text-xs font-mono font-bold text-rose-500 uppercase tracking-wider mb-2">Traditional: 🐌</p>
-                  <p className="text-sm font-medium text-rose-400 mb-6">{study.traditional}</p>
-
-                  <p className="text-xs font-mono font-bold text-emerald-500 uppercase tracking-wider mb-2">MEND-X: ⚡</p>
-                  <p className="text-sm font-medium text-emerald-400">{study.mendx}</p>
-                </div>
-
-                <div className="lg:border-l lg:border-[var(--border)] lg:pl-8">
-                  <p className="text-xs font-mono font-bold text-indigo-500 uppercase tracking-wider mb-4">Annual ROI</p>
-                  <p className="text-3xl font-black text-indigo-400 mb-6">{study.roi}</p>
-
-                  <div className="space-y-3">
-                    {study.metrics.map((m, i) => (
-                      <div key={i}>
-                        <p className="text-xs text-[var(--text-secondary)] font-semibold mb-1">{m.label}</p>
-                        <p className="text-sm font-mono font-bold text-[var(--text-primary)]">{m.value}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
 
       {/* ─── ENGINEERING BLOGS / NEWS ─── */}
       <EngineeringBlogs />
