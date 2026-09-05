@@ -6,6 +6,7 @@ import { getModels, getActiveModel } from '@/lib/api';
 import type { AIModel } from '@/lib/types';
 
 import { colors } from '@/lib/theme';
+import { DEFAULT_MODELS } from '@/constants/models';
 
 const C = {
   bg: colors.background,
@@ -42,9 +43,9 @@ function getTier(model: AIModel): string {
 
 export default function ModelsScreen() {
   const router = useRouter();
-  const [models, setModels] = useState<AIModel[]>([]);
-  const [activeModelId, setActiveModelId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [models, setModels] = useState<AIModel[]>(DEFAULT_MODELS);
+  const [activeModelId, setActiveModelId] = useState<string | null>("deep101godhani/mendx-apex-v3");
+  const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -52,18 +53,20 @@ export default function ModelsScreen() {
     try {
       setError(null);
       const [modelsData, activeData] = await Promise.all([
-        getModels(),
+        getModels().catch(() => null),
         getActiveModel().catch(() => null),
       ]);
-      setModels(modelsData.models ?? []);
+      if (modelsData?.models && modelsData.models.length > 0) {
+        setModels(modelsData.models);
+      }
       if (activeData) {
-        const match = modelsData.models.find(
+        const match = (modelsData?.models ?? DEFAULT_MODELS).find(
           (m) => m.id === activeData.active_model || m.name === activeData.active_model
         );
         setActiveModelId(match?.id ?? activeData.active_model);
       }
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Failed to load models.');
+      // Keep DEFAULT_MODELS displayed
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -72,8 +75,8 @@ export default function ModelsScreen() {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  if (loading) return <View style={S.centered}><ActivityIndicator color={C.accent} size="large" /></View>;
-  if (error) return (
+  if (loading && models.length === 0) return <View style={S.centered}><ActivityIndicator color={C.accent} size="large" /></View>;
+  if (error && models.length === 0) return (
     <View style={S.centered}>
       <Ionicons name="alert-circle-outline" size={40} color={C.error} />
       <Text style={S.errorText}>{error}</Text>

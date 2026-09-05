@@ -7,6 +7,7 @@ import { getActiveModel } from '@/lib/api';
 import type { Machine, AIModel } from '@/lib/types';
 
 import { colors } from '@/lib/theme';
+import { DEFAULT_MODELS } from '@/constants/models';
 
 const C = {
   bg: colors.background,
@@ -24,7 +25,7 @@ const C = {
 export default function NewChatScreen() {
   const router = useRouter();
   const [machines, setMachines] = useState<Machine[]>([]);
-  const [models, setModels] = useState<AIModel[]>([]);
+  const [models, setModels] = useState<AIModel[]>(DEFAULT_MODELS);
   const [selectedMachine, setSelectedMachine] = useState<string | null>(null);
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
   const [initialQuery, setInitialQuery] = useState('');
@@ -34,14 +35,14 @@ export default function NewChatScreen() {
 
   useEffect(() => {
     Promise.all([
-      getMachines(),
-      getModels(),
-      getActiveModel().catch(() => null),
+      getMachines().catch(() => []),
+      getModels().catch(() => null),
     ])
       .then(([ms, modelsData]) => {
-        setMachines(ms);
-        setModels(modelsData.models ?? []);
-        // Keep model default on Auto (adaptive routing)
+        if (ms && ms.length > 0) setMachines(ms);
+        if (modelsData?.models && modelsData.models.length > 0) {
+          setModels(modelsData.models);
+        }
         setSelectedModel(null);
       })
       .catch(() => {})
@@ -99,22 +100,18 @@ export default function NewChatScreen() {
           })}
         </View>}
 
-      {models.length > 0 && (
-        <>
-          <Text style={S.label}>AI Model <Text style={S.optional}>(optional)</Text></Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={S.chipRow} contentContainerStyle={{ gap: 10, paddingRight: 4 }}>
-            <TouchableOpacity style={[S.chip, !selectedModel && S.chipActive]} onPress={() => setSelectedModel(null)}>
-              <Ionicons name="sparkles" size={13} color={!selectedModel ? '#fff' : C.accent} />
-              <Text style={[S.chipText, !selectedModel && S.chipTextActive]}>Auto (Recommended)</Text>
-            </TouchableOpacity>
-            {models.map((mdl) => (
-              <TouchableOpacity key={mdl.id} style={[S.chip, selectedModel === mdl.id && S.chipActive]} onPress={() => setSelectedModel(selectedModel === mdl.id ? null : mdl.id)}>
-                <Text style={[S.chipText, selectedModel === mdl.id && S.chipTextActive]} numberOfLines={1}>{mdl.name}</Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </>
-      )}
+      <Text style={S.label}>AI Model <Text style={S.optional}>(optional)</Text></Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={S.chipRow} contentContainerStyle={{ gap: 10, paddingRight: 4 }}>
+        <TouchableOpacity style={[S.chip, !selectedModel && S.chipActive]} onPress={() => setSelectedModel(null)}>
+          <Ionicons name="sparkles" size={13} color={!selectedModel ? '#fff' : C.accent} />
+          <Text style={[S.chipText, !selectedModel && S.chipTextActive]}>Auto (Recommended)</Text>
+        </TouchableOpacity>
+        {models.map((mdl) => (
+          <TouchableOpacity key={mdl.id} style={[S.chip, selectedModel === mdl.id && S.chipActive]} onPress={() => setSelectedModel(selectedModel === mdl.id ? null : mdl.id)}>
+            <Text style={[S.chipText, selectedModel === mdl.id && S.chipTextActive]} numberOfLines={1}>{mdl.name}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
 
       <Text style={S.label}>Opening Question <Text style={S.optional}>(optional)</Text></Text>
       <TextInput style={S.queryInput} value={initialQuery} onChangeText={setInitialQuery} placeholder="E.g. E101 hydraulic fault on press line…" placeholderTextColor={C.muted} multiline maxLength={500} />

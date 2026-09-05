@@ -68,6 +68,26 @@
         }
       ]
     },
+    "huggingface": {
+      "enabled": true,
+      "default_model": "deep101godhani/mendx-apex-v3",
+      "models": [
+        {
+          "id": "deep101godhani/mendx-apex-v3",
+          "name": "MEND-X Apex v3 (Custom Fine-Tuned HF Cloud)",
+          "type": "custom_cloud",
+          "max_tokens": 4096,
+          "speed": "ultra_fast"
+        },
+        {
+          "id": "deep101godhani/nord",
+          "name": "MEND-X Nord (HF Cloud)",
+          "type": "fast",
+          "max_tokens": 2048,
+          "speed": "instant"
+        }
+      ]
+    },
     "gemini": {
       "enabled": true,
       "default_model": "gemini-2.5-flash",

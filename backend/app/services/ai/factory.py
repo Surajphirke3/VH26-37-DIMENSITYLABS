@@ -21,7 +21,25 @@ def _build_fallback_chain() -> LLMProvider:
     log = get_logger("ai.factory")
     providers: list[tuple[str, LLMProvider]] = []
 
-    # --- 1. Ollama Cloud --------------------------------------------------
+    # --- 1. Hugging Face Cloud (Own Custom Fine-Tuned Model) --------------
+    hf_key = (settings.HUGGINGFACE_API_KEY or "").strip()
+    if hf_key and hf_key not in ("placeholder", "your_huggingface_api_key_here", ""):
+        try:
+            from app.services.ai.huggingface import HuggingFaceLLM
+            providers.append((
+                "huggingface_cloud",
+                HuggingFaceLLM(
+                    api_key=hf_key,
+                    model=settings.HUGGINGFACE_MODEL,
+                    fallback_model=settings.HUGGINGFACE_FALLBACK_MODEL,
+                    endpoint_url=settings.HUGGINGFACE_ENDPOINT_URL or None,
+                ),
+            ))
+            log.info("factory.provider_registered", provider="huggingface_cloud", model=settings.HUGGINGFACE_MODEL)
+        except Exception as exc:
+            log.warning("factory.huggingface_cloud_unavailable", error=str(exc))
+
+    # --- 2. Ollama Cloud --------------------------------------------------
     cloud_key = (settings.OLLAMA_API_KEY or "").strip()
     if cloud_key and cloud_key not in ("placeholder", "your_ollama_api_key_here", ""):
         try:
@@ -81,6 +99,15 @@ def get_llm_provider() -> LLMProvider:
     if provider in ("auto", "fallback", "ollama"):
         return _build_fallback_chain()
 
+    if provider in ("huggingface", "hf", "huggingface_cloud"):
+        from app.services.ai.huggingface import HuggingFaceLLM
+        return HuggingFaceLLM(
+            api_key=settings.HUGGINGFACE_API_KEY,
+            model=settings.HUGGINGFACE_MODEL,
+            fallback_model=settings.HUGGINGFACE_FALLBACK_MODEL,
+            endpoint_url=settings.HUGGINGFACE_ENDPOINT_URL or None,
+        )
+
     if provider == "groq":
         from app.services.ai.groq import GroqLLM
         return GroqLLM(api_key=settings.GROQ_API_KEY, model=settings.GROQ_MODEL)
@@ -97,7 +124,7 @@ def get_llm_provider() -> LLMProvider:
             site_url=settings.OPENROUTER_SITE_URL,
         )
 
-    raise ValueError(f"Unknown LLM_PROVIDER: {provider!r}. Choose: auto, groq, gemini, openrouter, ollama")
+    raise ValueError(f"Unknown LLM_PROVIDER: {provider!r}. Choose: auto, huggingface, groq, gemini, openrouter, ollama")
 
 
 @lru_cache(maxsize=1)

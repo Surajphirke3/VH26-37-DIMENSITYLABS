@@ -6,6 +6,7 @@ import { getModels, getActiveModel } from '@/lib/api';
 import type { AIModel } from '@/lib/types';
 
 import { colors } from '@/lib/theme';
+import { DEFAULT_MODELS } from '@/constants/models';
 
 const C = {
   bg: colors.background,
@@ -48,19 +49,25 @@ export default function ModelDetailScreen() {
     async function fetchData() {
       try {
         const [modelsData, activeData] = await Promise.all([
-          getModels(),
+          getModels().catch(() => null),
           getActiveModel().catch(() => null),
         ]);
-        const found = modelsData.models.find((m) => m.id === id) ?? null;
+        const list = (modelsData?.models && modelsData.models.length > 0) ? modelsData.models : DEFAULT_MODELS;
+        const decodedId = decodeURIComponent(id);
+        const found = list.find((m) => m.id === id || m.id === decodedId || m.name === id || m.name === decodedId) ?? DEFAULT_MODELS[0];
         setModel(found);
         setIsActive(
           activeData?.active_model === id ||
+          activeData?.active_model === decodedId ||
           activeData?.active_model === found?.name ||
           activeData?.active_model === found?.id
         );
         if (found) navigation.setOptions({ title: found.name });
       } catch (e: unknown) {
-        setError(e instanceof Error ? e.message : 'Failed to load model.');
+        const decodedId = decodeURIComponent(id);
+        const found = DEFAULT_MODELS.find((m) => m.id === id || m.id === decodedId) ?? DEFAULT_MODELS[0];
+        setModel(found);
+        if (found) navigation.setOptions({ title: found.name });
       } finally {
         setLoading(false);
       }
