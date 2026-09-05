@@ -25,6 +25,7 @@ import {
   Type,
 } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/context";
+import { useSpaceWarp } from "@/components/common/SpaceWarpPortal";
 
 interface ChatInterfaceProps {
   conversationId: string | null;
@@ -106,6 +107,7 @@ export default function ChatInterface({
   onFirstMessage,
 }: ChatInterfaceProps) {
   const { t, language } = useLanguage();
+  const { triggerWarp } = useSpaceWarp();
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [expandedTraces, setExpandedTraces] = useState<Record<string, boolean>>({});
@@ -434,43 +436,28 @@ export default function ChatInterface({
           )}
         </div>
 
-        {/* Right HUD Controls: Version Switcher, Text Size Switcher, Target Switcher */}
+        {/* Right HUD Controls: Tri-Model Space Portal, Text Size Switcher, Target Switcher */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-          {/* Dimensional Space Portal Switcher (v1 SCADA ⇄ v2 Tri-Model Space) */}
-          <div className="flex items-center p-0.5 rounded-xl bg-slate-200/90 dark:bg-black/70 border border-slate-300 dark:border-white/15 text-[11px] font-mono shadow-md">
-            <button
-              type="button"
-              onClick={() => handleSetChatVersion("v1")}
-              className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg font-bold transition-all flex items-center gap-1 sm:gap-1.5 cursor-pointer ${
-                chatVersion === "v1"
-                  ? "bg-gradient-to-r from-cyan-600 via-indigo-600 to-indigo-700 text-white shadow-[0_0_15px_rgba(6,182,212,0.4)]"
-                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-              }`}
-              title="Enter Version 1: Industrial SCADA Shopfloor Terminal"
-            >
-              <Terminal className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-              <span className="hidden sm:inline">v1 SCADA</span>
-              <span className="sm:hidden">v1</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleSetChatVersion("v2")}
-              className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg font-bold transition-all flex items-center gap-1 sm:gap-1.5 cursor-pointer ${
-                chatVersion === "v2"
-                  ? "bg-slate-950 dark:bg-white text-white dark:text-slate-950 shadow-[0_0_20px_rgba(56,189,248,0.35)] border border-sky-400/30"
-                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-              }`}
-              title="Enter Version 2: Tri-Model Space (Nord · Forge · Apex)"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-sky-400 animate-pulse shrink-0" />
-              <span className="hidden sm:inline bg-gradient-to-r from-sky-400 via-amber-400 to-rose-400 bg-clip-text text-transparent font-black">
-                v2 Tri-Model Space
-              </span>
-              <span className="sm:hidden bg-gradient-to-r from-sky-400 via-amber-400 to-rose-400 bg-clip-text text-transparent font-black">
-                v2 Space
-              </span>
-            </button>
-          </div>
+          {/* Dedicated Tri-Model Space Portal Button */}
+          <button
+            type="button"
+            onClick={() =>
+              triggerWarp(
+                "/space",
+                "Entering Tri-Model Space",
+                "Activating Nord, Forge & Apex high-dimensional reasoning domain…"
+              )
+            }
+            className="px-2.5 sm:px-3.5 py-1.5 rounded-xl font-mono text-xs font-bold text-white bg-gradient-to-r from-sky-500 via-indigo-600 to-rose-500 hover:from-sky-400 hover:to-rose-400 shadow-[0_0_20px_rgba(56,189,248,0.35)] border border-sky-400/40 transition-all flex items-center gap-1.5 sm:gap-2 cursor-pointer hover:scale-[1.03] active:scale-95"
+            title="Traverse warp into the dedicated Tri-Model Space Page (Nord · Forge · Apex)"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-sky-200 animate-pulse shrink-0" />
+            <span className="hidden sm:inline bg-gradient-to-r from-sky-200 via-white to-rose-200 bg-clip-text text-transparent font-black">
+              Tri-Model Space (Nord · Forge · Apex)
+            </span>
+            <span className="sm:hidden font-black">Space</span>
+            <span className="text-[10px] font-mono px-1 rounded bg-white/20">3</span>
+          </button>
 
           {/* Text Size Slider (Enlarge / Unlarge) */}
           <div className="hidden xs:flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 rounded-xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-white/10 text-[11px] font-mono shadow-sm shrink-0">
