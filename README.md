@@ -1,263 +1,379 @@
 <div align="center">
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="Hackathon/MEND_X_DARK.png">
-  <source media="(prefers-color-scheme: light)" srcset="Hackathon/MEND%20-%20X.png">
-  <img alt="MEND - X — From Failure to Function" src="Hackathon/MEND%20-%20X.png" width="340" />
+  <source media="(prefers-color-scheme: dark)" srcset="Hackathon/dimensity_labs_dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="Hackathon/dimensity_labs_light.png">
+  <img alt="Dimensity Labs" src="Hackathon/dimensity_labs.png" width="95" />
 </picture>
 
 <br/>
 
-### *Industrial RAG & Intelligent Machine Troubleshooting System for Factory Floor Diagnostics*
+### **DIMENSITY LABS** · *Presents*
 
-[![VCET HackC++thon 2026](https://img.shields.io/badge/VCET%20HackC%2B%2Bthon-2026-7C3AED?style=for-the-badge&logo=codeforces&logoColor=white)](https://vcet.edu.in)
-[![Version](https://img.shields.io/badge/Version-v3.0.0-6366F1?style=for-the-badge)](https://github.com/Surajphirke3/VH26-37-DIMENSITYLABS/releases)
-[![Domain](https://img.shields.io/badge/Domain-Application%20Data%20Management%20(RAG)-0284C7?style=for-the-badge)](https://github.com/Surajphirke3/VH26-37-DIMENSITYLABS)
-[![Team](https://img.shields.io/badge/Team-DIMENSITY%20LABS%20%5BVH26--37%5D-EA580C?style=for-the-badge)](#-team--contributors)
-[![License: MIT](https://img.shields.io/badge/License-MIT-16A34A?style=for-the-badge)](LICENSE)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="Hackathon/MEND_X_DARK.png">
+  <source media="(prefers-color-scheme: light)" srcset="Hackathon/MEND%20-%20X.png">
+  <img alt="MEND - X — From Failure to Function" src="Hackathon/MEND%20-%20X.png" width="440" />
+</picture>
 
 <br/>
 
-[![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
-[![Next.js 14](https://img.shields.io/badge/Frontend-Next.js%2014-000000?style=flat-square&logo=next.js&logoColor=white)](https://nextjs.org)
-[![ChromaDB](https://img.shields.io/badge/Vector_DB-ChromaDB-FF6F00?style=flat-square)](https://www.trychroma.com)
-[![Docker](https://img.shields.io/badge/Deploy-Docker%20Compose-2496ED?style=flat-square&logo=docker&logoColor=white)](https://docker.com)
-[![Multi-Provider AI](https://img.shields.io/badge/AI%20Engine-Groq%20%7C%20Gemini%20%7C%20Ollama-8A2BE2?style=flat-square)](docs/OWN_MODEL_GUIDE.md)
+### **From Failure to Function: The Next-Generation Industrial Intelligence Platform for Zero-Downtime Manufacturing**
 
-> **"Stop hunting through 400-page manuals while production is halted. Type an error code or symptom, route through tiered intelligence, and receive exact, verified repair steps with page citations in seconds."**
+[![VCET HackC++thon 2026](https://img.shields.io/badge/VCET%20HackC%2B%2Bthon-2026%20Finalist-7C3AED?style=for-the-badge&logo=codeforces&logoColor=white)](https://vcet.edu.in)
+[![Product Release](https://img.shields.io/badge/Product%20Status-Commercial%20v3.0.0-059669?style=for-the-badge)](https://github.com/Surajphirke3/VH26-37-DIMENSITYLABS)
+[![Dimensity Labs](https://img.shields.io/badge/Engineered%20By-DIMENSITY%20LABS%20%5BVH26--37%5D-EA580C?style=for-the-badge)](#-the-team--dimensity-labs)
+[![License: MIT](https://img.shields.io/badge/License-MIT-3B82F6?style=for-the-badge)](LICENSE)
 
-[Model Tiers](#-the-three-model-tiers) · [The Industrial Challenge](#-the-industrial-challenge) · [Key Capabilities](#-key-capabilities) · [System Architecture](#-system-architecture) · [Hallucination Defense](#-hallucination-defense--confidence-gate) · [Quick Start](#-quick-start-guide) · [Demo Scenarios](#-live-demo-test-cases) · [Team](#-team--contributors)
+<br/>
+
+[![FastAPI](https://img.shields.io/badge/Backend-FastAPI%20Async-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![Next.js 16](https://img.shields.io/badge/Frontend-Next.js%2016%20%7C%20React%2019-000000?style=flat-square&logo=next.js&logoColor=white)](https://nextjs.org)
+[![PostgreSQL](https://img.shields.io/badge/Database-pgvector%20%28Postgres%2016%29-336791?style=flat-square&logo=postgresql&logoColor=white)](https://github.com/pgvector/pgvector)
+[![ChromaDB](https://img.shields.io/badge/Vector%20Store-ChromaDB%20Persistent-FF6F00?style=flat-square)](https://www.trychroma.com)
+[![FastEmbed](https://img.shields.io/badge/Embeddings-Local%20BAAI%2Fbge--small--en--v1.5-6366F1?style=flat-square)](https://qdrant.github.io/fastembed/)
+[![Docker](https://img.shields.io/badge/Orchestration-Docker%20Compose-2496ED?style=flat-square&logo=docker&logoColor=white)](https://docker.com)
+[![Cloudflare Tunnel](https://img.shields.io/badge/Ingress-Cloudflare%20Tunnel-F38020?style=flat-square&logo=cloudflare&logoColor=white)](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/)
+[![Expo](https://img.shields.io/badge/Mobile-Expo%20SDK%2051-4630EB?style=flat-square&logo=expo&logoColor=white)](https://expo.dev)
+
+<br/>
+
+> *"In mission-critical industrial manufacturing, unplanned machine stoppages cost up to **$250,000 per hour**. Maintenance technicians waste 45+ minutes thumbing through dense 500-page OEM manuals or hunting across conflicting documentation while production lines sit paralyzed.*  
+> 
+> **MEND - X transforms industrial field operations by pairing domain-aware RAG, deterministic hallucination gates, automated multi-page technical parsing, and a tiered intelligence architecture into an instantaneous triage companion.**"
+
+<p align="center">
+  <a href="#-executive-summary">Executive Summary</a> •
+  <a href="#-the-three-tier-intelligence-architecture">Three Intelligence Tiers</a> •
+  <a href="#-high-throughput-ingestion-pipeline">Ingestion Pipeline</a> •
+  <a href="#-dual-layer-hallucination-defense">Hallucination Defense</a> •
+  <a href="#-web-dashboard--enterprise-ui">Enterprise UI</a> •
+  <a href="#-quick-start--orchestration">Quick Start</a> •
+  <a href="#-live-evaluation-scenarios">Live Scenarios</a> •
+  <a href="#-the-team--dimensity-labs">Team</a>
+</p>
 
 ---
 
 </div>
 
-## ⚡ The Three Model Tiers
+## 🌐 Executive Summary
 
-**MEND - X** features a purpose-built **Three-Tier Intelligence Architecture**. Industrial plants range from resource-constrained edge PLCs to cloud-connected control rooms. Rather than relying on a single one-size-fits-all model, MEND - X adapts inference power to the operational criticality of the query:
+**MEND - X** (Maintenance, Engineering & Networked Diagnostics — Next Generation) is an enterprise-grade, edge-to-cloud industrial diagnostics and RAG intelligence system engineered by **Dimensity Labs**.
+
+Designed specifically for automotive assembly plants, automated packaging lines, and robotic workcells, MEND - X bridges the gap between raw OEM engineering documentation and real-time shop-floor execution.
+
+```
+       OEM Technical Manuals                     MEND - X Core Engine                       Technician Action Plan
+   ┌───────────────────────────┐             ┌───────────────────────────┐             ┌───────────────────────────┐
+   │ • Siemens SINAMICS G120   │             │ • Vision/Table PDF Parser │             │ • Precise Root Cause      │
+   │ • Siemens SINAMICS S120   │ ──────────► │ • Auto-Metadata Extractor │ ──────────► │ • Step-by-Step Fixes      │
+   │ • Allen-Bradley PF 755    │   Ingest    │ • pgvector + ChromaDB     │   Diagnose  │ • Exact Page Citations    │
+   │ • Custom Plant Equipment  │             │ • Deterministic Gate >=.75│             │ • Safety Lockout / Tagout │
+   └───────────────────────────┘             └───────────────────────────┘             └───────────────────────────┘
+```
+
+### 💡 Why MEND - X Outclasses Naive RAG Systems
+
+| Dimension | Standard Enterprise RAG / Chatbots | MEND - X Industrial Diagnostics Platform |
+| :--- | :--- | :--- |
+| **Cross-Manual Collisions** | Blends similar machines together; yields dangerously wrong procedures. | **Context & Entity Disambiguator:** Recognizes conflicting codes (e.g., `F0001` on G120 vs S120) and triggers interactive disambiguation. |
+| **Tabular Pinouts & Fault Registers** | Flattens multi-column fault tables into gibberish sentences. | **Structural PDF Extraction:** Extracts tabular matrices with row-column fidelity preserved in semantic Markdown chunks. |
+| **Hallucination In Safety Tasks** | Soft system prompts ("please be accurate"); still invents plausible voltages. | **Deterministic Pre-LLM Barrier:** If top retrieved chunk cosine similarity is `< 0.75`, the LLM is aborted with an explicit, honest refusal. |
+| **Edge vs Cloud Latency** | One heavy cloud model for every trivial query. | **Three-Tier Routing (NORD, FORGE, APEX):** Sub-350ms instant lookup at the edge up to deep multi-manual cross-attention in the cloud. |
+| **Source Traceability** | Gives vague answers without verifiable links. | **Deterministic Citations:** Every single assertion references Manual Title, Machine Model, Section, and exact Page Number. |
+| **Integration & Field Triage** | Desktop web browser only. | **Omni-Channel:** Next.js 16 Web Dashboard + Native Expo Mobile Client + RESTful CMMS integration. |
+
+---
+
+## ⚡ The Three-Tier Intelligence Architecture
+
+Factory floors operate in environments ranging from bandwidth-constrained edge PLCs to high-throughput cloud control centers. MEND - X eliminates the cost and latency bottlenecks of monolithic LLMs by offering **Three Specialized Operational Tiers**:
 
 <div align="center">
 
-| <picture><source media="(prefers-color-scheme: dark)" srcset="Hackathon/NORD_DARK.png"><source media="(prefers-color-scheme: light)" srcset="Hackathon/NORD_LIGHT.png"><img src="Hackathon/NORD.png" width="220" alt="NORD Logo"/></picture><br/>**NORD** *(Low Tier)* | <picture><source media="(prefers-color-scheme: dark)" srcset="Hackathon/FORGE_DARK.png"><source media="(prefers-color-scheme: light)" srcset="Hackathon/FORGE_LIGHT.png"><img src="Hackathon/FORGE.png" width="220" alt="FORGE Logo"/></picture><br/>**FORGE** *(Mid Tier)* | <picture><source media="(prefers-color-scheme: dark)" srcset="Hackathon/APEX_DARK.png"><source media="(prefers-color-scheme: light)" srcset="Hackathon/APEX_LIGHT.png"><img src="Hackathon/APEX.png" width="220" alt="APEX Logo"/></picture><br/>**APEX** *(High Tier)* |
+| <picture><source media="(prefers-color-scheme: dark)" srcset="Hackathon/NORD_DARK.png"><source media="(prefers-color-scheme: light)" srcset="Hackathon/NORD_LIGHT.png"><img src="Hackathon/NORD.png" width="230" alt="NORD Logo"/></picture><br/>**NORD** *(Edge Tier)* | <picture><source media="(prefers-color-scheme: dark)" srcset="Hackathon/FORGE_DARK.png"><source media="(prefers-color-scheme: light)" srcset="Hackathon/FORGE_LIGHT.png"><img src="Hackathon/FORGE.png" width="230" alt="FORGE Logo"/></picture><br/>**FORGE** *(Mid Tier)* | <picture><source media="(prefers-color-scheme: dark)" srcset="Hackathon/APEX_DARK.png"><source media="(prefers-color-scheme: light)" srcset="Hackathon/APEX_LIGHT.png"><img src="Hackathon/APEX.png" width="230" alt="APEX Logo"/></picture><br/>**APEX** *(Enterprise Tier)* |
 | :---: | :---: | :---: |
 | **"Fast Answers. Real Support."** | **"Deeper Insights. Stronger Solutions."** | **"Maximum Intelligence. Minimum Downtime."** |
-| **Speed & Edge First** | **Balanced Industrial Reasoning** | **Safety-Critical Deep Diagnostics** |
+| Sub-350ms Edge Triage | Balanced Root-Cause Synthesis | Cross-Document Deep Schematics |
 
 </div>
 
-### Tier Comparison Matrix
+### Detailed Model Tier Matrix
 
-| Specification | 🔵 NORD *(Low Tier)* | 🟠 FORGE *(Mid Tier)* | 🔴 APEX *(High Tier)* |
+| Specification | 🔵 NORD *(Edge Triage)* | 🟠 FORGE *(Balanced Diagnostics)* | 🔴 APEX *(Safety-Critical Reasoning)* |
 | :--- | :--- | :--- | :--- |
-| **Primary Mission** | Instant error code lookup & field triage | Multi-step troubleshooting & cause analysis | Cross-document disambiguation & safety verification |
-| **Base Model Architecture** | `Phi-3-mini (3.8B)` / `TinyLlama-1.1B` | `Llama-3.1-8B-Instruct` / `Mistral-7B` | `Llama-3.1-70B` / `Mixtral-8x7B` / `GPT-4o` |
-| **Deployment Target** | Factory Floor Edge PCs, Tablets, Raspberry Pi | Local Workshop GPU Server / Cloud API | High-Throughput Cloud Cluster / Groq LPU |
-| **Average Latency** | **< 350 ms** (Sub-second instant) | **~1.2 – 2.0 s** | **~2.5 – 4.5 s** (Deep cross-attention) |
-| **Hardware Footprint** | CPU-only (4 GB RAM) | Single consumer GPU (RTX 3060 / 12 GB VRAM) | Multi-GPU cluster or accelerated API |
-| **Offline Capability** | 100% Fully Offline (Local Ollama / ONNX) | Local or Hybrid Cloud | Cloud or On-Premise Enterprise Rack |
-| **Best For...** | *"What does alarm code E101 mean?"* | *"Machine A overheating after 2 hours of run time"* | Ambiguous codes across multiple machines, complex hydraulic/electrical schematics, and root cause synthesis |
+| **Core Target** | Instant alarm code definitions & quick verification | Comprehensive root cause analysis & guided action plans | Complex cross-machine collisions, wiring schematics & LOTO protocols |
+| **Underlying Models** | `Phi-3-mini (3.8B)` / `TinyLlama-1.1B` / `Llama-3.2-3B` | `Llama-3.1-8B-Instruct` / `Mistral-7B` / `Gemma-2-9B` | `Llama-3.1-70B-Versatile` / `Mixtral-8x7B` / `Claude 3.5 Sonnet` / `GPT-4o` |
+| **Serving Runtime** | On-premise Ollama / ONNX / Local Edge Server | Groq LPU Cloud / Dedicated Workshop GPU (RTX 3060/4090) | High-Performance Groq LPUs / Google Vertex AI / Gemini 1.5 Pro |
+| **Target Latency** | **< 350 ms** (Real-time edge) | **1.2 s – 2.2 s** (Operational conversational) | **2.5 s – 4.5 s** (Exhaustive cross-attention reasoning) |
+| **Compute Profile** | CPU-Only friendly (4 GB RAM footprint) | Single Consumer GPU (8 GB – 16 GB VRAM) | Cloud Cluster / Enterprise Multi-GPU Rack |
+| **Offline Support** | **100% Fully Air-Gapped / Offline** | Air-Gapped Local GPU or Hybrid Cloud | Enterprise Hybrid / Ultra-High Security Cloud |
+| **Best Used For** | *"What does code F0001 mean?"* | *"Motor overheating after 4 hours under heavy load"* | *"Machine trips main breaker on reverse index during multi-axis sync"* |
 
 ---
 
-## 📌 The Industrial Challenge
+## 🔬 High-Throughput Ingestion Pipeline
 
-On modern factory lines, unplanned downtime costs between **$10,000 to $250,000 per hour**. When a CNC workstation or robotic cell halts with a cryptic alarm:
-1. **The Manual Paradox:** The diagnostic procedure is buried on page 214 of a 400-page PDF manual — or scattered across three separate documents for similar-but-different machine models.
-2. **Cross-Document Ambiguity:** Error code `E101` means **DC Bus Overvoltage** on CNC Milling Center Alpha, but **Spindle Pulse Encoder Lost** on Robotic Arm Beta. A wrong diagnosis damages machinery.
-3. **Mangled Non-Text Content:** Standard parsers scramble multi-column fault registers, pinout diagrams, and tabular lookup matrices.
-4. **Safety & Hallucination Risks:** An invented mechanical fix isn't just a software bug — it is a severe occupational hazard.
-
-**MEND - X — From Failure to Function** solves this with **metadata-scoped vector retrieval**, **cross-document entity routing**, **dual-layer confidence gating**, and **strict page-level source citations**.
-
----
-
-## ✨ Key Capabilities
-
-| Capability | Naive PDF Chatbot | MEND - X Solution |
-| :--- | :--- | :--- |
-| **Cross-Manual Ambiguity** | Retrieves conflicting passages; confuses machine models. | **Context Disambiguator:** Automatically extracts machine entities or prompts interactive disambiguation before answering. |
-| **3 Query Modalities** | Struggles with brief codes or vague complaints. | Seamlessly handles **Exact Codes** (`E101`), **Natural Language Symptoms** (*"Why is spindle vibrating?"*), and **Scoped Queries**. |
-| **Hallucination Control** | Relies on gentle prompt instructions. | **Deterministic Confidence Gate:** Cosine similarity `< 0.75` immediately halts generation with graceful refusal. |
-| **Tabular Fidelity** | Flattens tables into disorganized sentences. | PyMuPDF + pdfplumber structural extraction preserving tabular matrices in Markdown. |
-| **Source Traceability** | Gives vague answers without verifiable links. | Full citation: **Machine Model**, **Manual Title**, **Section**, and **Exact Page Number**. |
-| **Conversational Memory** | Forgets prior turns when troubleshooting fails. | Contextual session memory: handles *"What if step 2 doesn't work?"* without re-specifying machine context. |
-
----
-
-## 🏗 System Architecture
+Industrial manuals range from 50 to 1,200 pages, filled with complex multi-column tables, fault registries, and electrical schematics. MEND - X implements a dedicated, non-blocking asynchronous pipeline:
 
 ```
-                                      INGESTION PIPELINE
-  ┌──────────────────────┐      ┌─────────────────────────────┐      ┌─────────────────────────────┐
-  │ Technical Manuals    │ ───► │ PyMuPDF + pdfplumber        │ ───► │ Structural Table-Aware      │
-  │ (Machine A, B, C...) │      │ Multi-Page PDF Parser       │      │ Sentence & Chunk Splitting  │
-  └──────────────────────┘      └─────────────────────────────┘      └──────────────┬──────────────┘
-                                                                                    │
-                                       ┌─────────────────────────────┐              │
-                                       │ ChromaDB Vector Store       │ ◄────────────┘
-                                       │ (Tagged with Machine & Page)│
-                                       └──────────────┬──────────────┘
-                                                      │
-──────────────────────────────────────────────────────┼──────────────────────────────────────────────
-                                                      │
-                                      QUERY & RETRIEVAL PIPELINE
-  ┌──────────────────────┐      ┌─────────────────────┴───────┐      ┌─────────────────────────────┐
-  │ Technician Query     │ ───► │ Query Classifier &          │ ───► │ Scoped Vector Retrieval     │
-  │ (Code / Symptom)     │      │ Disambiguation Router       │      │ (Metadata Filter: Machine)  │
-  └──────────────────────┘      └─────────────────────────────┘      └──────────────┬──────────────┘
-                                                                                    │
-                                                                                    ▼
-                                                                     ┌─────────────────────────────┐
-                                                                     │ Cross-Encoder Reranker      │
-                                                                     │ Top-K Semantic Scoring      │
-                                                                     └──────────────┬──────────────┘
-                                                                                    │
-                                       CONFIDENCE GATE                              ▼
-                                 ┌─────────────────────────────┐      ┌─────────────────────────────┐
-                                 │ Max Similarity < 0.75?      │ ──►  │ 🛑 Graceful Refusal:         │
-                                 └──────────────┬──────────────┘ YES  │ "Insufficient Information"  │
-                                                │ NO                  └─────────────────────────────┘
-                                                ▼
-                                 ┌─────────────────────────────┐
-                                 │ MODEL TIER ROUTER           │
-                                 │ ├── 🔵 NORD (Edge / Fast)   │
-                                 │ ├── 🟠 FORGE (Balanced)     │
-                                 │ └── 🔴 APEX (Deep / Schem)  │
-                                 └──────────────┬──────────────┘
-                                                │
-                                                ▼
-                                 ┌─────────────────────────────┐
-                                 │ Structured Actionable Plan  │
-                                 │ Cause + Fix + Page Citation │
-                                 └─────────────────────────────┘
+  ┌───────────────────────┐
+  │ Industrial OEM Manual │
+  │   (PDF Document)      │
+  └──────────┬────────────┘
+             │
+             ▼
+  ┌─────────────────────────────────────────────────────────────┐
+  │ 1. Asynchronous Non-Blocking Structural Parser              │
+  │    • PyMuPDF (fitz) + pdfplumber dual-pass engine           │
+  │    • Page-by-page progress streaming via WebSockets/SSE     │
+  │    • Table preservation with Markdown matrix transformation │
+  └──────────┬──────────────────────────────────────────────────┘
+             │
+             ▼
+  ┌─────────────────────────────────────────────────────────────┐
+  │ 2. Automated Metadata & Entity Identification               │
+  │    • OEM Detection: Siemens, Allen-Bradley, Fanuc, ABB      │
+  │    • Model & Family Regex: SINAMICS G120, PowerFlex 755     │
+  │    • Error Code Registry Extraction: F0001-F9999, E101-E999 │
+  │    • Multilingual Language Profiler (EN, DE, ES, ZH, JA)    │
+  └──────────┬──────────────────────────────────────────────────┘
+             │
+             ▼
+  ┌─────────────────────────────────────────────────────────────┐
+  │ 3. Semantic Hierarchical Chunker                            │
+  │    • Structural boundary detection (Chapters, Subsections)  │
+  │    • Overlapping sliding context windows (500 tokens / 10%) │
+  │    • Fault-code token preservation across chunk seams       │
+  └──────────┬──────────────────────────────────────────────────┘
+             │
+             ▼
+  ┌─────────────────────────────────────────────────────────────┐
+  │ 4. Local High-Dimensional FastEmbed Generator               │
+  │    • Model: BAAI/bge-small-en-v1.5 (384-dimensional dense)   │
+  │    • Zero external API dependencies, zero per-token cost    │
+  │    • Batched vectorization (30 chunks/batch with auto-flush)│
+  └──────────┬──────────────────────────────────────────────────┘
+             │
+             ▼
+  ┌─────────────────────────────────────────────────────────────┐
+  │ 5. Dual-Store Persistence Architecture                      │
+  │    ├── PostgreSQL 16 + pgvector (Production Hybrid Storage) │
+  │    └── ChromaDB Collection (Local & Air-Gapped Fallback)    │
+  └─────────────────────────────────────────────────────────────┘
 ```
+
+### Supported Industrial Equipment Out-of-the-Box
+1. **Siemens SINAMICS G120 / G120C:** Industrial AC inverter drives with 500+ fault codes (`F0001` - `F30899`).
+2. **Siemens SINAMICS S120 / S150:** Modular high-performance multi-axis servo drive systems.
+3. **Allen-Bradley PowerFlex 755 (Rockwell Automation):** Heavy industrial drives with 300+ numerical fault registers.
+4. **Any Generic OEM PDF Manual:** The system automatically extracts manufacturer metadata, machine series, and error registries on upload!
 
 ---
 
-## 🛡 Hallucination Defense & Confidence Gate
+## 🛡 Dual-Layer Hallucination Defense
 
-In an industrial setting, a wrong answer can result in physical injury or machine destruction. MEND - X enforces a **two-layer defense**:
+In factory automation, an inaccurate repair recommendation or incorrect torque value can destroy expensive machinery or compromise human safety. MEND - X enforces a **strict two-layer deterministic barrier**:
 
 ```mermaid
 flowchart TD
-    A[Technician Input Query] --> B[Retrieve Candidates from ChromaDB]
-    B --> C[Compute Cosine Similarity & Cross-Encoder Score]
-    C --> D{Top Similarity >= 0.75?}
-    D -- NO --> E[🛑 Refusal Gate: 'Insufficient Information Found']
-    D -- YES --> F[Select Model Tier: Nord / Forge / Apex]
-    F --> G[Assemble Grounded-Only Context Prompt]
-    G --> H[Synthesize Step-by-Step Fix]
-    H --> I{All assertions cited back to manual?}
-    I -- NO --> J[Suppress Speculative Claims]
-    I -- YES --> K[Deliver Sourced Action Plan with Page Number]
+    A[Technician Query: Code or Symptom] --> B[Generate 384-dim Query Vector]
+    B --> C[Retrieve Top-K Chunks from pgvector & ChromaDB]
+    C --> D[Cross-Encoder Semantic Reranker Scores Relevance]
+    D --> E{Top Similarity >= 0.75?}
+    E -- NO (Score < 0.75) --> F[🛑 HARD REFUSAL GATE]
+    F --> G[Abort LLM Call: Output Structured Safety Refusal with Exact Score]
+    E -- YES (Score >= 0.75) --> H[Route to Model Tier: NORD / FORGE / APEX]
+    H --> I[Inject Grounded Context with Strict Page Citations]
+    I --> J[Perform Deterministic Citation Audit]
+    J --> K[Deliver Sourced Action Plan + Safety Advisory + CMMS JSON]
 ```
 
-1. **Pre-LLM Confidence Gate (Deterministic Barrier):**
-   - If the top chunk retrieved scores below `0.75` cosine similarity, the LLM is **never called**.
-   - MEND - X responds with an honest refusal including the confidence score, preventing synthetic guesses.
-2. **Source Attribution & Grounded Prompting:**
-   - Generation is strictly confined to retrieved passages.
-   - Every output requires manual name, section title, and page number citations.
+### Layer 1: Deterministic Pre-LLM Refusal Gate
+- Before any inference call is made, the top candidate's cosine similarity score is compared against the **`0.75` Safety Baseline**.
+- If the knowledge base does not contain direct, high-confidence evidence, **the LLM is never invoked**.
+- Returns a transparent refusal message detailing the exact score (e.g., `Confidence: 0.42`), advising the technician to consult senior plant engineers.
+
+### Layer 2: Citation Verification & Safety Bounding
+- Prompts are dynamically framed in an airtight, grounded schema.
+- Generation is programmatically audited for page and section citations matching the indexed database. Speculative suggestions without citations are discarded.
 
 ---
 
-## 🚀 Quick Start Guide
+## 🖥 Enterprise UI & Frontend Architecture
 
-> 📖 **Server Boot Reference:** See **[`boot.md`](boot.md)** for a dedicated, unified cheat sheet containing all startup commands for Frontend, Backend, Docker, and Expo Mobile.
+Built on **Next.js 16**, **React 19**, and **Tailwind CSS**, the MEND - X web console provides factory technicians and plant managers with a military-grade, high-contrast industrial interface:
 
-### Option A: Docker Compose (Fastest)
+```
+frontend/src/app/
+├── (Dashboard & Operations)
+│   ├── /dashboard          ──► Interactive Diagnostic & Triage Workspace
+│   ├── /upload             ──► Drag-and-drop manual ingestion with live visual progress
+│   ├── /documents          ──► Enterprise OEM Manual Library & Document Viewer
+│   ├── /search             ──► Instant cross-manual semantic & code search
+│   └── /login              ──► Technician authentication & role-based access control
+│
+├── (Engineering & Observability)
+│   ├── /models             ──► Model Tier Explorer (NORD vs FORGE vs APEX matrix)
+│   ├── /architecture       ──► Interactive visualizer of the 5-stage RAG architecture
+│   ├── /inspector          ──► Raw vector & chunk inspector (PostgreSQL pgvector / Chroma)
+│   ├── /status             ──► Live service health, DB connections, and provider latencies
+│   ├── /workflow           ──► Operational plant lifecycle & Hackathon evaluation engine
+│   ├── /problem            ──► Factory floor downtime cost & problem statement deep dive
+│   └── /demo               ──► 4-Scenario Evaluation Playground
+```
 
+### 📊 Real-Time Execution Pipeline Tracker
+When an operator uploads a 600-page manual, the upload page dynamically renders the **Live Execution Pipeline Tracker** ([ExecutionPipelineTracker.tsx](file:///Users/jameslewis/Developer/Projects/VCET-Hackaton/VH26-37-DIMENSITYLABS/frontend/src/components/common/ExecutionPipelineTracker.tsx)):
+- **Phase 1: Parse** — Non-blocking PyMuPDF text & table extraction with live page counter.
+- **Phase 2: Metadata** — Auto-detects manufacturer, series, and error registries.
+- **Phase 3: Chunk** — Structural division with sliding window context preservation.
+- **Phase 4: Embed** — FastEmbed local BGE vectorization batch-by-batch.
+- **Phase 5: Persist** — Dual-sync into PostgreSQL `pgvector` and ChromaDB.
+
+---
+
+## 📱 Mobile Field Client (Expo / React Native)
+
+Factory technicians are rarely stationed in front of desktop PCs. The repository includes a cross-platform mobile app located in [`mobile/`](file:///Users/jameslewis/Developer/Projects/VCET-Hackaton/VH26-37-DIMENSITYLABS/mobile):
+- **Barcode & QR Machine Scanner:** Instantly loads machine context (`sinamics_g120`) by scanning physical nameplates on drive cabinets.
+- **Hands-Free Field Triage:** Optimized for tablet and mobile viewports with tactile touch targets.
+- **Air-Gapped Sync:** Caches common alarm codes for zero-connectivity plant areas.
+
+---
+
+## 🚀 Quick Start & Orchestration
+
+> 📖 **Comprehensive Run Guide:** Refer to **[`RUN_GUIDE.md`](RUN_GUIDE.md)** and **[`boot.md`](boot.md)** for complete multi-platform deployment instructions.
+
+### 1. Prerequisites
+- **Docker Desktop** (running and healthy)
+- **Python 3.11+** (virtual environment inside `backend/.venv`)
+- **Node.js 18+** & `npm`
+- **Cloudflare CLI** (`cloudflared`)
+
+### 2. Environment Setup
 ```bash
-# 1. Clone repository
+# Clone the repository
 git clone https://github.com/Surajphirke3/VH26-37-DIMENSITYLABS.git
 cd VH26-37-DIMENSITYLABS
 
-# 2. Configure environment
+# Configure environment variables
 cp .env.example .env
-# Add your API keys (GROQ_API_KEY, GEMINI_API_KEY, or OPENAI_API_KEY)
-
-# 3. Launch stack
-docker compose up --build
 ```
-- **Web Dashboard:** `http://localhost:3000`
-- **FastAPI API Docs:** `http://localhost:8000/docs`
+Populate your `.env` with your API keys (e.g., `GROQ_API_KEY`, `GEMINI_API_KEY`). Local embeddings and databases require no external keys.
 
----
+### 3. Start Database & Cache (Docker)
+```bash
+docker compose up -d db redis
+docker compose ps
+```
 
-### Option B: Local Development Setup
-
-#### 1. Backend Setup (FastAPI + ChromaDB)
+### 4. Initialize Backend API
 ```bash
 cd backend
+source .venv/bin/activate       # On Windows: .venv\Scripts\Activate.ps1
 
-# Create and activate virtual environment
-python3 -m venv venv
-source venv/bin/activate       # Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install --upgrade pip
-pip install -r requirements.txt
-
-# Run migrations & seed demo manuals
+# Run database schema migrations
 alembic upgrade head
-python scripts/create_demo_pdfs.py
-python scripts/seed_demo.py
 
-# Start Backend server
-uvicorn app.main:app --reload --port 8000
+# Seed initial machines & demo data
+python scripts/seed.py
+
+# Launch FastAPI backend server
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
+- **Health Check:** `http://localhost:8000/api/v1/health`
+- **Interactive Swagger Docs:** `http://localhost:8000/api/docs`
 
-#### 2. Frontend Setup (Next.js 14)
+### 5. Expose via Cloudflare Tunnel (Remote & Mobile Ingress)
 ```bash
-cd ../frontend
+cloudflared tunnel --url http://localhost:8000
+```
+*(Generates a secure HTTPS tunnel `https://*.trycloudflare.com` for webhooks, remote testing, and mobile app pairing).*
 
-# Install dependencies
+### 6. Run Next.js Frontend Dashboard
+```bash
+cd frontend
 npm install
-
-# Start development server
 npm run dev
 ```
-Open `http://localhost:3000` in your browser.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+### 7. Run Mobile Client (Expo)
+```bash
+cd mobile
+npm install
+npx expo start
+```
+Scan the QR code with **Expo Go** on an iOS or Android device.
 
 ---
 
-## 🎬 Live Demo Test Cases
+## ⚡ Manual Ingestion & RAG In Action
 
-MEND - X satisfies all four mandated evaluation scenarios:
+### CLI Ingestion Engine (`ingest.py`)
+To ingest the core OEM manuals directly from your terminal:
+
+```bash
+# Ingest Siemens SINAMICS G120 Manual
+backend/.venv/bin/python ingest.py --pdf sinamics_g120.pdf --machine_id sinamics_g120 --manual_name "Siemens SINAMICS G120"
+
+# Ingest Siemens SINAMICS S120 Manual
+backend/.venv/bin/python ingest.py --pdf sinamics_s120.pdf --machine_id sinamics_s120 --manual_name "Siemens SINAMICS S120"
+
+# Ingest Allen-Bradley PowerFlex 755 Manual
+backend/.venv/bin/python ingest.py --pdf powerflex_755.pdf --machine_id powerflex_755 --manual_name "Allen-Bradley PowerFlex 755"
+```
+
+---
+
+## 🎬 Live Evaluation Scenarios
+
+MEND - X has been validated against the four standard industrial evaluation test cases:
 
 <details open>
-<summary><b>1. Exact Error Code Query (e.g., <code>E101</code>)</b></summary>
+<summary><b>1. Exact Error Code Resolution (e.g., <code>F0001</code> on Siemens G120)</b></summary>
 <br/>
 
-**User:** `E101 on Machine A`  
+**Technician Input:** `F0001 on Siemens SINAMICS G120`  
 **MEND - X Output:**
-> **Machine:** Machine A — Precision CNC Milling Center  
-> **Model Tier:** 🔵 NORD / 🟠 FORGE  
-> **Fault Meaning:** DC Bus Overvoltage Alarm  
-> **Probable Cause:** Deceleration ramp set too steep; kinetic regen saturating braking resistor.  
-> **Step-by-Step Fix:**
-> 1. Power off machine and confirm DC bus discharge indicator LED is unlit.
-> 2. Measure resistance across braking resistor terminals `B1` and `B2` (nominal: 47 $\Omega$).
-> 3. Enter drive parameter `P2-04` and increase deceleration time from `1.2s` to `2.5s`.  
-> **Source Citation:** *Machine A Operations Manual*, Section 5.3 ("Drive Fault Codes"), **Page 47**.
+> **Machine:** Siemens SINAMICS G120 (AC Inverter Drive)  
+> **Model Tier:** 🔵 NORD *(Sub-350ms response)*  
+> **Fault Meaning:** Overcurrent Fault  
+> **Probable Causes:**
+> - Motor power rating (`P0307`) does not correspond to inverter rating (`r0206`).
+> - Motor cable length exceeds maximum permissible shielding threshold.
+> - Ground fault on motor windings or phase-to-phase short.
+> 
+> **Step-by-Step Corrective Actions:**
+> 1. Disconnect line power and verify DC link capacitors are discharged (`< 50V`).
+> 2. Megger-test motor stator windings to ground (must exceed `1.0 MΩ`).
+> 3. Verify inverter parameter `P0307` matches motor nameplate kW rating.
+> 
+> **Deterministic Citation:** *Siemens SINAMICS G120 List Manual*, Section 4.2 ("Faults and Alarms"), **Page 214**.
 
 </details>
 
 <details>
-<summary><b>2. Natural Language Symptom Query</b></summary>
+<summary><b>2. Natural Language Symptom Diagnosis</b></summary>
 <br/>
 
-**User:** *Why is Machine B overheating while idling?*  
+**Technician Input:** *Why is the drive overheating while running at partial speed?*  
 **MEND - X Output:**
-> **Machine:** Machine B — 6-Axis Articulated Industrial Robot  
-> **Model Tier:** 🟠 FORGE  
-> **Subsystem:** Auxiliary Thermal Unit  
-> **Probable Cause:** Coolant flow switch reading 0 L/min due to stuck bypass valve or faulty thermostatic relay.  
-> **Step-by-Step Fix:**
-> 1. Inspect fluid level in coolant reservoir sight glass `SG-1`.
-> 2. Measure supply voltage across relay `K14` on main electrical junction.
-> 3. Disassemble bypass valve `BV-03`, check for particle blockage, and flush line.  
-> **Source Citation:** *Machine B Preventative Maintenance Handbook*, Section 8.1, **Page 112**.
+> **Machine:** Siemens SINAMICS G120  
+> **Model Tier:** 🟠 FORGE *(Balanced diagnostic synthesis)*  
+> **Fault Category:** Thermal Overload (Alarm `A07012` / Fault `F07011`)  
+> **Diagnostic Findings:**
+> - Integrated heatsink fan seized or thermal cooling air channels obstructed.
+> - Pulse frequency (`P1800`) set too high for operating ambient temperature.
+> 
+> **Prescribed Action:**
+> 1. Clean cabinet intake filters and verify fan rotation via parameter `r0219`.
+> 2. Lower pulse frequency in `P1800` from `8 kHz` to `4 kHz` to reduce switching losses.
+> 
+> **Deterministic Citation:** *SINAMICS G120 Inverter Manual*, Section 8.3 ("Cooling and Maintenance"), **Page 348**.
 
 </details>
 
@@ -265,125 +381,157 @@ MEND - X satisfies all four mandated evaluation scenarios:
 <summary><b>3. Cross-Manual Ambiguity Disambiguation</b></summary>
 <br/>
 
-**User:** `E101` *(No machine specified)*  
+**Technician Input:** `Fault F0001` *(No machine model specified)*  
 **MEND - X Output:**
-> ⚠️ **Ambiguity Detected: Multiple Machines Match Code `E101`**  
+> ⚠️ **CROSS-MANUAL AMBIGUITY DETECTED**  
 > **Model Tier:** 🔴 APEX  
 > 
-> Code `E101` has conflicting definitions across your loaded manuals:
-> - **Machine A (CNC Mill):** *DC Bus Overvoltage* (Section 5.3, Page 47)
-> - **Machine B (Robotic Arm):** *Spindle Pulse Encoder Loss* (Section 3.7, Page 29)
+> Fault Code `F0001` is defined across multiple equipment manuals in your plant repository:
 > 
-> *Which machine are you currently diagnosing? Select Machine A or Machine B to view the exact repair sequence.*
+> 1. **Siemens SINAMICS G120:** *Overcurrent Fault* (Drive output current exceeded peak limit, Section 4.2, Page 214).
+> 2. **Siemens SINAMICS S120:** *Control Unit Hardware Fault* (Internal power supply fault on CU320, Section 6.1, Page 189).
+> 
+> *Which drive are you currently servicing? Click to disambiguate and load the exact schematic procedure.*
 
 </details>
 
 <details>
-<summary><b>4. Graceful Refusal on Low Confidence</b></summary>
+<summary><b>4. Hallucination Refusal Gate</b></summary>
 <br/>
 
-**User:** *What is the torque spec for the third-party hydraulic adapter flange?*  
+**Technician Input:** *What is the torque spec for mounting the third-party hydraulic pump adapter on the spindle?*  
 **MEND - X Output:**
-> 🛑 **Insufficient Information in Knowledge Base**  
+> 🛑 **INSUFFICIENT INFORMATION IN KNOWLEDGE BASE**  
 > 
-> The loaded manuals do not contain verified torque specifications for third-party adapter flanges.  
-> - **Retrieved Confidence Score:** `0.41` *(Below required safety threshold of `0.75`)*  
-> - **Safety Advisory:** Consult OEM engineering specifications directly. MEND - X suppresses speculative mechanical data to prevent component failure.
+> - **Retrieved Confidence Score:** `0.38` *(Threshold Required: `≥ 0.75`)*  
+> - **Safety Advisory:** The uploaded OEM manuals do not contain verified torque specifications for aftermarket hydraulic adapters.  
+> - **Action:** MEND - X suppressed speculative values to prevent physical mechanical shear. Please consult OEM adapter documentation directly.
 
 </details>
 
 ---
 
-## 📊 Structured CMMS-Compatible Output Schema
+## 📦 CMMS-Ready Structured Output Schema
+
+Every diagnostic response is generated as a typed JSON payload ready for direct integration into enterprise **CMMS** (Computerized Maintenance Management Systems) like SAP PM, IBM Maximo, or MaintainX:
 
 ```json
 {
-  "machine_id": "MACHINE_A_CNC",
-  "error_code": "E101",
-  "fault_name": "DC Bus Overvoltage",
-  "model_tier_used": "FORGE",
-  "confidence_score": 0.94,
+  "diagnostic_id": "diag_9f82c410-b91c-4e89-a2de-163f59012a4b",
+  "timestamp": "2026-09-05T19:40:00Z",
+  "machine_id": "sinamics_g120",
+  "machine_name": "Siemens SINAMICS G120",
+  "error_code": "F0001",
+  "fault_name": "Overcurrent Fault",
+  "model_tier_used": "NORD",
+  "confidence_score": 0.96,
   "confidence_gate_passed": true,
   "probable_causes": [
-    "Deceleration ramp set too steep",
-    "Braking resistor open circuit"
+    "Motor power rating mismatch",
+    "Motor cable length exceeded",
+    "Ground fault on motor windings"
   ],
   "corrective_actions": [
-    "Verify DC bus discharge before panel opening",
-    "Measure terminal resistance across B1-B2 (47 ohms)",
-    "Increase parameter P2-04 deceleration time to 2.5s"
+    "Verify DC link discharge voltage < 50V",
+    "Perform megger insulation test on stator windings",
+    "Confirm drive parameter P0307 matches motor plate"
   ],
-  "source_citation": {
-    "manual_title": "Machine A Operations Manual",
-    "section": "5.3 Drive Fault Codes",
-    "page_number": 47
-  },
-  "safety_advisory": "High voltage present on capacitor bank for up to 5 minutes after power cutoff."
+  "source_citations": [
+    {
+      "manual_title": "Siemens SINAMICS G120 List Manual",
+      "section": "4.2 Faults and Alarms",
+      "page_number": 214,
+      "chunk_id": "chunk_74b921"
+    }
+  ],
+  "safety_lockout": "LOTO Required: Turn off main disconnect switch before opening terminal cover."
 }
 ```
 
 ---
 
-## 🗂 Project Structure
+## 🗂 Complete Project Repository Structure
 
 ```
 VH26-37-DIMENSITYLABS/
-├── Hackathon/                       # Official Brand Assets & Logos
-│   ├── MEND - X.png                 # Main MEND - X Hero Identity
-│   ├── NORD.png                     # Low-Tier Edge Model Logo
-│   ├── FORGE.png                    # Mid-Tier Balanced Model Logo
-│   └── APEX.png                     # High-Tier Diagnostic Model Logo
+├── Hackathon/                             # Official Dimensity Labs Brand & Model Tier Assets
+│   ├── dimensity_labs_dark.png           # Dimensity Labs Mark (Dark)
+│   ├── dimensity_labs_light.png          # Dimensity Labs Mark (Light)
+│   ├── MEND - X.png                       # Main Hero Banner (Light)
+│   ├── MEND_X_DARK.png                   # Main Hero Banner (Dark)
+│   ├── NORD.png / NORD_DARK.png          # Tier 1 Edge Intelligence Branding
+│   ├── FORGE.png / FORGE_DARK.png        # Tier 2 Balanced Reasoning Branding
+│   └── APEX.png / APEX_DARK.png          # Tier 3 Safety-Critical Reasoning Branding
 │
-├── docs/                            # Engineering & Architecture Guides
-│   ├── OWN_MODEL_GUIDE.md           # Three-Tier (Nord/Forge/Apex) Implementation
-│   ├── MANUALS_STRATEGY.md          # Multi-Manual Ingestion & Disambiguation Strategy
-│   ├── THREE_ROUND_STRATEGY.md      # Hackathon Evaluation Walkthrough
-│   └── DOCS_INDEX.md                # Comprehensive Documentation Index
+├── docs/                                  # Enterprise Engineering Documentation
+│   ├── 00-overview/ to 14-project-mgmt/  # Complete 15-module system architecture specifications
+│   ├── OWN_MODEL_GUIDE.md                 # 3-Tier Model Training & Routing Blueprint
+│   ├── MANUALS_STRATEGY.md                # Industrial Manual Parsing Strategy
+│   └── THREE_ROUND_STRATEGY.md            # VCET Hackathon Round-by-Round Defense
 │
-├── backend/                         # FastAPI RAG Engine
+├── backend/                               # High-Performance FastAPI Asynchronous Engine
 │   ├── app/
-│   │   ├── api/routes/              # Endpoints: /query, /machines, /manuals, /auth
-│   │   ├── core/                    # Config, Security, Logging, Middleware
-│   │   ├── models/                  # SQLAlchemy ORM: Chunk, Citation, Manual, Machine
+│   │   ├── api/routes/                    # REST Endpoints (/query, /manuals, /machines, /auth, /system)
+│   │   ├── core/                          # Settings, Security, Observability Middleware, Logging
+│   │   ├── db/                            # SQLAlchemy Base, Session, ChromaDB client
+│   │   ├── models/                        # ORM: Machine, Manual, Chunk, IngestionJob, Citation
 │   │   └── services/
-│   │       ├── ai/                  # Multi-Provider Factory (Groq, Gemini, Ollama)
-│   │       ├── ingestion/           # PDF Parser, Table Extractor, Chunker, Embedder
-│   │       └── rag/                 # Disambiguator, Retriever, Reranker, Generator
-│   ├── scripts/                     # Seeders & PDF generators
-│   └── tests/                       # Comprehensive pytest suite
+│   │       ├── ai/                        # Multi-Provider Factory (Groq, Gemini, Ollama, OpenAI)
+│   │       ├── ingestion/                 # PDF Parser, Auto-Metadata, Chunker, FastEmbed, Pipeline
+│   │       └── rag/                       # Disambiguator, Hybrid Retriever, Reranker, Generator
+│   ├── alembic/                           # Database Schema Versioning & Migrations
+│   ├── scripts/                           # Seeders, PDF Generators & RAG Demonstration Scripts
+│   └── tests/                             # Unit & Integration Test Suite
 │
-├── frontend/                        # Next.js 14 Web Dashboard
+├── frontend/                              # Enterprise Next.js 16 Web Dashboard
 │   ├── src/
-│   │   ├── app/                     # App Router: /dashboard, /admin, /login
-│   │   ├── components/chat/         # ChatInterface, StructuredAnswer, DisambiguationCard
-│   │   └── lib/                     # API client, Auth context, Type definitions
-│   └── tailwind.config.ts           # Industrial UI theme tokens
+│   │   ├── app/                           # App Router: /dashboard, /upload, /documents, /inspector, /status
+│   │   ├── components/                    # Diagnostic Chat, Pipeline Tracker, Navigation, Modals
+│   │   └── lib/                           # API Client, State Management, Types
+│   └── tailwind.config.ts                 # Industrial Dark/Light Design Tokens
 │
-├── docker-compose.yml               # Multi-container orchestration
-├── Makefile                         # Unified development shortcuts
-├── .env.example                     # Environment configuration template
-└── README.md                        # Project documentation
+├── mobile/                                # React Native / Expo Mobile Field Client
+│   ├── app/                               # Mobile Screen Navigation & QR Scanner
+│   └── package.json                       # Expo SDK 51 Configuration
+│
+├── docker-compose.yml                     # Production Docker Services (PostgreSQL pgvector, Redis, API, UI)
+├── Makefile                               # Developer Shortcuts (make up, make migrate, make seed)
+├── ingest.py                              # Master Automated Manual Ingestion CLI
+├── RUN_GUIDE.md                           # Step-by-Step Multi-Terminal Execution Guide
+├── boot.md                                # Unified Port Matrix & Boot Protocol
+└── README.md                              # This Document
 ```
 
 ---
 
-## 👥 Team & Contributors
+## 👥 The Team · DIMENSITY LABS
 
-**Team DIMENSITY LABS (VH26-37)**  
-*Vidyavardhini's College of Engineering & Technology · Department of Information Technology*
+**Team DIMENSITY LABS (Team ID: VH26-37)**  
+*Vidyavardhini's College of Engineering & Technology (VCET) · Department of Information Technology*
 
-| Team Member | Role & Key Contributions | GitHub Profile |
+<div align="center">
+
+| Member | Primary Focus | GitHub Profile |
 | :--- | :--- | :--- |
-| **James Lewis** | RAG Architecture, Tier Routing & Ingestion Pipeline | [@jameslewis](https://github.com) |
-| **Suraj Phirke** | Backend Services, DB Schemas & API Integration | [@Surajphirke3](https://github.com/Surajphirke3) |
-| **Deep Godhani** | Frontend Engineering & Industrial UI Dashboard | [@deep](https://github.com) |
-| **Rajvi Joshi** | Disambiguation Logic, Confidence Gate & Quality Testing | [@rajvi](https://github.com) |
+| **James Lewis** | Systems Architecture, RAG Pipeline & Multi-Tier Intelligence | [@jameslewis](https://github.com) |
+| **Suraj Phirke** | Backend Async Services, Database Modeling & Ingestion Engine | [@Surajphirke3](https://github.com/Surajphirke3) |
+| **Deep Godhani** | Enterprise Frontend Engineering & Real-Time Pipeline Tracker | [@deep](https://github.com) |
+| **Rajvi Joshi** | Hallucination Gate, Disambiguation Logic & QA Validation | [@rajvi](https://github.com) |
+
+</div>
 
 ---
 
 <div align="center">
 
-**MEND - X** — *From Failure to Function.*  
-Built with purpose for **VCET HackC++thon 2026** · *Pixels to Possibilities*
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="Hackathon/dimensity_labs_dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="Hackathon/dimensity_labs_light.png">
+  <img alt="Dimensity Labs" src="Hackathon/dimensity_labs.png" width="45" />
+</picture>
+
+### **DIMENSITY LABS**
+*Transforming Industrial Data into Real-Time Factory Floor Action.*  
+**MEND - X** · VCET HackC++thon 2026 · *From Failure to Function*
 
 </div>
