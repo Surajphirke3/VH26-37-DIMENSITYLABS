@@ -39,10 +39,11 @@ class MachineDisambiguator:
         dominant_str, dominant_count = machine_counts.most_common(1)[0]
         ambiguity_score = 1.0 - (dominant_count / total) if total > 0 else 0.0
 
-        # Trigger disambiguation if 2 or more machines have matched chunks for an error code query
+        # Trigger disambiguation only when query has error code and ambiguity threshold is exceeded
         is_ambiguous = (
             len(machine_counts) > 1
-            and (query_has_error_code or ambiguity_score >= self.threshold)
+            and query_has_error_code
+            and ambiguity_score >= self.threshold
         )
 
         # Build at most 5 unique machine options from the window

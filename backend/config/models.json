@@ -17,6 +17,13 @@
           "type": "deep_reasoning",
           "max_tokens": 4096,
           "speed": "fast"
+        },
+        {
+          "id": "qwen-2.5-32b",
+          "name": "Qwen 2.5 32B (Legacy)",
+          "type": "deep_reasoning",
+          "max_tokens": 4096,
+          "speed": "fast"
         }
       ]
     },
@@ -44,6 +51,13 @@
           "type": "fast",
           "max_tokens": 4096,
           "speed": "ultra_fast"
+        },
+        {
+          "id": "llama-3.3-70b-versatile",
+          "name": "Llama 3.3 70B Versatile",
+          "type": "deep_reasoning",
+          "max_tokens": 4096,
+          "speed": "fast"
         }
       ]
     },
