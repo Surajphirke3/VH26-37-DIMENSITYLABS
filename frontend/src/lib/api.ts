@@ -93,6 +93,7 @@ export function logout(): void {
 }
 
 export const getMe = (): Promise<User> => apiFetch<User>("/api/v1/auth/me");
+export const getUsers = (): Promise<User[]> => apiFetch<User[]>("/api/v1/auth/users");
 
 // backend: {success, data: {items: Machine[]}}
 export const getMachines = (): Promise<Machine[]> =>

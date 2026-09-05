@@ -101,3 +101,12 @@ async def register(
     db.add(user)
     await db.flush()
     return user
+
+
+@router.get("/users", response_model=list[UserResponse])
+async def list_users(
+    db: AsyncSession = Depends(get_db),
+    _: User = Depends(require_admin),
+) -> list[User]:
+    result = await db.execute(select(User).order_by(User.created_at.asc()))
+    return list(result.scalars().all())
