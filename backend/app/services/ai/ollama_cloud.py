@@ -28,7 +28,7 @@ class OllamaCloudLLM(LLMProvider):
         self._model = model
         self._client = AsyncOpenAI(
             api_key=api_key,
-            base_url="https://api.ollama.com/v1",
+            base_url="https://ollama.com/v1",
         )
         logger.info("ollama_cloud.init", model=model)
 
