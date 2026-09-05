@@ -10,9 +10,10 @@ import {
   ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { searchKnowledgeBase, getMachines } from '@/lib/api';
+import { searchKnowledgeBase, getMachines, createConversation } from '@/lib/api';
 import type { SearchResultItem, Machine } from '@/lib/types';
-import { useFocusEffect } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { useLanguage } from '@/lib/language-context';
 import { colors, borderRadius, spacing, shadows } from '@/lib/theme';
 
 function ScoreBadge({ score }: { score: number }) {
@@ -27,6 +28,8 @@ function ScoreBadge({ score }: { score: number }) {
 }
 
 export default function SearchScreen() {
+  const router = useRouter();
+  const { t } = useLanguage();
   const [query, setQuery] = useState('');
   const [machines, setMachines] = useState<Machine[]>([]);
   const [selectedMachine, setSelectedMachine] = useState<string | null>(null);
@@ -69,7 +72,7 @@ export default function SearchScreen() {
             style={styles.input}
             value={query}
             onChangeText={setQuery}
-            placeholder="Search manuals, fault codes, specs…"
+            placeholder={t('search_input_placeholder')}
             placeholderTextColor={colors.muted}
             returnKeyType="search"
             onSubmitEditing={handleSearch}
@@ -93,7 +96,7 @@ export default function SearchScreen() {
             onPress={() => setSelectedMachine(null)}
           >
             <Text style={[styles.chipText, !selectedMachine && styles.chipTextActive]}>
-              All Machines
+              {t('search_filter_all')}
             </Text>
           </TouchableOpacity>
           {machines.map((m) => (
@@ -119,7 +122,7 @@ export default function SearchScreen() {
             <ActivityIndicator color="#fff" size="small" />
           ) : (
             <View style={styles.btnRow}>
-              <Text style={styles.searchBtnText}>Run Semantic Query</Text>
+              <Text style={styles.searchBtnText}>{t('tab_search')}</Text>
               <Ionicons name="arrow-forward" size={16} color="#fff" />
             </View>
           )}
@@ -142,7 +145,7 @@ export default function SearchScreen() {
           searched && !loading ? (
             <View style={styles.emptyWrap}>
               <Ionicons name="search-outline" size={40} color={colors.muted} />
-              <Text style={styles.emptyTitle}>No matching documentation found</Text>
+              <Text style={styles.emptyTitle}>{t('search_no_results')}</Text>
               <Text style={styles.emptyText}>
                 Try adjusting your search terms or selecting 'All Machines'.
               </Text>
@@ -185,6 +188,24 @@ export default function SearchScreen() {
               </Text>
               <Text style={styles.sourceText}>{item.machine_name || item.manual_title}</Text>
             </View>
+
+            <TouchableOpacity
+              style={styles.askChatBtn}
+              onPress={async () => {
+                try {
+                  const conv = await createConversation();
+                  const promptText = `Referencing ${item.manual_title} (p. ${item.page_start}–${item.page_end}):\n"${item.excerpt.slice(0, 160)}…"\n\nHow do I resolve this or execute this procedure?`;
+                  router.push({
+                    pathname: `/chat/${conv.conversation_id}`,
+                    params: { prompt: promptText },
+                  } as never);
+                } catch {}
+              }}
+              activeOpacity={0.8}
+            >
+              <Ionicons name="chatbubble-ellipses-outline" size={13} color={colors.accentAi} />
+              <Text style={styles.askChatText}>{t('btn_diagnose_in_chat')}</Text>
+            </TouchableOpacity>
           </View>
         )}
       />
@@ -345,6 +366,24 @@ const styles = StyleSheet.create({
   sourceText: {
     color: colors.muted,
     fontSize: 11,
+  },
+  askChatBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: 'rgba(16, 185, 129, 0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(16, 185, 129, 0.25)',
+    borderRadius: borderRadius.md,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    marginTop: 10,
+    justifyContent: 'center',
+  },
+  askChatText: {
+    color: colors.accentAi,
+    fontSize: 12,
+    fontWeight: '700',
   },
 
   emptyWrap: {

@@ -4,6 +4,7 @@ import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider, useAuth } from '@/lib/auth-context';
+import { LanguageProvider } from '@/lib/language-context';
 
 // ─── Auth Gate ────────────────────────────────────────────────────────────────
 function AuthGate({ children }: { children: React.ReactNode }) {
@@ -59,7 +60,39 @@ function RootStack() {
       />
       <Stack.Screen
         name="admin"
-        options={{ title: 'Admin Panel', headerBackTitle: 'Back' }}
+        options={{ title: 'Admin Console', headerBackTitle: 'Back' }}
+      />
+      <Stack.Screen
+        name="architecture"
+        options={{ title: 'System Architecture', headerBackTitle: 'Back' }}
+      />
+      <Stack.Screen
+        name="models"
+        options={{ title: 'AI Model Matrix', headerBackTitle: 'Back' }}
+      />
+      <Stack.Screen
+        name="models/[id]"
+        options={{ title: 'Model Specification', headerBackTitle: 'Back' }}
+      />
+      <Stack.Screen
+        name="workflow"
+        options={{ title: 'Diagnostic Workflow', headerBackTitle: 'Back' }}
+      />
+      <Stack.Screen
+        name="problem"
+        options={{ title: 'Industrial Problem', headerBackTitle: 'Back' }}
+      />
+      <Stack.Screen
+        name="inspector"
+        options={{ title: 'RAG Inspector', headerBackTitle: 'Back' }}
+      />
+      <Stack.Screen
+        name="help"
+        options={{ title: 'Help & Knowledge', headerBackTitle: 'Back' }}
+      />
+      <Stack.Screen
+        name="search-result"
+        options={{ title: 'Chunk Detail', headerBackTitle: 'Back' }}
       />
     </Stack>
   );
@@ -70,10 +103,12 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <AuthProvider>
-        <StatusBar style="light" backgroundColor={colors.background} />
-        <AuthGate>
-          <RootStack />
-        </AuthGate>
+        <LanguageProvider>
+          <StatusBar style="light" backgroundColor={colors.background} />
+          <AuthGate>
+            <RootStack />
+          </AuthGate>
+        </LanguageProvider>
       </AuthProvider>
     </SafeAreaProvider>
   );

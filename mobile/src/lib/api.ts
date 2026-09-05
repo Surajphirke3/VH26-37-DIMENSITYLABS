@@ -117,22 +117,27 @@ async function apiUpload<T>(path: string, formData: FormData): Promise<T> {
   if (token) headers.Authorization = `Bearer ${token}`;
 
   try {
-    const response = await axios.post<ApiEnvelope<T>>(
-      `${API_BASE_URL}${path}`,
-      formData,
-      { headers }
-    );
-    const envelope = response.data;
-    if (envelope && typeof envelope === "object" && "data" in envelope) {
-      return envelope.data;
-    }
-    return envelope as unknown as T;
-  } catch (err: unknown) {
-    if (axios.isAxiosError(err) && err.response?.status === 401) {
+    const res = await fetch(`${API_BASE_URL}${path}`, {
+      method: "POST",
+      headers,
+      body: formData,
+    });
+    if (res.status === 401) {
       await clearTokens();
       throw new Error("Unauthorized");
     }
-    throw new Error(parseError(err));
+    const json = await res.json();
+    if (!res.ok) {
+      const msg = json?.error ?? json?.detail ?? json?.message ?? `Upload failed (${res.status})`;
+      throw new Error(typeof msg === "string" ? msg : JSON.stringify(msg));
+    }
+    if (json && typeof json === "object" && "data" in json) {
+      return json.data;
+    }
+    return json as unknown as T;
+  } catch (err: unknown) {
+    if (err instanceof Error) throw err;
+    throw new Error("Upload failed. Please check network connection.");
   }
 }
 
@@ -162,6 +167,41 @@ export async function logout(): Promise<void> {
 
 export async function getMe(): Promise<User> {
   return apiFetch<User>("/api/v1/auth/me");
+}
+
+export async function getUsers(): Promise<User[]> {
+  return apiFetch<User[]>("/api/v1/auth/users");
+}
+
+export interface ExtractedManualMetadata {
+  title: string;
+  machine_name: string;
+  machine_model: string;
+  manufacturer: string;
+  category: string;
+  manual_type: string;
+  version?: string;
+  document_number?: string;
+  page_count: number;
+  detected_error_codes: string[];
+  suggested_machine_id?: string;
+  suggested_machine_name?: string;
+  confidence: number;
+  extraction_method: string;
+}
+
+export async function extractManualMetadata(file: {
+  uri: string;
+  name: string;
+  type: string;
+}): Promise<ExtractedManualMetadata> {
+  const formData = new FormData();
+  formData.append("file", {
+    uri: file.uri,
+    name: file.name,
+    type: file.type,
+  } as unknown as Blob);
+  return apiUpload<ExtractedManualMetadata>("/api/v1/manuals/extract-metadata", formData);
 }
 
 // ─── Machines ─────────────────────────────────────────────────────────────────

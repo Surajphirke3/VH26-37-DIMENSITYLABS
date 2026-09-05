@@ -1,6 +1,7 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useLanguage } from '@/lib/language-context';
 import { colors } from '@/lib/theme';
 
 type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
@@ -17,6 +18,8 @@ function TabIcon({ name, focused, color, size }: TabIconProps) {
 }
 
 export default function TabsLayout() {
+  const { t } = useLanguage();
+
   return (
     <Tabs
       screenOptions={{
@@ -54,7 +57,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Dashboard',
+          title: t('tab_dashboard'),
           tabBarIcon: ({ focused, color, size }) => (
             <TabIcon name={focused ? 'home' : 'home-outline'} focused={focused} color={color} size={size} />
           ),
@@ -63,7 +66,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="search"
         options={{
-          title: 'Search',
+          title: t('tab_search'),
           tabBarIcon: ({ focused, color, size }) => (
             <TabIcon name={focused ? 'search' : 'search-outline'} focused={focused} color={color} size={size} />
           ),
@@ -72,7 +75,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="documents"
         options={{
-          title: 'Documents',
+          title: t('tab_documents'),
           tabBarIcon: ({ focused, color, size }) => (
             <TabIcon name={focused ? 'document-text' : 'document-text-outline'} focused={focused} color={color} size={size} />
           ),
@@ -81,7 +84,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="status"
         options={{
-          title: 'Status',
+          title: t('tab_status'),
           tabBarIcon: ({ focused, color, size }) => (
             <TabIcon name={focused ? 'pulse' : 'pulse-outline'} focused={focused} color={color} size={size} />
           ),
@@ -90,7 +93,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="settings"
         options={{
-          title: 'Settings',
+          title: t('tab_settings'),
           tabBarIcon: ({ focused, color, size }) => (
             <TabIcon name={focused ? 'settings' : 'settings-outline'} focused={focused} color={color} size={size} />
           ),

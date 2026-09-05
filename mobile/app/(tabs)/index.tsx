@@ -8,10 +8,17 @@ import {
   ActivityIndicator,
   RefreshControl,
 } from 'react-native';
+import { Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/lib/auth-context';
-import { listConversations, createConversation, type ConversationItem } from '@/lib/api';
+import { useLanguage } from '@/lib/language-context';
+import {
+  listConversations,
+  createConversation,
+  deleteConversation,
+  type ConversationItem,
+} from '@/lib/api';
 import { colors, roleColors, borderRadius, spacing, shadows } from '@/lib/theme';
 import ConfidenceBadge from '@/components/common/ConfidenceBadge';
 
@@ -79,9 +86,55 @@ const COMMON_FAULT_PROBES = [
   },
 ];
 
+const SYSTEM_MODULES = [
+  {
+    title: 'Architecture',
+    sub: '8-Stage RAG Pipeline',
+    icon: 'git-network-outline' as const,
+    color: '#06b6d4',
+    route: '/architecture',
+  },
+  {
+    title: 'AI Models',
+    sub: 'Tri-Tier Matrix',
+    icon: 'hardware-chip-outline' as const,
+    color: '#38bdf8',
+    route: '/models',
+  },
+  {
+    title: 'Workflow',
+    sub: 'Fault Flowchart',
+    icon: 'git-merge-outline' as const,
+    color: '#a78bfa',
+    route: '/workflow',
+  },
+  {
+    title: 'Inspector',
+    sub: 'Judge Evaluation',
+    icon: 'speedometer-outline' as const,
+    color: '#f59e0b',
+    route: '/inspector',
+  },
+  {
+    title: 'Problem',
+    sub: 'Downtime Analysis',
+    icon: 'alert-circle-outline' as const,
+    color: '#ef4444',
+    route: '/problem',
+  },
+  {
+    title: 'Documentation',
+    sub: 'Manuals & Guide',
+    icon: 'book-outline' as const,
+    color: '#10b981',
+    route: '/help',
+  },
+];
+
 export default function DashboardScreen() {
   const router = useRouter();
   const { user } = useAuth();
+  const { t, activeLanguageInfo } = useLanguage();
   const [conversations, setConversations] = useState<ConversationItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -156,17 +209,28 @@ export default function DashboardScreen() {
             <Text style={styles.userNameText}>{displayName}</Text>
           </View>
 
-          <View style={[styles.roleBadge, { backgroundColor: roleStyle.bg, borderColor: roleStyle.border }]}>
-            <Text style={[styles.roleText, { color: roleStyle.main }]}>
-              {role.toUpperCase()}
-            </Text>
+          <View style={{ alignItems: 'flex-end', gap: 6 }}>
+            <View style={[styles.roleBadge, { backgroundColor: roleStyle.bg, borderColor: roleStyle.border }]}>
+              <Text style={[styles.roleText, { color: roleStyle.main }]}>
+                {role.toUpperCase()}
+              </Text>
+            </View>
+            {/* Active Language Badge */}
+            <TouchableOpacity
+              style={styles.langPill}
+              onPress={() => router.push('/(tabs)/settings')}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.langPillFlag}>{activeLanguageInfo.flag}</Text>
+              <Text style={styles.langPillText}>{activeLanguageInfo.code.toUpperCase()}</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
 
       {/* Quick Actions */}
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Operations Console</Text>
+        <Text style={styles.sectionTitle}>{t('dash_quick_triage')}</Text>
         <Text style={styles.sectionSub}>Select an automated workflow</Text>
       </View>
 
@@ -224,7 +288,7 @@ export default function DashboardScreen() {
 
       {/* Recent Sessions */}
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Recent Sessions</Text>
+        <Text style={styles.sectionTitle}>{t('dash_recent_sessions')}</Text>
         <Text style={styles.sectionSub}>Active machine diagnostics</Text>
       </View>
 
@@ -235,8 +299,8 @@ export default function DashboardScreen() {
       ) : conversations.length === 0 ? (
         <View style={styles.emptyCard}>
           <Ionicons name="chatbubbles-outline" size={32} color={colors.muted} />
-          <Text style={styles.emptyTitle}>No active sessions</Text>
-          <Text style={styles.emptySub}>Start a new triage session above</Text>
+          <Text style={styles.emptyTitle}>{t('dash_no_sessions')}</Text>
+          <Text style={styles.emptySub}>{t('dash_describe_issue')}</Text>
         </View>
       ) : (
         <View style={styles.sessionList}>
@@ -261,11 +325,82 @@ export default function DashboardScreen() {
                 </View>
               </View>
 
-              <Ionicons name="chevron-forward" size={16} color={colors.muted} />
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                <TouchableOpacity
+                  onPress={(e) => {
+                    e.stopPropagation();
+                    Alert.alert(
+                      'Delete Session',
+                      `Delete "${conv.title || 'this session'}"?`,
+                      [
+                        { text: t('btn_cancel'), style: 'cancel' },
+                        {
+                          text: 'Delete',
+                          style: 'destructive',
+                          onPress: async () => {
+                            try {
+                              await deleteConversation(conv.conversation_id);
+                              setConversations((prev) =>
+                                prev.filter((c) => c.conversation_id !== conv.conversation_id)
+                              );
+                            } catch {}
+                          },
+                        },
+                      ]
+                    );
+                  }}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                >
+                  <Ionicons name="trash-outline" size={16} color={colors.muted} />
+                </TouchableOpacity>
+                <Ionicons name="chevron-forward" size={16} color={colors.muted} />
+              </View>
             </TouchableOpacity>
           ))}
         </View>
       )}
+
+      {/* System Explorers & Deep Dive Section */}
+      <View style={[styles.sectionHeader, { marginTop: 24 }]}>
+        <View style={styles.probeTitleRow}>
+          <Ionicons name="layers-outline" size={16} color={colors.accent} />
+          <Text style={styles.sectionTitle}>{t('dash_system_modules')}</Text>
+        </View>
+        <Text style={styles.sectionSub}>Explore deep-dive specs, models, and workflows</Text>
+      </View>
+
+      <View style={styles.modulesGrid}>
+        {SYSTEM_MODULES.map((mod, idx) => (
+          <TouchableOpacity
+            key={idx}
+            style={styles.moduleCard}
+            onPress={() => router.push(mod.route as never)}
+            activeOpacity={0.8}
+          >
+            <View style={[styles.moduleTopEdge, { backgroundColor: mod.color }]} />
+            <View style={[styles.moduleIconBox, { backgroundColor: mod.color + '1a' }]}>
+              <Ionicons name={mod.icon} size={18} color={mod.color} />
+            </View>
+            <Text style={styles.moduleTitle}>{mod.title}</Text>
+            <Text style={styles.moduleSub}>{mod.sub}</Text>
+          </TouchableOpacity>
+        ))}
+
+        {user?.role === 'admin' && (
+          <TouchableOpacity
+            style={styles.moduleCard}
+            onPress={() => router.push('/admin')}
+            activeOpacity={0.8}
+          >
+            <View style={[styles.moduleTopEdge, { backgroundColor: colors.accent }]} />
+            <View style={[styles.moduleIconBox, { backgroundColor: colors.accent + '1a' }]}>
+              <Ionicons name="shield-checkmark-outline" size={18} color={colors.accent} />
+            </View>
+            <Text style={styles.moduleTitle}>Admin Console</Text>
+            <Text style={styles.moduleSub}>Fleet & Team</Text>
+          </TouchableOpacity>
+        )}
+      </View>
     </ScrollView>
   );
 }
@@ -521,5 +656,67 @@ const styles = StyleSheet.create({
   centered: {
     padding: spacing.xl,
     alignItems: 'center',
+  },
+
+  modulesGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  moduleCard: {
+    width: '48.5%',
+    backgroundColor: colors.surface,
+    borderRadius: borderRadius.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: spacing.md,
+    position: 'relative',
+    overflow: 'hidden',
+    ...shadows.sm,
+  },
+  moduleTopEdge: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 2.5,
+  },
+  moduleIconBox: {
+    width: 34,
+    height: 34,
+    borderRadius: borderRadius.sm,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  moduleTitle: {
+    color: colors.text,
+    fontSize: 13,
+    fontWeight: '700',
+    marginBottom: 2,
+  },
+  moduleSub: {
+    color: colors.muted,
+    fontSize: 11,
+  },
+  langPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: 'rgba(245, 158, 11, 0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(245, 158, 11, 0.35)',
+    borderRadius: borderRadius.full,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  langPillFlag: {
+    fontSize: 12,
+  },
+  langPillText: {
+    color: colors.warning,
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 0.5,
   },
 });

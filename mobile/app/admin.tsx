@@ -5,9 +5,9 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { getMachines, createMachine, deactivateMachine, getManuals, deleteManual } from '@/lib/api';
+import { getMachines, createMachine, deactivateMachine, getManuals, deleteManual, getUsers } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
-import type { Machine, Manual } from '@/lib/types';
+import type { Machine, Manual, User } from '@/lib/types';
 
 import { colors } from '@/lib/theme';
 
@@ -26,7 +26,7 @@ const C = {
 
 const CATEGORIES = ['CNC', 'Hydraulic', 'Pneumatic', 'Electrical', 'Mechanical', 'Other'];
 
-type TabKey = 'machines' | 'manuals';
+type TabKey = 'machines' | 'manuals' | 'users';
 
 export default function AdminScreen() {
   const { user: authUser } = useAuth();
@@ -35,8 +35,10 @@ export default function AdminScreen() {
   const [tab, setTab] = useState<TabKey>('machines');
   const [machines, setMachines] = useState<Machine[]>([]);
   const [manuals, setManuals] = useState<Manual[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [loadingMachines, setLoadingMachines] = useState(true);
   const [loadingManuals, setLoadingManuals] = useState(true);
+  const [loadingUsers, setLoadingUsers] = useState(true);
 
   // Create machine form
   const [name, setName] = useState('');
@@ -52,6 +54,7 @@ export default function AdminScreen() {
     if (!isAdmin) { router.replace('/(tabs)'); return; }
     fetchMachines();
     fetchManuals();
+    fetchUsers();
   }, [isAdmin]);
 
   const fetchMachines = useCallback(async () => {
@@ -64,6 +67,14 @@ export default function AdminScreen() {
     setLoadingManuals(true);
     try { setManuals(await getManuals()); } catch { /* swallow */ }
     finally { setLoadingManuals(false); }
+  }, []);
+
+  const fetchUsers = useCallback(async () => {
+    setLoadingUsers(true);
+    try {
+      setUsers(await getUsers());
+    } catch { /* swallow */ }
+    finally { setLoadingUsers(false); }
   }, []);
 
   async function handleCreateMachine() {
@@ -105,26 +116,30 @@ export default function AdminScreen() {
     <View style={styles.root}>
       {/* Tabs */}
       <View style={styles.tabRow}>
-        {(['machines', 'manuals'] as TabKey[]).map((t) => (
-          <TouchableOpacity key={t} style={[styles.tabBtn, tab === t && styles.tabBtnActive]} onPress={() => setTab(t)}>
-            <Text style={[styles.tabText, tab === t && styles.tabTextActive]}>{t === 'machines' ? 'Machines' : 'Manuals'}</Text>
-          </TouchableOpacity>
-        ))}
+        <TouchableOpacity style={[styles.tabBtn, tab === 'machines' && styles.tabBtnActive]} onPress={() => setTab('machines')} activeOpacity={0.8}>
+          <Text style={[styles.tabText, tab === 'machines' && styles.tabTextActive]}>Fleet</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.tabBtn, tab === 'manuals' && styles.tabBtnActive]} onPress={() => setTab('manuals')} activeOpacity={0.8}>
+          <Text style={[styles.tabText, tab === 'manuals' && styles.tabTextActive]}>Manuals</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.tabBtn, tab === 'users' && styles.tabBtnActive]} onPress={() => setTab('users')} activeOpacity={0.8}>
+          <Text style={[styles.tabText, tab === 'users' && styles.tabTextActive]}>Team ({users.length})</Text>
+        </TouchableOpacity>
       </View>
 
       {tab === 'machines' ? (
-        <ScrollView style={styles.pane} contentContainerStyle={styles.paneContent}>
-          {/* Create form */}
-          <Text style={styles.sectionLabel}>Add Machine</Text>
+        <ScrollView style={styles.pane} contentContainerStyle={styles.paneContent} keyboardShouldPersistTaps="handled">
+          {/* Create Machine Form */}
+          <Text style={styles.sectionLabel}>Add New Machine</Text>
           <View style={styles.formCard}>
-            {formError && <Text style={styles.formError}>{formError}</Text>}
-            <TextInput style={styles.input} value={name} onChangeText={setName} placeholder="Machine Name *" placeholderTextColor={C.muted} />
-            <TextInput style={styles.input} value={model} onChangeText={setModel} placeholder="Model" placeholderTextColor={C.muted} />
-            <TextInput style={styles.input} value={manufacturer} onChangeText={setManufacturer} placeholder="Manufacturer" placeholderTextColor={C.muted} />
+            {formError ? <Text style={styles.formError}>{formError}</Text> : null}
+            <TextInput style={styles.input} placeholder="Machine Name *" placeholderTextColor={C.muted} value={name} onChangeText={setName} />
+            <TextInput style={styles.input} placeholder="Model (optional)" placeholderTextColor={C.muted} value={model} onChangeText={setModel} />
+            <TextInput style={styles.input} placeholder="Manufacturer (optional)" placeholderTextColor={C.muted} value={manufacturer} onChangeText={setManufacturer} />
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipRow} contentContainerStyle={styles.chipContent}>
-              {CATEGORIES.map((c) => (
-                <TouchableOpacity key={c} style={[styles.chip, category === c && styles.chipActive]} onPress={() => setCategory(category === c ? '' : c)}>
-                  <Text style={[styles.chipText, category === c && styles.chipTextActive]}>{c}</Text>
+              {CATEGORIES.map((cat) => (
+                <TouchableOpacity key={cat} style={[styles.chip, category === cat && styles.chipActive]} onPress={() => setCategory(category === cat ? '' : cat)} activeOpacity={0.8}>
+                  <Text style={[styles.chipText, category === cat && styles.chipTextActive]}>{cat}</Text>
                 </TouchableOpacity>
               ))}
             </ScrollView>
@@ -150,7 +165,7 @@ export default function AdminScreen() {
             ))
           }
         </ScrollView>
-      ) : (
+      ) : tab === 'manuals' ? (
         <ScrollView style={styles.pane} contentContainerStyle={styles.paneContent}>
           <TouchableOpacity style={styles.uploadLink} onPress={() => router.push('/upload')}>
             <Ionicons name="cloud-upload-outline" size={16} color={C.accent} />
@@ -168,6 +183,31 @@ export default function AdminScreen() {
                 <TouchableOpacity onPress={() => confirmDeleteManual(m)}>
                   <Ionicons name="trash-outline" size={18} color={C.error} />
                 </TouchableOpacity>
+              </View>
+            ))
+          }
+        </ScrollView>
+      ) : (
+        <ScrollView style={styles.pane} contentContainerStyle={styles.paneContent}>
+          <Text style={styles.sectionLabel}>Authorized Team & Operators ({users.length})</Text>
+          {loadingUsers
+            ? <ActivityIndicator color={C.accent} />
+            : users.map((u) => (
+              <View key={u.id} style={styles.listCard}>
+                <View style={[styles.avatarMini, { backgroundColor: u.role === 'admin' ? 'rgba(99, 102, 241, 0.2)' : 'rgba(16, 185, 129, 0.2)' }]}>
+                  <Text style={[styles.avatarMiniText, { color: u.role === 'admin' ? C.accent : C.success }]}>
+                    {(u.full_name || u.email)[0].toUpperCase()}
+                  </Text>
+                </View>
+                <View style={styles.listInfo}>
+                  <Text style={styles.listTitle}>{u.full_name || u.email}</Text>
+                  <Text style={styles.listSub}>{u.email} · {u.is_active ? 'Active' : 'Disabled'}</Text>
+                </View>
+                <View style={[styles.roleTag, { borderColor: u.role === 'admin' ? C.accent : C.success }]}>
+                  <Text style={[styles.roleTagText, { color: u.role === 'admin' ? C.accent : C.success }]}>
+                    {u.role.toUpperCase()}
+                  </Text>
+                </View>
               </View>
             ))
           }
@@ -205,4 +245,8 @@ const styles = StyleSheet.create({
   listSub: { color: C.muted, fontSize: 12, marginTop: 2 },
   uploadLink: { flexDirection: 'row', alignItems: 'center', gap: 8, borderWidth: 1, borderColor: C.accent, borderRadius: 8, paddingVertical: 12, justifyContent: 'center', marginBottom: 16 },
   uploadLinkText: { color: C.accent, fontSize: 14, fontWeight: '600' },
+  avatarMini: { width: 36, height: 36, borderRadius: 18, justifyContent: 'center', alignItems: 'center' },
+  avatarMiniText: { fontSize: 14, fontWeight: '700' },
+  roleTag: { borderWidth: 1, borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 },
+  roleTagText: { fontSize: 10, fontWeight: '700', letterSpacing: 0.5 },
 });

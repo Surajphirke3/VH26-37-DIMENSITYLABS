@@ -79,6 +79,8 @@ export interface TroubleshootingResponse {
   disambiguation_options?: DisambiguationOption[];
   model_used?: string;
   model?: string;
+  language_detected?: string;
+  language_name?: string;
   retrieval_latency_ms?: number;
   llm_latency_ms?: number;
   total_latency_ms?: number;

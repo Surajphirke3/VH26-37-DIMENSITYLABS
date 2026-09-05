@@ -10,24 +10,37 @@ import {
 } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useLanguage } from '@/lib/language-context';
 import { getManuals } from '@/lib/api';
 import type { Manual } from '@/lib/types';
 import { colors, borderRadius, spacing, shadows } from '@/lib/theme';
 
-const STATUS_CONFIG: Record<Manual['processing_status'], { color: string; label: string; icon: React.ComponentProps<typeof Ionicons>['name'] }> = {
-  completed:    { color: colors.success,       label: 'Indexed',      icon: 'checkmark-circle' },
-  processing:   { color: colors.warning,       label: 'Chunking',     icon: 'time' },
-  pending:      { color: colors.muted,         label: 'Queued',       icon: 'hourglass-outline' },
-  failed:       { color: colors.error,         label: 'Failed',       icon: 'close-circle' },
-  reprocessing: { color: colors.accentCyan,    label: 'Reprocessing', icon: 'refresh-circle' },
+const STATUS_ICONS: Record<Manual['processing_status'], { color: string; icon: React.ComponentProps<typeof Ionicons>['name'] }> = {
+  completed:    { color: colors.success,       icon: 'checkmark-circle' },
+  processing:   { color: colors.warning,       icon: 'time' },
+  pending:      { color: colors.muted,         icon: 'hourglass-outline' },
+  failed:       { color: colors.error,         icon: 'close-circle' },
+  reprocessing: { color: colors.accentCyan,    icon: 'refresh-circle' },
 };
 
 function StatusBadge({ status }: { status: Manual['processing_status'] }) {
-  const cfg = STATUS_CONFIG[status] ?? STATUS_CONFIG.pending;
+  const { t } = useLanguage();
+  const cfg = STATUS_ICONS[status] ?? STATUS_ICONS.pending;
+  const labelKey =
+    status === 'completed'
+      ? 'docs_status_indexed'
+      : status === 'processing'
+      ? 'docs_status_chunking'
+      : status === 'failed'
+      ? 'docs_status_failed'
+      : status === 'reprocessing'
+      ? 'docs_status_reprocessing'
+      : 'docs_status_queued';
+
   return (
     <View style={[styles.badge, { backgroundColor: cfg.color + '18', borderColor: cfg.color + '50' }]}>
       <Ionicons name={cfg.icon} size={11} color={cfg.color} />
-      <Text style={[styles.badgeText, { color: cfg.color }]}>{cfg.label}</Text>
+      <Text style={[styles.badgeText, { color: cfg.color }]}>{t(labelKey as any)}</Text>
     </View>
   );
 }
@@ -41,6 +54,7 @@ function formatSize(bytes?: number | null) {
 
 export default function DocumentsScreen() {
   const router = useRouter();
+  const { t } = useLanguage();
   const [manuals, setManuals] = useState<Manual[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -98,7 +112,7 @@ export default function DocumentsScreen() {
           <Ionicons name="alert-circle" size={16} color={colors.error} />
           <Text style={styles.errorText}>{error}</Text>
           <TouchableOpacity onPress={() => fetchManuals()}>
-            <Text style={styles.retryText}>Retry</Text>
+            <Text style={styles.retryText}>{t('btn_retry')}</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -130,7 +144,7 @@ export default function DocumentsScreen() {
               activeOpacity={0.8}
             >
               <Ionicons name="cloud-upload-outline" size={16} color="#fff" />
-              <Text style={styles.uploadBtnText}>Upload First Manual</Text>
+              <Text style={styles.uploadBtnText}>{t('docs_upload')}</Text>
             </TouchableOpacity>
           </View>
         }
@@ -157,7 +171,7 @@ export default function DocumentsScreen() {
                   {item.chunk_count ? (
                     <Text style={styles.metaItem}>
                       <Ionicons name="layers-outline" size={11} color={colors.accentCyan} />{' '}
-                      {item.chunk_count} chunks
+                      {item.chunk_count} {t('docs_chunks')}
                     </Text>
                   ) : null}
                   {item.file_size_bytes ? (

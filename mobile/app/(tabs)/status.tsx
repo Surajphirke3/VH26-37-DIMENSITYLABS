@@ -9,6 +9,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useLanguage } from '@/lib/language-context';
 import { getSystemStatus } from '@/lib/api';
 import type { SystemStatusData } from '@/lib/types';
 import { colors, borderRadius, spacing, shadows } from '@/lib/theme';
@@ -74,6 +75,7 @@ function formatUptime(seconds: number) {
 }
 
 export default function StatusScreen() {
+  const { t } = useLanguage();
   const [data, setData] = useState<SystemStatusData | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -170,7 +172,7 @@ export default function StatusScreen() {
       <View style={styles.servicesGrid}>
         {/* Database */}
         <ServiceCard
-          title="PostgreSQL (pgvector)"
+          title={t('status_database')}
           status={data?.database?.status ?? 'connected'}
           icon="server"
         >
@@ -181,7 +183,7 @@ export default function StatusScreen() {
 
         {/* Redis */}
         <ServiceCard
-          title="Redis Cache & Queue"
+          title={t('status_redis_cache')}
           status={data?.redis?.status ?? 'connected'}
           icon="flash"
         >
@@ -191,7 +193,7 @@ export default function StatusScreen() {
 
         {/* ChromaDB Vector Store */}
         <ServiceCard
-          title="ChromaDB Vector Engine"
+          title={t('status_vector_store')}
           status={data?.chromadb?.status ?? 'ok'}
           icon="layers"
         >
@@ -202,7 +204,7 @@ export default function StatusScreen() {
 
         {/* AI Inference Providers */}
         <ServiceCard
-          title="AI Inference Providers"
+          title={t('status_llm_gateway')}
           status="ready"
           icon="sparkles"
         >

@@ -20,10 +20,45 @@ const C = {
   error: colors.error,
 };
 
+const JUDGE_SCENARIOS = [
+  {
+    id: 'haas',
+    label: 'Haas Spindle Overheat',
+    code: 'Alarm 102',
+    query: 'Alarm 102 Spindle Motor Overheat on Haas VF-4 CNC mill',
+    badge: 'Compound Mini',
+    color: '#38bdf8',
+  },
+  {
+    id: 'siemens',
+    label: 'Siemens Bus Timeout',
+    code: '0x80',
+    query: 'Siemens S7-1500 PLC PROFINET communication timeout error 0x80',
+    badge: 'GPT-OSS 20B',
+    color: '#f59e0b',
+  },
+  {
+    id: 'kuka',
+    label: 'KUKA Resolver Drift',
+    code: 'KRC4 1024',
+    query: 'KUKA KR210 industrial arm Axis 3 resolver feedback drift error',
+    badge: 'GPT-OSS 20B',
+    color: '#10b981',
+  },
+  {
+    id: 'fanuc',
+    label: 'Fanuc DCS E-Stop',
+    code: 'SRVO-001',
+    query: 'Fanuc M20iA controller Dual Check Safety emergency stop trip',
+    badge: 'GPT-OSS 120B',
+    color: '#ef4444',
+  },
+];
+
 function ScoreBadge({ score }: { score: number }) {
   const pct = Math.round(score * 100);
   const color = pct >= 70 ? C.success : pct >= 45 ? C.warning : C.error;
-  return <View style={[S.scoreBadge, { borderColor: color }]}><Text style={[S.scoreText, { color }]}>{pct}%</Text></View>;
+  return <View style={[S.scoreBadge, { borderColor: color }]}><Text style={[S.scoreText, { color }]}>{pct}% MATCH</Text></View>;
 }
 
 export default function InspectorScreen() {
@@ -38,12 +73,14 @@ export default function InspectorScreen() {
 
   useFocusEffect(useCallback(() => { getMachines().then(setMachines).catch(() => {}); }, []));
 
-  async function handleSearch() {
-    if (!query.trim()) return;
+  async function handleSearch(overrideQuery?: string) {
+    const q = overrideQuery || query;
+    if (!q.trim()) return;
+    if (overrideQuery) setQuery(overrideQuery);
     setLoading(true); setError(null); setSearched(true);
     try {
       const data = await searchKnowledgeBase(
-        query.trim(),
+        q.trim(),
         selectedMachine ?? undefined,
         30
       );
@@ -63,14 +100,33 @@ export default function InspectorScreen() {
 
   const EmptyComp = searched && !loading
     ? <Text style={S.emptyText}>No chunks found. Try a broader search term.</Text>
-    : !searched ? <Text style={S.emptyText}>Enter any text to inspect matching knowledge base chunks. Min similarity is 0.0.</Text>
+    : !searched ? <Text style={S.emptyText}>Tap a benchmark probe above or enter custom fault text to inspect chunk embeddings.</Text>
     : null;
 
   return (
     <View style={S.root}>
+      {/* Benchmark Probes Strip */}
+      <Text style={S.benchmarksTitle}>LIVE BENCHMARK PROBES</Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={S.scenariosStrip} contentContainerStyle={{ gap: 8, paddingBottom: 10 }}>
+        {JUDGE_SCENARIOS.map((sc) => (
+          <TouchableOpacity
+            key={sc.id}
+            style={[S.scenarioChip, { borderLeftColor: sc.color, borderLeftWidth: 3 }]}
+            onPress={() => handleSearch(sc.query)}
+            activeOpacity={0.8}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <Text style={S.scenarioLabel}>{sc.label}</Text>
+              <Text style={[S.scenarioCode, { color: sc.color }]}>[{sc.code}]</Text>
+            </View>
+            <Text style={S.scenarioBadge}>{sc.badge}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+
       <View style={S.searchBar}>
         <Ionicons name="search-outline" size={18} color={C.muted} style={{ marginRight: 8 }} />
-        <TextInput style={S.input} value={query} onChangeText={setQuery} placeholder="Search chunks by text content…" placeholderTextColor={C.muted} returnKeyType="search" onSubmitEditing={handleSearch} />
+        <TextInput style={S.input} value={query} onChangeText={setQuery} placeholder="Search chunks by text content…" placeholderTextColor={C.muted} returnKeyType="search" onSubmitEditing={() => handleSearch()} />
         {query.length > 0 && <TouchableOpacity onPress={() => { setQuery(''); setResults([]); setSearched(false); }}><Ionicons name="close-circle" size={18} color={C.muted} /></TouchableOpacity>}
       </View>
 
@@ -85,15 +141,15 @@ export default function InspectorScreen() {
         ))}
       </ScrollView>
 
-      <TouchableOpacity style={S.searchBtn} onPress={handleSearch} disabled={loading || !query.trim()} activeOpacity={0.8}>
-        {loading ? <ActivityIndicator color="#fff" size="small" /> : <Text style={S.searchBtnText}>Inspect Chunks</Text>}
+      <TouchableOpacity style={S.searchBtn} onPress={() => handleSearch()} disabled={loading || !query.trim()} activeOpacity={0.8}>
+        {loading ? <ActivityIndicator color="#fff" size="small" /> : <Text style={S.searchBtnText}>Inspect Vectors & Cosine Distance</Text>}
       </TouchableOpacity>
 
       {error && (
         <View style={S.errorRow}>
           <Ionicons name="alert-circle-outline" size={16} color={C.error} />
           <Text style={S.errorText}>{error}</Text>
-          <TouchableOpacity onPress={handleSearch}><Text style={S.retryInline}>Retry</Text></TouchableOpacity>
+          <TouchableOpacity onPress={() => handleSearch()}><Text style={S.retryInline}>Retry</Text></TouchableOpacity>
         </View>
       )}
 
@@ -128,6 +184,12 @@ export default function InspectorScreen() {
 
 const S = StyleSheet.create({
   root: { flex: 1, backgroundColor: C.bg, padding: 16 },
+  benchmarksTitle: { color: C.muted, fontSize: 10, fontWeight: '700', letterSpacing: 0.8, marginBottom: 8 },
+  scenariosStrip: { maxHeight: 60, marginBottom: 12 },
+  scenarioChip: { backgroundColor: C.surface, borderWidth: 1, borderColor: C.border, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 8, justifyContent: 'center' },
+  scenarioLabel: { color: C.text, fontSize: 13, fontWeight: '700' },
+  scenarioCode: { fontSize: 11, fontWeight: '700' },
+  scenarioBadge: { color: C.muted, fontSize: 10, marginTop: 2 },
   searchBar: { flexDirection: 'row', alignItems: 'center', backgroundColor: C.surface, borderWidth: 1, borderColor: C.border, borderRadius: 10, paddingHorizontal: 12, marginBottom: 12 },
   input: { flex: 1, color: C.text, fontSize: 15, paddingVertical: 12 },
   filterRow: { marginBottom: 12, maxHeight: 40 },

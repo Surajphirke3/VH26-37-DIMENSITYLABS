@@ -22,6 +22,7 @@ import {
   type ConversationMessage,
 } from '@/lib/api';
 import type { Message, Machine, DisambiguationOption } from '@/lib/types';
+import { useLanguage } from '@/lib/language-context';
 import { colors, borderRadius, spacing, shadows } from '@/lib/theme';
 import ConfidenceBadge from '@/components/common/ConfidenceBadge';
 
@@ -45,16 +46,34 @@ function UserBubble({ message }: { message: Message }) {
   );
 }
 
-function AssistantBubble({ message }: { message: Message }) {
+function AssistantBubble({
+  message,
+  onSelectSuggestion,
+}: {
+  message: Message;
+  onSelectSuggestion?: (s: string) => void;
+}) {
   const resp = message.response;
+  const { t } = useLanguage();
+
   return (
     <View style={styles.asstBubbleWrap}>
       <View style={styles.asstBubble}>
         {/* Top AI Indicator Bar */}
         <View style={styles.aiTagRow}>
-          <View style={styles.aiBadge}>
-            <Ionicons name="sparkles" size={12} color={colors.accentAi} />
-            <Text style={styles.aiBadgeText}>MEND - X AI</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <View style={styles.aiBadge}>
+              <Ionicons name="sparkles" size={12} color={colors.accentAi} />
+              <Text style={styles.aiBadgeText}>MEND - X AI</Text>
+            </View>
+            {resp?.language_detected && resp.language_detected.toLowerCase() !== 'en' && (
+              <View style={styles.langDetectedBadge}>
+                <Ionicons name="language-outline" size={11} color={colors.warning} />
+                <Text style={styles.langDetectedText}>
+                  LANG: {resp.language_name || resp.language_detected.toUpperCase()}
+                </Text>
+              </View>
+            )}
           </View>
           {resp?.confidence_level && (
             <ConfidenceBadge level={resp.confidence_level as any} score={resp.evidence_score} />
@@ -63,17 +82,32 @@ function AssistantBubble({ message }: { message: Message }) {
 
         {resp ? (
           <>
+            {resp.error_meaning && (
+              <View style={styles.errorMeaningBox}>
+                <Ionicons name="information-circle" size={14} color={colors.accentCyan} />
+                <Text style={styles.errorMeaningText}>{resp.error_meaning}</Text>
+              </View>
+            )}
+
             <Text style={styles.asstSummary}>{resp.summary}</Text>
 
             {resp.corrective_steps && resp.corrective_steps.length > 0 && (
               <View style={styles.stepsBlock}>
-                <Text style={styles.stepsTitle}>CORRECTIVE ACTIONS</Text>
+                <Text style={styles.stepsTitle}>{t('chat_corrective_steps')}</Text>
                 {resp.corrective_steps.map((step) => (
                   <View key={step.step_number} style={styles.step}>
                     <View style={styles.stepNum}>
                       <Text style={styles.stepNumText}>{step.step_number}</Text>
                     </View>
-                    <Text style={styles.stepAction}>{step.action}</Text>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.stepAction}>{step.action}</Text>
+                      {step.warning && (
+                        <View style={styles.stepWarning}>
+                          <Ionicons name="warning" size={12} color={colors.warning} />
+                          <Text style={styles.stepWarningText}>{step.warning}</Text>
+                        </View>
+                      )}
+                    </View>
                   </View>
                 ))}
               </View>
@@ -81,8 +115,41 @@ function AssistantBubble({ message }: { message: Message }) {
 
             {resp.probable_causes && resp.probable_causes.length > 0 && (
               <View style={styles.metaBox}>
-                <Text style={styles.metaTitle}>PROBABLE CAUSES</Text>
-                <Text style={styles.metaContent}>{resp.probable_causes.join('\n• ')}</Text>
+                <Text style={styles.metaTitle}>{t('chat_probable_causes')}</Text>
+                <Text style={styles.metaContent}>{resp.probable_causes.map((c) => `• ${c}`).join('\n')}</Text>
+              </View>
+            )}
+
+            {resp.citations && resp.citations.length > 0 && (
+              <View style={styles.citationsBox}>
+                <Text style={styles.metaTitle}>{t('chat_verified_citations')}</Text>
+                {resp.citations.slice(0, 3).map((cit, idx) => (
+                  <View key={cit.citation_id || idx} style={styles.citationItem}>
+                    <Ionicons name="book-outline" size={12} color={colors.accent} />
+                    <Text style={styles.citationText} numberOfLines={1}>
+                      {cit.manual_name} ({t('chat_page')} {cit.page_start}–{cit.page_end})
+                    </Text>
+                    <Text style={styles.citationScore}>
+                      {Math.round(cit.relevance_score * 100)}%
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            )}
+
+            {resp.follow_up_suggestions && resp.follow_up_suggestions.length > 0 && (
+              <View style={styles.suggestionsRow}>
+                {resp.follow_up_suggestions.slice(0, 3).map((sugg, idx) => (
+                  <TouchableOpacity
+                    key={idx}
+                    style={styles.suggestionChip}
+                    onPress={() => onSelectSuggestion?.(sugg)}
+                    activeOpacity={0.7}
+                  >
+                    <Ionicons name="arrow-redo-outline" size={11} color={colors.accentCyan} />
+                    <Text style={styles.suggestionText} numberOfLines={1}>{sugg}</Text>
+                  </TouchableOpacity>
+                ))}
               </View>
             )}
           </>
@@ -97,6 +164,7 @@ function AssistantBubble({ message }: { message: Message }) {
 export default function ChatScreen() {
   const { id, prompt } = useLocalSearchParams<{ id: string; prompt?: string }>();
   const navigation = useNavigation();
+  const { language, autoDetect, t, activeLanguageInfo } = useLanguage();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
@@ -110,11 +178,11 @@ export default function ChatScreen() {
 
   useEffect(() => {
     navigation.setOptions({
-      title: 'Diagnostic Session',
+      title: t('chat_title'),
       headerStyle: { backgroundColor: colors.surface },
       headerTintColor: colors.text,
     });
-  }, [navigation]);
+  }, [navigation, t]);
 
   useEffect(() => {
     Promise.all([
@@ -135,10 +203,11 @@ export default function ChatScreen() {
     }
   }, [prompt]);
 
-  async function handleSend() {
-    if (!input.trim() || sending) return;
-    const query = input.trim();
-    setInput('');
+  async function handleSend(overrideQuery?: string) {
+    const textToSend = overrideQuery || input;
+    if (!textToSend.trim() || sending) return;
+    const query = textToSend.trim();
+    if (!overrideQuery) setInput('');
     setSending(true);
 
     const tempUserMsg: Message = {
@@ -150,7 +219,13 @@ export default function ChatScreen() {
     setMessages((prev) => [...prev, tempUserMsg]);
 
     try {
-      const resp = await sendMessage(id, query, selectedMachine ?? undefined);
+      // If user selected a specific language and disabled auto-detect, inject directive
+      let backendQuery = query;
+      if (!autoDetect && language !== 'en') {
+        backendQuery = `${query}\n\n[Respond in ${activeLanguageInfo.name} (${activeLanguageInfo.nativeName})]`;
+      }
+
+      const resp = await sendMessage(id, backendQuery, selectedMachine ?? undefined);
       if (resp.disambiguation_options && resp.disambiguation_options.length > 0) {
         setDisambigOptions(resp.disambiguation_options);
         setPendingQuery(query);
@@ -165,8 +240,23 @@ export default function ChatScreen() {
         };
         setMessages((prev) => [...prev, asstMsg]);
       }
-    } catch {
-      // Error handling
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Diagnostic request failed';
+      const errorMsg: Message = {
+        id: `err-${Date.now()}`,
+        role: 'assistant',
+        content: `⚠️ Diagnostics Alert: ${msg}. Please ensure backend services are reachable.`,
+        response: {
+          answer_type: 'error',
+          summary: `Request failed: ${msg}`,
+          probable_causes: [],
+          corrective_steps: [],
+          citations: [],
+          follow_up_suggestions: ['Retry diagnostics', 'Check system telemetry'],
+        },
+        timestamp: new Date().toISOString(),
+      };
+      setMessages((prev) => [...prev, errorMsg]);
     } finally {
       setSending(false);
     }
@@ -175,10 +265,9 @@ export default function ChatScreen() {
   async function handleDisambiguate(machineId: string) {
     setShowDisambig(false);
     setSelectedMachine(machineId);
-    if (!pendingQuery) return;
     setSending(true);
     try {
-      const resp = await disambiguate(id, pendingQuery, machineId);
+      const resp = await disambiguate(id, machineId);
       const asstMsg: Message = {
         id: resp.message_id || `asst-${Date.now()}`,
         role: 'assistant',
@@ -187,6 +276,23 @@ export default function ChatScreen() {
         timestamp: new Date().toISOString(),
       };
       setMessages((prev) => [...prev, asstMsg]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Disambiguation request failed';
+      const errorMsg: Message = {
+        id: `err-${Date.now()}`,
+        role: 'assistant',
+        content: `⚠️ Disambiguation Error: ${msg}`,
+        response: {
+          answer_type: 'error',
+          summary: msg,
+          probable_causes: [],
+          corrective_steps: [],
+          citations: [],
+          follow_up_suggestions: [],
+        },
+        timestamp: new Date().toISOString(),
+      };
+      setMessages((prev) => [...prev, errorMsg]);
     } finally {
       setSending(false);
       setPendingQuery(null);
@@ -255,14 +361,19 @@ export default function ChatScreen() {
             <View style={styles.emptyIconBox}>
               <Ionicons name="hardware-chip-outline" size={32} color={colors.accent} />
             </View>
-            <Text style={styles.emptyTitle}>Industrial Triage Ready</Text>
-            <Text style={styles.emptyText}>
-              Describe a machine fault, error code, or abnormal vibration to start diagnostics.
-            </Text>
+            <Text style={styles.emptyTitle}>{t('chat_empty_title')}</Text>
+            <Text style={styles.emptyText}>{t('chat_empty_subtitle')}</Text>
           </View>
         }
         renderItem={({ item }) =>
-          item.role === 'user' ? <UserBubble message={item} /> : <AssistantBubble message={item} />
+          item.role === 'user' ? (
+            <UserBubble message={item} />
+          ) : (
+            <AssistantBubble
+              message={item}
+              onSelectSuggestion={(sugg) => handleSend(sugg)}
+            />
+          )
         }
       />
 
@@ -272,7 +383,7 @@ export default function ChatScreen() {
           style={styles.input}
           value={input}
           onChangeText={setInput}
-          placeholder="Describe fault or alarm code (e.g. Alarm 102)…"
+          placeholder={t('chat_input_placeholder')}
           placeholderTextColor={colors.muted}
           multiline
           maxLength={2000}
@@ -280,7 +391,7 @@ export default function ChatScreen() {
         />
         <TouchableOpacity
           style={[styles.sendBtn, (!input.trim() || sending) && styles.sendBtnDisabled]}
-          onPress={handleSend}
+          onPress={() => handleSend()}
           disabled={!input.trim() || sending}
         >
           {sending ? (
@@ -295,8 +406,8 @@ export default function ChatScreen() {
       <Modal visible={showDisambig} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalCard}>
-            <Text style={styles.modalTitle}>Select Machine Context</Text>
-            <Text style={styles.modalSub}>Multiple machines match your query. Choose the relevant unit:</Text>
+            <Text style={styles.modalTitle}>{t('chat_select_machine')}</Text>
+            <Text style={styles.modalSub}>{t('chat_select_machine_desc')}</Text>
             {disambigOptions.map((opt) => (
               <TouchableOpacity
                 key={opt.machine_id}
@@ -310,7 +421,7 @@ export default function ChatScreen() {
               </TouchableOpacity>
             ))}
             <TouchableOpacity style={styles.cancelBtn} onPress={() => setShowDisambig(false)}>
-              <Text style={styles.cancelText}>Cancel</Text>
+              <Text style={styles.cancelText}>{t('btn_cancel')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -450,6 +561,23 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 0.5,
   },
+  langDetectedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(245, 158, 11, 0.12)',
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    borderRadius: borderRadius.full,
+    borderWidth: 1,
+    borderColor: 'rgba(245, 158, 11, 0.35)',
+  },
+  langDetectedText: {
+    color: colors.warning,
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 0.4,
+  },
 
   asstSummary: {
     color: colors.text,
@@ -510,12 +638,95 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 0.5,
-    marginBottom: 2,
+    marginBottom: 4,
   },
   metaContent: {
     color: colors.textSecondary,
     fontSize: 12,
     lineHeight: 16,
+  },
+
+  errorMeaningBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: 'rgba(56, 189, 248, 0.08)',
+    borderLeftWidth: 3,
+    borderLeftColor: colors.accentCyan,
+    padding: 10,
+    borderRadius: borderRadius.xs,
+    marginBottom: 10,
+  },
+  errorMeaningText: {
+    flex: 1,
+    color: colors.accentCyan,
+    fontSize: 12,
+    lineHeight: 16,
+    fontWeight: '500',
+  },
+
+  stepWarning: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+    borderRadius: borderRadius.xs,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    marginTop: 4,
+  },
+  stepWarningText: {
+    color: colors.warning,
+    fontSize: 11,
+    fontWeight: '600',
+  },
+
+  citationsBox: {
+    marginTop: 12,
+    padding: 10,
+    backgroundColor: colors.surface,
+    borderRadius: borderRadius.sm,
+    borderWidth: 1,
+    borderColor: colors.border,
+    gap: 6,
+  },
+  citationItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  citationText: {
+    flex: 1,
+    color: colors.textSecondary,
+    fontSize: 11,
+  },
+  citationScore: {
+    color: colors.accentAi,
+    fontSize: 10,
+    fontWeight: '700',
+  },
+
+  suggestionsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    marginTop: 12,
+  },
+  suggestionChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: borderRadius.full,
+  },
+  suggestionText: {
+    color: colors.textSecondary,
+    fontSize: 11,
+    fontWeight: '500',
   },
 
   inputBar: {

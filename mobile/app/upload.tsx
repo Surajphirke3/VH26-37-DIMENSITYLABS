@@ -7,8 +7,8 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as DocumentPicker from 'expo-document-picker';
 import { uploadManual, getMachines } from '@/lib/api';
+import { useAuth } from '@/lib/auth-context';
 import type { Machine } from '@/lib/types';
-
 import { colors } from '@/lib/theme';
 
 const C = {
@@ -21,9 +21,11 @@ const C = {
   muted: colors.muted,
   success: colors.success,
   error: colors.error,
+  warning: colors.warning,
+  accentAi: colors.accentAi,
 };
 
-const MANUAL_TYPES = ['Service Manual', 'Parts Manual', 'Operation Manual', 'Safety Manual', 'Electrical Schematic', 'Other'];
+const MANUAL_TYPES = ['service', 'operator', 'parts', 'installation', 'schematic', 'troubleshooting'];
 
 interface PickedFile {
   uri: string;
@@ -34,14 +36,17 @@ interface PickedFile {
 
 export default function UploadScreen() {
   const router = useRouter();
+  const { user } = useAuth();
+  const isManagerOrAdmin = user?.role === 'admin' || user?.role === 'manager';
+
   const [file, setFile] = useState<PickedFile | null>(null);
   const [title, setTitle] = useState('');
   const [machines, setMachines] = useState<Machine[]>([]);
   const [selectedMachine, setSelectedMachine] = useState<string | null>(null);
-  const [manualType, setManualType] = useState('Service Manual');
+  const [manualType, setManualType] = useState('service');
   const [version, setVersion] = useState('');
   const [uploading, setUploading] = useState(false);
-  const [progress, setProgress] = useState<string | null>(null);
+  const [stage, setStage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => { getMachines().then(setMachines).catch(() => {}); }, []);
@@ -69,11 +74,16 @@ export default function UploadScreen() {
   }
 
   async function handleUpload() {
+    if (!isManagerOrAdmin) {
+      setError('Manual upload is restricted to Managers & Administrators. Please sign in with an Admin account.');
+      return;
+    }
     if (!file) { setError('Please select a PDF file.'); return; }
     setError(null);
     setUploading(true);
-    setProgress('Uploading…');
+    setStage('Validating binary magic bytes…');
     try {
+      setStage('Transmitting PDF to ingestion pipeline…');
       const manual = await uploadManual({
         file: { uri: file.uri, name: file.name, type: file.mimeType ?? 'application/pdf' },
         title: title.trim() || undefined,
@@ -81,23 +91,38 @@ export default function UploadScreen() {
         manual_type: manualType,
         version: version.trim() || undefined,
       });
-      setProgress('Upload complete!');
+      setStage('Vector chunking & embedding…');
       Alert.alert(
         'Upload Successful',
-        `Manual ID: ${manual.manual_id}\nProcessing will begin shortly.`,
-        [{ text: 'View Document', onPress: () => router.replace(`/document/${manual.manual_id}`) },
-         { text: 'Upload Another', onPress: () => { setFile(null); setTitle(''); setProgress(null); } }]
+        `Manual "${title || file.name}" uploaded successfully!\nPipeline Job ID: ${manual.ingestion_job_id}`,
+        [
+          { text: 'View in Library', onPress: () => router.replace(`/document/${manual.manual_id}`) },
+          { text: 'Upload Another', onPress: () => { setFile(null); setTitle(''); setStage(null); } },
+        ]
       );
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Upload failed. Please try again.');
+      setError(e instanceof Error ? e.message : 'Upload failed. Please check network connection.');
     } finally {
       setUploading(false);
-      if (!error) setProgress(null);
+      setStage(null);
     }
   }
 
   return (
     <ScrollView style={styles.root} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+      {/* Role Banner for Technicians */}
+      {!isManagerOrAdmin && (
+        <View style={styles.roleWarningCard}>
+          <Ionicons name="shield-outline" size={18} color={C.warning} />
+          <View style={{ flex: 1 }}>
+            <Text style={styles.roleWarningTitle}>Manager / Administrator Access Required</Text>
+            <Text style={styles.roleWarningText}>
+              You are signed in as {user?.role || 'Technician'}. Technical manual ingestion and vector indexing require Administrator privileges (admin@mechind.com).
+            </Text>
+          </View>
+        </View>
+      )}
+
       {/* File picker */}
       <Text style={styles.sectionLabel}>Document (PDF Only)</Text>
       <TouchableOpacity style={[styles.dropZone, file && styles.dropZoneActive]} onPress={pickDocument} activeOpacity={0.8}>
@@ -114,7 +139,7 @@ export default function UploadScreen() {
           <>
             <Ionicons name="cloud-upload-outline" size={36} color={C.muted} />
             <Text style={styles.dropText}>Tap to select PDF</Text>
-            <Text style={styles.dropHint}>PDF files only</Text>
+            <Text style={styles.dropHint}>PDF files up to 100MB</Text>
           </>
         )}
       </TouchableOpacity>
@@ -151,14 +176,14 @@ export default function UploadScreen() {
       <TextInput style={styles.input} value={version} onChangeText={setVersion} placeholder="e.g. 2.1.0" placeholderTextColor={C.muted} />
 
       {error && <Text style={styles.errorText}>{error}</Text>}
-      {progress && (
+      {stage && (
         <View style={styles.progressRow}>
-          <ActivityIndicator color={C.success} size="small" />
-          <Text style={styles.progressText}>{progress}</Text>
+          <ActivityIndicator color={C.accentAi} size="small" />
+          <Text style={styles.progressText}>{stage}</Text>
         </View>
       )}
 
-      <TouchableOpacity style={[styles.uploadBtn, (!file || uploading) && styles.uploadBtnDisabled]} onPress={handleUpload} disabled={!file || uploading} activeOpacity={0.8}>
+      <TouchableOpacity style={[styles.uploadBtn, (!file || uploading || !isManagerOrAdmin) && styles.uploadBtnDisabled]} onPress={handleUpload} disabled={!file || uploading || !isManagerOrAdmin} activeOpacity={0.8}>
         {uploading ? <ActivityIndicator color="#fff" size="small" /> : <><Ionicons name="cloud-upload-outline" size={18} color="#fff" /><Text style={styles.uploadBtnText}>Upload Manual</Text></>}
       </TouchableOpacity>
     </ScrollView>
@@ -168,6 +193,28 @@ export default function UploadScreen() {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: C.bg },
   content: { padding: 16, paddingBottom: 40 },
+  roleWarningCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(245, 158, 11, 0.3)',
+    borderRadius: 10,
+    padding: 14,
+    marginBottom: 16,
+  },
+  roleWarningTitle: {
+    color: C.warning,
+    fontSize: 13,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  roleWarningText: {
+    color: colors.textSecondary,
+    fontSize: 12,
+    lineHeight: 16,
+  },
   sectionLabel: { color: C.muted, fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 8, marginTop: 16 },
   dropZone: { borderWidth: 2, borderColor: C.border, borderStyle: 'dashed', borderRadius: 14, padding: 32, alignItems: 'center', gap: 8, backgroundColor: C.surface },
   dropZoneActive: { borderColor: C.accent, borderStyle: 'solid' },
