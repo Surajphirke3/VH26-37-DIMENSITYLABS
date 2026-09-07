@@ -243,20 +243,49 @@ Factory technicians are rarely stationed in front of desktop PCs. The repository
 
 ---
 
-## 🚀 Quick Start & Orchestration
+## 🚀 Quick Start & Run Instructions
 
-> 💡 **One-Click Teammate Hub:** Everything is organized in the **[`how_to_run/`](how_to_run/README.md)** folder!
-> - Run **`./how_to_run/start_localhost.sh`** for pure localhost mode (DB + Backend + Frontend).
-> - Run **`./how_to_run/start_tunnel.sh`** to expose your local backend via Cloudflare tunnel.
-> - Run **`./how_to_run/menu.sh`** (or `menu.bat` on Windows) for an interactive menu.
+> 💡 **Dedicated Operations Hub:** All scripts and instructions are located in the **[`how_to_run/`](how_to_run/INSTRUCTIONS.md)** folder!
+> - Detailed Step-by-Step Guide: **[`how_to_run/INSTRUCTIONS.md`](how_to_run/INSTRUCTIONS.md)**
+> - Quick Cheatsheet: **[`how_to_run/HOW_TO_RUN.md`](how_to_run/HOW_TO_RUN.md)**
+> - Architecture & Diagnostics: **[`how_to_run/README.md`](how_to_run/README.md)**
 
-> 📖 **Full Run Guides:** Refer to **[`how_to_run/README.md`](how_to_run/README.md)** and **[`RUN_GUIDE.md`](RUN_GUIDE.md)**.
+---
+
+### ⚡ Quick Execution Modes
+
+| Mode | Use Case | macOS / Linux | Windows |
+| :--- | :--- | :--- | :--- |
+| **🏠 Mode A: Localhost** | Full local stack (DB + Redis + Backend on `:8000` + Frontend on `:3000`) | `./how_to_run/start_localhost.sh` | `how_to_run\start_localhost.bat` |
+| **🌐 Mode B: Tunneling** | Expose backend via Cloudflare tunnel for Vercel or remote teammates | `./how_to_run/start_tunnel.sh` | `how_to_run\start_tunnel.bat` |
+| **📱 Mode C: Mobile USB** | Test Expo on a physical Android phone over USB cable (ADB reverse tunnel) | `./how_to_run/connect_phone.sh` | `how_to_run\connect_phone.bat` |
+| **🔍 Diagnostics** | Inspect live health of Docker, DB, Redis, Backend, Frontend, and AI model | `./how_to_run/check_system.sh` | Run in Git Bash / WSL |
+| **🎛 Interactive Menu** | Choose any action from a simple numbered terminal menu | `./how_to_run/menu.sh` | `how_to_run\menu.bat` |
+
+---
+
+### 🏛 Port & Service Reference
+
+| Service | Port / URL | Purpose |
+| :--- | :--- | :--- |
+| **Next.js Frontend** | `http://localhost:3000` | Industrial diagnostics web dashboard & pipeline tracker |
+| **FastAPI Backend** | `http://localhost:8000` | REST API, Ingestion, RAG query engine |
+| **Interactive API Docs** | `http://localhost:8000/docs` | Interactive Swagger UI API documentation |
+| **PostgreSQL + pgvector** | `localhost:5432` | Relational tables & vector embeddings (`mechind`) |
+| **Redis Cache** | `localhost:6379` | High-speed cache & rate limiting |
+| **Expo Metro Bundler** | `http://localhost:8081` | Mobile client app bundler |
+| **AI Inference** | Groq LPU (`openai/gpt-oss-120b`, `openai/gpt-oss-20b`, `groq/compound-mini`) | Active default (Hugging Face API key is optional/exempt) |
+
+---
 
 ### 1. Prerequisites
 - **Docker Desktop** (running and healthy)
-- **Python 3.11+** (virtual environment inside `backend/.venv`)
-- **Node.js 18+** & `npm`
-- **Cloudflare CLI** (`cloudflared`)
+- **Python 3.11+** (`python3 --version`)
+- **Node.js 18+** & `npm` (`node --version`)
+- *(Optional)* **cloudflared CLI** (`brew install cloudflared` on macOS, `winget install Cloudflare.cloudflared` on Windows)
+- *(Optional)* **ADB** (`brew install --cask android-platform-tools` on macOS, `winget install Google.PlatformTools` on Windows)
+
+---
 
 ### 2. Environment Setup
 ```bash
@@ -267,52 +296,101 @@ cd VH26-37-DIMENSITYLABS
 # Configure environment variables
 cp .env.example .env
 ```
-Populate your `.env` with your API keys (e.g., `GROQ_API_KEY`, `GEMINI_API_KEY`). Local embeddings and databases require no external keys.
+Ensure your `GROQ_API_KEY` is set in `.env`. The system uses **Groq LPU** for zero-latency inference.
+> 💡 **Hugging Face API Key Exempt:** Hugging Face is completely optional. If no key is provided, the system automatically runs on Groq without any errors.
 
-### 3. Start Database & Cache (Docker)
+---
+
+### 3. Mode A: Running Full Stack on Localhost
+
+#### One-Command Automatic Startup:
 ```bash
+# macOS / Linux
+./how_to_run/start_localhost.sh
+
+# Windows
+how_to_run\start_localhost.bat
+```
+*This automatically starts PostgreSQL & Redis in Docker, checks the Python `.venv` & npm dependencies, and runs both the FastAPI Backend (`:8000`) and Next.js Frontend (`:3000`) concurrently. Press `Ctrl+C` to stop all services cleanly.*
+
+#### Manual Step-by-Step Startup:
+```bash
+# Terminal 1 — Database & Cache (Docker)
 docker compose up -d db redis
-docker compose ps
-```
 
-### 4. Initialize Backend API
-```bash
+# Terminal 2 — FastAPI Backend
 cd backend
-source .venv/bin/activate       # On Windows: .venv\Scripts\Activate.ps1
-
-# Run database schema migrations
+source .venv/bin/activate       # On Windows: .venv\Scripts\activate
 alembic upgrade head
-
-# Seed initial machines & demo data
 python scripts/seed.py
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
-# Launch FastAPI backend server
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
-- **Health Check:** `http://localhost:8000/api/v1/health`
-- **Interactive Swagger Docs:** `http://localhost:8000/api/docs`
-
-### 5. Expose via Cloudflare Tunnel (Remote & Mobile Ingress)
-```bash
-cloudflared tunnel --url http://localhost:8000
-```
-*(Generates a secure HTTPS tunnel `https://*.trycloudflare.com` for webhooks, remote testing, and mobile app pairing).*
-
-### 6. Run Next.js Frontend Dashboard
-```bash
+# Terminal 3 — Next.js Frontend
 cd frontend
 npm install
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-### 7. Run Mobile Client (Expo)
+- Web UI: [http://localhost:3000](http://localhost:3000)
+- API Docs: [http://localhost:8000/docs](http://localhost:8000/docs)
+- Health Check: [http://localhost:8000/api/v1/health](http://localhost:8000/api/v1/health)
+
+---
+
+### 4. Mode B: Cloudflare Tunneling (For Vercel & Remote Mobile)
+
+To connect your local backend to a Vercel-hosted frontend or test from a remote device:
+
 ```bash
-cd mobile
-npm install
-npx expo start
+# macOS / Linux
+./how_to_run/start_tunnel.sh
+
+# Windows
+how_to_run\start_tunnel.bat
 ```
-Scan the QR code with **Expo Go** on an iOS or Android device.
+1. Copy the generated `https://xxxx.trycloudflare.com` URL.
+2. In your Vercel Dashboard (Settings → Environment Variables):
+   - `NEXT_PUBLIC_API_URL` = `https://xxxx.trycloudflare.com`
+   - `INTERNAL_API_URL`    = `https://xxxx.trycloudflare.com`
+3. Add the URL to `CORS_ORIGINS` in your local `.env`.
+
+---
+
+### 5. Mode C: Physical Android Phone Testing (USB Cable)
+
+1. Enable **Developer Options** & **USB Debugging** on your Android phone.
+2. Plug your phone into your computer via USB and select *File Transfer (MTP)*.
+3. Run the connector script:
+   ```bash
+   # macOS / Linux
+   ./how_to_run/connect_phone.sh
+
+   # Windows
+   how_to_run\connect_phone.bat
+   ```
+4. Start the mobile app:
+   ```bash
+   cd mobile
+   npx expo start
+   ```
+   Press **`a`** in your terminal to immediately open MEND - X on your phone!
+
+---
+
+### 6. System Diagnostics & Health Check
+Run the real-time health inspector:
+```bash
+./how_to_run/check_system.sh
+```
+Instantly displays the live status of Docker, PostgreSQL (5432), Redis (6379), FastAPI Backend (8000), Next.js Frontend (3000), Active AI Model, Cloudflare Tunnel, and connected ADB devices.
+
+---
+
+### 7. Troubleshooting Common Issues
+- **`Address already in use: [Errno 48]` (Port 8000 or 3000):**
+  Run: `kill -9 $(lsof -ti :8000) 2>/dev/null; kill -9 $(lsof -ti :3000) 2>/dev/null`
+- **`Docker daemon not running`:** Start Docker Desktop and wait until the status is green.
+- **CORS Errors:** Add your tunnel URL or `http://localhost:3000` to `CORS_ORIGINS` in `.env`.
 
 ---
 
@@ -332,7 +410,7 @@ backend/.venv/bin/python ingest.py --pdf sinamics_s120.pdf --machine_id sinamics
 backend/.venv/bin/python ingest.py --pdf powerflex_755.pdf --machine_id powerflex_755 --manual_name "Allen-Bradley PowerFlex 755"
 ```
 
----
+Or open [`http://localhost:3000/upload`](http://localhost:3000/upload) to drag-and-drop any OEM manual PDF.
 
 ## 🎬 Live Evaluation Scenarios
 
