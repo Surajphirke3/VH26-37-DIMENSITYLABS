@@ -73,6 +73,12 @@ class Settings(BaseSettings):
     OLLAMA_EMBEDDING_MODEL: str = "nomic-embed-text"
     OLLAMA_API_KEY: str = ""   # Set to use Ollama Cloud (https://ollama.com)
 
+    # Hugging Face (optional / exempt by default)
+    HUGGINGFACE_API_KEY: str = ""
+    HUGGINGFACE_MODEL: str = "deep101godhani/mendx-apex-v3"
+    HUGGINGFACE_FALLBACK_MODEL: str = "Qwen/Qwen2.5-Coder-32B-Instruct"
+    HUGGINGFACE_ENDPOINT_URL: str = ""
+
     # JWT
     JWT_SECRET_KEY: str = "dev-secret-change-in-production-min-32-chars!"
     JWT_ALGORITHM: str = "HS256"

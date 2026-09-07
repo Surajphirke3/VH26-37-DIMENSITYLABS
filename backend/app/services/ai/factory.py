@@ -21,23 +21,18 @@ def _build_fallback_chain() -> LLMProvider:
     log = get_logger("ai.factory")
     providers: list[tuple[str, LLMProvider]] = []
 
-    # --- 1. Hugging Face Cloud (Own Custom Fine-Tuned Model) --------------
-    hf_key = (settings.HUGGINGFACE_API_KEY or "").strip()
-    if hf_key and hf_key not in ("placeholder", "your_huggingface_api_key_here", ""):
+    # --- 1. Groq (Fastest primary inference) ----------------------------
+    groq_key = (settings.GROQ_API_KEY or "").strip()
+    if groq_key and groq_key not in ("placeholder", ""):
         try:
-            from app.services.ai.huggingface import HuggingFaceLLM
+            from app.services.ai.groq import GroqLLM
             providers.append((
-                "huggingface_cloud",
-                HuggingFaceLLM(
-                    api_key=hf_key,
-                    model=settings.HUGGINGFACE_MODEL,
-                    fallback_model=settings.HUGGINGFACE_FALLBACK_MODEL,
-                    endpoint_url=settings.HUGGINGFACE_ENDPOINT_URL or None,
-                ),
+                "groq",
+                GroqLLM(api_key=groq_key, model=settings.GROQ_MODEL),
             ))
-            log.info("factory.provider_registered", provider="huggingface_cloud", model=settings.HUGGINGFACE_MODEL)
+            log.info("factory.provider_registered", provider="groq", model=settings.GROQ_MODEL)
         except Exception as exc:
-            log.warning("factory.huggingface_cloud_unavailable", error=str(exc))
+            log.warning("factory.groq_unavailable", error=str(exc))
 
     # --- 2. Ollama Cloud --------------------------------------------------
     cloud_key = (settings.OLLAMA_API_KEY or "").strip()
@@ -52,7 +47,7 @@ def _build_fallback_chain() -> LLMProvider:
         except Exception as exc:
             log.warning("factory.ollama_cloud_unavailable", error=str(exc))
 
-    # --- 2. Local Ollama --------------------------------------------------
+    # --- 3. Local Ollama --------------------------------------------------
     try:
         from app.services.ai.ollama import OllamaLLM
         providers.append((
@@ -63,23 +58,28 @@ def _build_fallback_chain() -> LLMProvider:
     except Exception as exc:
         log.warning("factory.ollama_local_unavailable", error=str(exc))
 
-    # --- 3. Groq (last resort) -------------------------------------------
-    groq_key = (settings.GROQ_API_KEY or "").strip()
-    if groq_key and groq_key not in ("placeholder", ""):
+    # --- 4. Hugging Face Cloud (Optional, exempt if key not set) ---------
+    hf_key = (getattr(settings, "HUGGINGFACE_API_KEY", "") or "").strip()
+    if hf_key and hf_key not in ("placeholder", "your_huggingface_api_key_here", ""):
         try:
-            from app.services.ai.groq import GroqLLM
+            from app.services.ai.huggingface import HuggingFaceLLM
             providers.append((
-                "groq",
-                GroqLLM(api_key=groq_key, model=settings.GROQ_MODEL),
+                "huggingface_cloud",
+                HuggingFaceLLM(
+                    api_key=hf_key,
+                    model=getattr(settings, "HUGGINGFACE_MODEL", "deep101godhani/mendx-apex-v3"),
+                    fallback_model=getattr(settings, "HUGGINGFACE_FALLBACK_MODEL", "Qwen/Qwen2.5-Coder-32B-Instruct"),
+                    endpoint_url=getattr(settings, "HUGGINGFACE_ENDPOINT_URL", None) or None,
+                ),
             ))
-            log.info("factory.provider_registered", provider="groq", model=settings.GROQ_MODEL)
+            log.info("factory.provider_registered", provider="huggingface_cloud", model=getattr(settings, "HUGGINGFACE_MODEL", ""))
         except Exception as exc:
-            log.warning("factory.groq_unavailable", error=str(exc))
+            log.warning("factory.huggingface_cloud_unavailable", error=str(exc))
 
     if not providers:
         raise RuntimeError(
             "No LLM providers are configured. "
-            "Set OLLAMA_API_KEY, ensure local Ollama is running, or set GROQ_API_KEY."
+            "Set GROQ_API_KEY, OLLAMA_API_KEY, or ensure local Ollama is running."
         )
 
     if len(providers) == 1:
@@ -92,20 +92,28 @@ def _build_fallback_chain() -> LLMProvider:
 @lru_cache(maxsize=1)
 def get_llm_provider() -> LLMProvider:
     from app.core.config import settings
+    from app.core.logging import get_logger
 
+    log = get_logger("ai.factory")
     provider = settings.LLM_PROVIDER.lower()
 
-    # "auto" or "ollama" -> build the full round-robin chain
-    if provider in ("auto", "fallback", "ollama"):
+    # "auto" or "fallback" -> build the full round-robin chain
+    if provider in ("auto", "fallback"):
         return _build_fallback_chain()
 
     if provider in ("huggingface", "hf", "huggingface_cloud"):
+        hf_key = (getattr(settings, "HUGGINGFACE_API_KEY", "") or "").strip()
+        if not hf_key or hf_key in ("placeholder", "your_huggingface_api_key_here"):
+            log.warning("factory.huggingface_exempt_fallback_to_groq", message="HuggingFace key is exempt/missing; using Groq.")
+            from app.services.ai.groq import GroqLLM
+            return GroqLLM(api_key=settings.GROQ_API_KEY, model=settings.GROQ_MODEL)
+
         from app.services.ai.huggingface import HuggingFaceLLM
         return HuggingFaceLLM(
-            api_key=settings.HUGGINGFACE_API_KEY,
-            model=settings.HUGGINGFACE_MODEL,
-            fallback_model=settings.HUGGINGFACE_FALLBACK_MODEL,
-            endpoint_url=settings.HUGGINGFACE_ENDPOINT_URL or None,
+            api_key=hf_key,
+            model=getattr(settings, "HUGGINGFACE_MODEL", "deep101godhani/mendx-apex-v3"),
+            fallback_model=getattr(settings, "HUGGINGFACE_FALLBACK_MODEL", "Qwen/Qwen2.5-Coder-32B-Instruct"),
+            endpoint_url=getattr(settings, "HUGGINGFACE_ENDPOINT_URL", None) or None,
         )
 
     if provider == "groq":
@@ -123,6 +131,9 @@ def get_llm_provider() -> LLMProvider:
             model=settings.OPENROUTER_MODEL,
             site_url=settings.OPENROUTER_SITE_URL,
         )
+
+    if provider == "ollama":
+        return _build_fallback_chain()
 
     raise ValueError(f"Unknown LLM_PROVIDER: {provider!r}. Choose: auto, huggingface, groq, gemini, openrouter, ollama")
 
