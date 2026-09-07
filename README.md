@@ -596,7 +596,7 @@ VH26-37-DIMENSITYLABS/
 
 | Member | Primary Focus | GitHub Profile |
 | :--- | :--- | :--- |
-| **James Lewis** | Systems Architecture, RAG Pipeline & Multi-Tier Intelligence | [@jameslewis-git](https://github.com/jameslewis-git)) |
+| **James Lewis** | Systems Architecture, RAG Pipeline & Multi-Tier Intelligence | [@jameslewis-git](https://github.com/jameslewis-git) |
 | **Suraj Phirke** | Backend Async Services, Database Modeling & Ingestion Engine | [@Surajphirke3](https://github.com/Surajphirke3) |
 | **Deep Godhani** | Enterprise Frontend Engineering & Real-Time Pipeline Tracker | [@deepngodhani](https://github.com) |
 | **Rajvi Joshi** | Hallucination Gate, Disambiguation Logic & QA Validation | [@rajvijoshi](https://github.com) |
