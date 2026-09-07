@@ -35,9 +35,9 @@ def _safe_model(model: str | None) -> str:
 class GroqLLM(LLMProvider):
     """Groq-hosted LLM implementation."""
 
-    def __init__(self, api_key: str, model: str = Field(default_factory=lambda: settings.GROQ_MODEL)):
+    def __init__(self, api_key: str, model: str | None = None):
         self._client = AsyncGroq(api_key=api_key)
-        self.model = _safe_model(model)
+        self.model = _safe_model(model or settings.GROQ_MODEL)
 
     async def generate(self, prompt: str, model: str | None = None, image_data: str | None = None) -> str:
         chosen_model = _safe_model(model or self.model)

@@ -245,7 +245,12 @@ Factory technicians are rarely stationed in front of desktop PCs. The repository
 
 ## 🚀 Quick Start & Orchestration
 
-> 📖 **Comprehensive Run Guide:** Refer to **[`RUN_GUIDE.md`](RUN_GUIDE.md)** and **[`boot.md`](boot.md)** for complete multi-platform deployment instructions.
+> 💡 **One-Click Teammate Hub:** Everything is organized in the **[`how_to_run/`](how_to_run/README.md)** folder!
+> - Run **`./how_to_run/start_localhost.sh`** for pure localhost mode (DB + Backend + Frontend).
+> - Run **`./how_to_run/start_tunnel.sh`** to expose your local backend via Cloudflare tunnel.
+> - Run **`./how_to_run/menu.sh`** (or `menu.bat` on Windows) for an interactive menu.
+
+> 📖 **Full Run Guides:** Refer to **[`how_to_run/README.md`](how_to_run/README.md)** and **[`RUN_GUIDE.md`](RUN_GUIDE.md)**.
 
 ### 1. Prerequisites
 - **Docker Desktop** (running and healthy)

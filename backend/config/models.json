@@ -69,7 +69,7 @@
       ]
     },
     "huggingface": {
-      "enabled": true,
+      "enabled": false,
       "default_model": "deep101godhani/mendx-apex-v3",
       "models": [
         {
@@ -103,9 +103,9 @@
     }
   },
   "task_routing": {
-    "error_code_triage": "gpt-oss:20b",
-    "balanced_troubleshooting": "gpt-oss:20b",
-    "deep_diagnostics": "gpt-oss:20b",
-    "visual_inspection": "gpt-oss:20b"
+    "error_code_triage": "groq/compound-mini",
+    "balanced_troubleshooting": "openai/gpt-oss-20b",
+    "deep_diagnostics": "openai/gpt-oss-120b",
+    "visual_inspection": "openai/gpt-oss-20b"
   }
 }
